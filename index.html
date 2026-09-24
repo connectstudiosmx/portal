@@ -135,7 +135,29 @@ main.app{max-width:var(--ancho);margin:0 auto;padding:1.75rem 1.25rem 5rem}
 .f-cuerpo{min-width:0}
 .f-titulo{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .f-meta{font-size:.8rem;color:var(--crema-3);display:flex;gap:.3rem .9rem;flex-wrap:wrap;margin-top:.1rem}
-.f-der{display:grid;grid-template-columns:7.6rem 5.4rem 10rem;align-items:center;gap:.6rem}
+.f-der{display:grid;grid-template-columns:7.6rem 5.4rem minmax(10rem,auto);align-items:center;gap:.6rem}
+.f-ver{background:none;border:0;padding:0;color:var(--verde);font:inherit;font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+.f-guion{grid-column:1/-1;padding:.2rem 0 .4rem}
+.f-guion p{margin:0 0 .5rem}
+.f-cambios{margin-top:.35rem;font-size:.84rem;color:var(--crema);background:rgba(240,112,90,.1);border-left:3px solid var(--rojo);padding:.35rem .6rem;border-radius:0 var(--r1) var(--r1) 0;overflow-wrap:anywhere}
+.f-cambios b{color:var(--rojo)}
+/* Tablero del editor */
+.tablero{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin:0 0 1.6rem}
+.t-dato,.t-prox{background:var(--panel);border:1px solid var(--linea);border-radius:10px;padding:.9rem 1rem;display:grid;gap:.35rem;align-content:start}
+.t-dato b{font-family:var(--display);font-weight:400;font-size:2.7rem;line-height:.9;color:var(--verde)}
+.t-dato b.cero{color:var(--crema-3)}
+.t-dato span,.t-prox span{font-size:.82rem;color:var(--crema-2);font-weight:600}
+.t-dato.t-alerta{border-color:rgba(240,112,90,.55)}
+.t-dato.t-alerta b{color:var(--rojo)}
+.t-prox{grid-column:span 2}
+.t-prox b{font-family:var(--display);font-weight:400;font-size:1.7rem;line-height:1;text-transform:uppercase;color:var(--crema)}
+.t-prox small{color:var(--crema-3);font-size:.8rem}
+.t-prox.n-urgente{border-color:var(--dorado)}
+.t-prox.n-urgente b{color:var(--dorado)}
+.t-prox.n-vencido{border-color:var(--rojo)}
+.t-prox.n-vencido b{color:var(--rojo)}
+@media (max-width:560px){.t-prox{grid-column:1/-1}}
+.clip.solo-ver{cursor:default}
 .f-der .estado{justify-self:start}
 .f-der.solo{display:flex}
 .f-editor{font-size:.82rem;color:var(--crema-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -283,7 +305,7 @@ main.app{max-width:var(--ancho);margin:0 auto;padding:1.75rem 1.25rem 5rem}
 .resumen .ojo{color:var(--dorado);display:block;margin-top:.3rem}
 .d-pie{display:flex;gap:.5rem;justify-content:flex-end;flex-wrap:wrap;margin-top:1.3rem;padding-top:1rem;border-top:1px solid var(--linea)}
 .d-pie .izq{margin-right:auto}
-.guion-texto{white-space:pre-wrap;background:var(--negro);border:1px solid var(--linea);border-radius:var(--r2);padding:.8rem;max-height:40vh;overflow:auto;font-size:.92rem;line-height:1.55;margin:0}
+.guion-texto{font-family:var(--texto);white-space:pre-wrap;background:var(--negro);border:1px solid var(--linea);border-radius:var(--r2);padding:.8rem;max-height:40vh;overflow:auto;font-size:.92rem;line-height:1.55;margin:0}
 
 /* Entrada */
 .entrada{min-height:100vh;display:grid;align-content:center;padding:2.5rem 1.5rem calc(2.5rem + env(safe-area-inset-bottom,0px));max-width:var(--ancho);margin:0 auto}
@@ -336,6 +358,7 @@ const S = {
 
 // Meses desplegados en Producción: se recuerdan en este navegador
 S.abiertos = (() => { try { return new Set(JSON.parse(localStorage.getItem('portal.abiertos') || '[]')); } catch (e) { return new Set(); } })();
+S.guiones = new Set();  // videos con el guion desplegado en la lista
 function guardarAbiertos() { try { localStorage.setItem('portal.abiertos', JSON.stringify([...S.abiertos].slice(-200))); } catch (e) { /* sin almacenamiento */ } }
 
 // ---------- Utilidades ----------------------------------------------
@@ -407,6 +430,7 @@ function humano(e) {
   if (/_url_check/.test(m)) return 'Los links tienen que empezar con https://';
   if (/script_text_check/.test(m)) return 'El guion es demasiado largo; mejor compártelo como link.';
   if (/team_notes_check/.test(m)) return 'Las notas son demasiado largas.';
+  if (/change_request_check/.test(m)) return 'El comentario de cambios es demasiado largo (máximo 2,000 caracteres).';
   if (/videos_per_cycle_check/.test(m)) return 'El número de videos por mes tiene que estar entre 1 y 40.';
   if (/name_check/.test(m)) return 'Escribe un nombre.';
   if (/duplicate key|_number_key/.test(m)) return 'Ya existe un video con ese número en este mes.';
@@ -504,7 +528,8 @@ function pantallaSimple(titulo, texto, boton, accion) {
 // ---------- Barra superior ------------------------------------------
 function barra() {
   const p = S.perfil, esAdmin = p.role === 'admin';
-  const tabs = esAdmin ? [['produccion', 'Producción'], ['calendario', 'Calendario'], ['clientes', 'Clientes'], ['accesos', 'Accesos']] : [];
+  const tabs = esAdmin ? [['produccion', 'Producción'], ['calendario', 'Calendario'], ['clientes', 'Clientes'], ['accesos', 'Accesos']]
+    : p.role === 'editor' ? [['produccion', 'Producción'], ['calendario', 'Calendario']] : [];
   const pendientes = esAdmin ? S.perfiles.filter(x => x.role === 'pendiente').length : 0;
   const actual = S.vista === 'previa' ? 'clientes' : S.vista;
   return `<header class="barra"><div class="barra-in">
@@ -523,7 +548,7 @@ function render() {
   let cuerpo;
   if (S.perfil.role === 'cliente') cuerpo = vistaCliente(S.portal, false);
   else if (S.vista === 'previa' && S.perfil.role === 'admin') cuerpo = vistaPrevia();
-  else if (S.vista === 'calendario' && S.perfil.role === 'admin') cuerpo = vistaCalendario();
+  else if (S.vista === 'calendario') cuerpo = vistaCalendario();
   else if (S.vista === 'clientes' && S.perfil.role === 'admin') cuerpo = vistaClientes();
   else if (S.vista === 'accesos' && S.perfil.role === 'admin') cuerpo = vistaAccesos();
   else cuerpo = vistaProduccion();
@@ -603,9 +628,13 @@ function cabGrupo(g, abierto) {
 function filaVideo(v) {
   const esAdmin = S.perfil.role === 'admin', yo = S.perfil.id;
   const ed = v.editor_id ? perfilPorId(v.editor_id) : null;
-  const guion = v.script_url ? enlace(v.script_url, 'Guion') : (v.script_text ? '<span>Guion escrito</span>' : '<span>Sin guion</span>');
+  const verGuion = S.guiones.has(v.id);
+  const guion = (v.script_url || v.script_text)
+    ? `<button class="f-ver" data-accion="ver-guion" data-id="${v.id}" aria-expanded="${verGuion}">${verGuion ? 'Ocultar guion' : 'Ver guion'}</button>`
+    : '<span>Sin guion</span>';
+  const cambios = v.change_request && ['edicion', 'revision'].includes(v.status);
   let rapida = '';
-  if (esAdmin && v.status === 'revision') rapida = `<button class="btn btn-s btn-p" data-accion="aprobar" data-id="${v.id}">Aprobar</button>`;
+  if (esAdmin && v.status === 'revision') rapida = `<button class="btn btn-s btn-t" data-accion="pedir-cambios" data-id="${v.id}">Pedir cambios</button><button class="btn btn-s btn-p" data-accion="aprobar" data-id="${v.id}">Aprobar</button>`;
   if (!esAdmin && (!v.editor_id || v.editor_id === yo)) {
     if (v.status === 'grabado') rapida = `<button class="btn btn-s" data-accion="empezar" data-id="${v.id}">Empezar</button>`;
     else if (v.status === 'edicion') rapida = `<button class="btn btn-s btn-p" data-accion="termine" data-id="${v.id}">Terminé</button>`;
@@ -615,13 +644,43 @@ function filaVideo(v) {
     <div class="f-cuerpo">
       <div class="f-titulo">${v.title ? esc(v.title) : '<span class="vacio">Sin título</span>'}</div>
       <div class="f-meta">${guion}${enlace(v.final_url, 'Video terminado')}${v.team_notes ? '<span>Tiene notas</span>' : ''}</div>
+      ${cambios ? `<div class="f-cambios"><b>Cambios pedidos:</b> ${esc(v.change_request)}</div>` : ''}
     </div>
     <div class="f-der">
       ${pill(v.status)}
       <span class="f-editor">${ed ? esc(nombreCorto(ed)) : '<span class="nota">Sin editor</span>'}</span>
       <span class="f-acc">${rapida}<button class="btn btn-s btn-t" data-accion="abrir-video" data-id="${v.id}">Abrir</button></span>
     </div>
+    ${verGuion ? `<div class="f-guion">
+      ${v.script_url ? `<p>${enlace(v.script_url, 'Abrir el guion en otra pestaña')}</p>` : ''}
+      ${v.script_text ? `<pre class="guion-texto">${esc(v.script_text)}</pre>` : ''}
+    </div>` : ''}
   </div>`;
+}
+
+// Tablero del editor: sus números y su próxima fecha límite
+function tableroEditor() {
+  const yo = S.perfil.id, mios = S.videos.filter(v => v.editor_id === yo);
+  const cuenta = f => mios.filter(f).length;
+  const porEmpezar = S.videos.filter(v => v.status === 'grabado' && (!v.editor_id || v.editor_id === yo)).length;
+  const conCambios = cuenta(v => v.status === 'edicion' && v.change_request);
+  const datos = [
+    [porEmpezar, 'Por empezar'],
+    [cuenta(v => v.status === 'edicion'), 'En edición'],
+    [cuenta(v => v.status === 'revision'), 'En revisión'],
+    [cuenta(v => v.status === 'listo' || v.status === 'entregado'), 'Aprobados']
+  ];
+  const pendientes = S.ciclos
+    .filter(c => S.videos.some(v => v.cycle_id === c.id && (v.status === 'grabado' || v.status === 'edicion') && (!v.editor_id || v.editor_id === yo)))
+    .sort((a, b) => a.editor_due.localeCompare(b.editor_due));
+  const prox = pendientes[0], p = prox && plazo(prox.editor_due), cl = prox && clientePorId(prox.client_id);
+  return `<section class="tablero" aria-label="Tus pendientes">
+    ${datos.map(([n, txt]) => `<div class="t-dato"><b class="${n ? '' : 'cero'}">${n}</b><span>${txt}</span></div>`).join('')}
+    ${conCambios ? `<div class="t-dato t-alerta"><b>${conCambios}</b><span>Con cambios pedidos</span></div>` : ''}
+    <div class="t-prox${prox ? ' n-' + p.nivel : ''}"><span>Tu próxima fecha límite</span>
+      ${prox ? `<b>${esc(fDia(prox.editor_due))}</b><small>${esc(cl ? cl.name : '')} · ${esc(prox.name)} · ${esc(p.txt)}</small>` : '<b>Al día</b><small>No tienes videos por editar.</small>'}
+    </div>
+  </section>`;
 }
 
 function vistaProduccion() {
@@ -655,6 +714,7 @@ function vistaProduccion() {
       ${grupos.length > 1 && !filtrando ? `<button class="btn btn-s btn-t" data-accion="${todosAbiertos ? 'plegar-todo' : 'desplegar-todo'}">${todosAbiertos ? 'Plegar todo' : 'Desplegar todo'}</button>` : ''}
     </div>
   </div>
+  ${!esAdmin && S.clientes.length ? tableroEditor() : ''}
   ${grupos.length ? grupos.map(g => { const abierto = filtrando || S.abiertos.has(g.c.id); return `<section class="grupo n-${nivelGrupo(g)}">
       ${cabGrupo(g, abierto)}
       ${abierto ? `<div class="filas">${g.visibles.map(filaVideo).join('')}</div>
@@ -664,7 +724,7 @@ function vistaProduccion() {
 
 // ---------- Calendario ------------------------------------------------
 function vistaCalendario() {
-  const DW = 24, DIAS = 92;
+  const DW = 24, DIAS = 92, esAdmin = S.perfil.role === 'admin';
   const inicio = S.calInicio || primerDia(hoy());
   const fin = sumarDias(inicio, DIAS - 1);
   const iISO = aISO(inicio), fISO = aISO(fin);
@@ -695,21 +755,27 @@ function vistaCalendario() {
     if (i1 < i0 || i1 < 0 || i0 > DIAS - 1) return '';
     i0 = Math.max(0, i0); i1 = Math.min(DIAS - 1, i1);
     if (cls === 'clip-grab' && (i1 - i0 + 1) * DW < 90) txt = 'Rec';
-    return `<button class="clip ${cls}" style="left:${i0 * DW + 1}px;width:${(i1 - i0 + 1) * DW - 2}px" data-accion="editar-ciclo" data-id="${c.id}" title="${esc(titulo)}">${esc(txt)}</button>`;
+    const estilo = `left:${i0 * DW + 1}px;width:${(i1 - i0 + 1) * DW - 2}px`;
+    // El editor solo mira el calendario; el admin toca un tramo para cambiar fechas
+    return esAdmin
+      ? `<button class="clip ${cls}" style="${estilo}" data-accion="editar-ciclo" data-id="${c.id}" title="${esc(titulo)}">${esc(txt)}</button>`
+      : `<span class="clip ${cls} solo-ver" style="${estilo}" title="${esc(titulo)}">${esc(txt)}</span>`;
   };
   const filas = filasCli.map(cl => {
     const clips = enRango.filter(c => c.client_id === cl.id).map(c => {
       const e = idx(c.delivery_date);
       return tramo(c.record_start, c.record_end, 'clip-grab', 'Grabación', c, `${c.name}: grabación ${rango(c.record_start, c.record_end)}`)
-        + tramo(aISO(sumarDias(aFecha(c.record_end), 1)), c.editor_due, 'clip-edit', `Edición ${c.name}`, c, `${c.name}: edición hasta ${fDia(c.editor_due)}`)
-        + tramo(aISO(sumarDias(aFecha(c.editor_due), 1)), aISO(sumarDias(aFecha(c.delivery_date), -1)), 'clip-rev', 'Revisión', c, `${c.name}: tu revisión antes de entregar`)
+        + tramo(aISO(sumarDias(aFecha(c.record_end), 1)), c.editor_due, 'clip-edit', `${esAdmin ? 'Edición' : 'Tu edición'} ${c.name}`, c, `${c.name}: edición hasta ${fDia(c.editor_due)}`)
+        + tramo(aISO(sumarDias(aFecha(c.editor_due), 1)), aISO(sumarDias(aFecha(c.delivery_date), -1)), 'clip-rev', 'Revisión', c, `${c.name}: ${esAdmin ? 'tu revisión' : 'revisión de Connect Studios'} antes de entregar`)
         + ((e >= 0 && e < DIAS) ? `<span class="hito" style="left:${e * DW + DW / 2 - 1}px" title="${esc(c.name)}: entrega ${fDia(c.delivery_date)}"></span>` : '');
     }).join('');
     return `<div class="lt-fila"><div class="lt-lbl">${esc(cl.name)}${cl.active ? '' : '<small>En pausa</small>'}</div><div class="lt-pista" style="width:${ancho}px">${clips}</div></div>`;
   }).join('');
 
   return `<div class="encabezado">
-    <div><h1>Calendario</h1><p class="sub">Grabaciones, edición y entregas de todos tus clientes en una sola línea de tiempo. Si dos clientes graban el mismo día, el número se pone en rojo.</p></div>
+    <div><h1>Calendario</h1><p class="sub">${esAdmin
+      ? 'Grabaciones, edición y entregas de todos tus clientes en una sola línea de tiempo. Si dos clientes graban el mismo día, el número se pone en rojo.'
+      : 'Grabaciones, tu tiempo de edición y las entregas de los clientes que llevas. La barra dorada termina en tu fecha límite.'}</p></div>
     <div class="controles">
       <button class="btn btn-s" data-accion="cal-mover" data-id="-1" aria-label="Mes anterior">‹</button>
       <button class="btn btn-s" data-accion="cal-mover" data-id="0">Hoy</button>
@@ -725,13 +791,15 @@ function vistaCalendario() {
   </div></div>
   <div class="leyenda">
     <span><i style="background:var(--crema)"></i>Grabación</span>
-    <span><i style="background:var(--dorado)"></i>Edición</span>
-    <span><i style="background:repeating-linear-gradient(135deg,rgba(227,178,60,.6) 0 4px,rgba(227,178,60,.18) 4px 8px)"></i>Tu revisión</span>
+    <span><i style="background:var(--dorado)"></i>${esAdmin ? 'Edición' : 'Tu edición'}</span>
+    <span><i style="background:repeating-linear-gradient(135deg,rgba(227,178,60,.6) 0 4px,rgba(227,178,60,.18) 4px 8px)"></i>${esAdmin ? 'Tu revisión' : 'Revisión de Connect'}</span>
     <span><i style="background:var(--verde);width:4px"></i>Entrega al cliente</span>
     <span><i style="background:var(--dorado);width:2px"></i>Hoy</span>
   </div>
-  ${enRango.length ? '<p class="nota">Toca cualquier tramo para cambiar las fechas de ese mes.</p>' : '<p class="nota">No hay meses en estas fechas. Créalos desde Clientes.</p>'}` :
-  `<div class="caja-vacia"><p>Cuando tengas clientes, aquí verás tu capacidad de grabación y edición mes con mes.</p><button class="btn btn-p" data-accion="ir" data-id="clientes">Ir a Clientes</button></div>`}`;
+  ${enRango.length ? (esAdmin ? '<p class="nota">Toca cualquier tramo para cambiar las fechas de ese mes.</p>' : '')
+    : `<p class="nota">No hay meses en estas fechas.${esAdmin ? ' Créalos desde Clientes.' : ''}</p>`}` :
+  (esAdmin ? `<div class="caja-vacia"><p>Cuando tengas clientes, aquí verás tu capacidad de grabación y edición mes con mes.</p><button class="btn btn-p" data-accion="ir" data-id="clientes">Ir a Clientes</button></div>`
+    : '<div class="caja-vacia"><p>Aún no tienes clientes asignados. Cuando te asignen uno, aquí verás sus fechas.</p></div>')}`;
 }
 
 // ---------- Clientes --------------------------------------------------
@@ -942,6 +1010,10 @@ function modalVideo(id) {
         ${v.script_text ? `<pre class="guion-texto">${esc(v.script_text)}</pre>` : ''}
         ${!v.script_url && !v.script_text ? '<p class="ayuda">El cliente todavía no sube guion.</p>' : ''}
       </div>`}
+    ${!esAdmin && v.change_request ? `<div class="f-cambios" style="margin:0 0 1rem"><b>Cambios pedidos:</b> ${esc(v.change_request)}</div>` : ''}
+    ${esAdmin && (v.change_request || ['edicion', 'revision'].includes(v.status)) ? `<div class="campo"><label for="f-cambios">Cambios pedidos al editor</label>
+      <textarea id="f-cambios" name="change_request" maxlength="2000" placeholder="Solo si le pides cambios al editor">${esc(v.change_request || '')}</textarea>
+      <p class="ayuda">El cliente no lo ve. Se borra solo al aprobar el video.</p></div>` : ''}
     <div class="fila-campos">
       <div class="campo"><label for="f-estado">Estado</label>
         <select id="f-estado" name="status"${bloqueado || ajeno ? ' disabled' : ''}>${opciones.map(s => `<option value="${s}"${v.status === s ? ' selected' : ''}>${esc(etiqueta(s))}</option>`).join('')}</select>
@@ -967,6 +1039,21 @@ function modalVideo(id) {
       <button type="button" class="btn" data-accion="cerrar">Cancelar</button>
       <button type="submit" class="btn btn-p">Guardar cambios</button>
     </div>
+  </form>`);
+}
+
+// Pedir cambios (admin): regresa el video a edición con un comentario para el editor
+function modalPedirCambios(id) {
+  const v = S.videos.find(x => x.id === id); if (!v) return;
+  const ed = v.editor_id ? perfilPorId(v.editor_id) : null;
+  abrirModal(`<form data-form="pedir-cambios" data-id="${v.id}" novalidate>
+    <div class="d-cab"><span class="d-num">${pad(v.number)}</span><div>
+      <h2 class="d-titulo">Pedir cambios</h2><p class="d-sub">${v.title ? esc(v.title) : 'Sin título'}. Regresa a edición${ed ? ` con ${esc(nombreCorto(ed))}` : ''}.</p></div></div>
+    ${urlSegura(v.final_url) ? `<p style="margin:0 0 1rem">${enlace(v.final_url, 'Ver el video terminado')}</p>` : ''}
+    <div class="campo"><label for="p-cambios">¿Qué hay que cambiar?</label>
+      <textarea id="p-cambios" name="change_request" maxlength="2000" placeholder="Ej. Quita la música del inicio y agranda los subtítulos">${esc(v.change_request || '')}</textarea>
+      <p class="ayuda">Lo ve el editor, nunca el cliente. Se borra solo cuando apruebes el video.</p></div>
+    <div class="d-pie"><button type="button" class="btn" data-accion="cerrar">Cancelar</button><button type="submit" class="btn btn-p">Regresar a edición</button></div>
   </form>`);
 }
 
@@ -1200,6 +1287,7 @@ const FORMS = {
       poner('script_url', valor(f, 'script_url'));
       poner('script_text', valor(f, 'script_text'));
       poner('editor_id', valor(f, 'editor_id'));
+      poner('change_request', valor(f, 'change_request'));
     }
     poner('status', valor(f, 'status'));
     poner('final_url', valor(f, 'final_url'));
@@ -1261,6 +1349,11 @@ const FORMS = {
       aviso(f.dataset.id ? 'Mes actualizado' : 'Mes creado');
       await recargar();
     } catch (e) { aviso(humano(e), true); }
+  },
+  async 'pedir-cambios'(f) {
+    const texto = valor(f, 'change_request');
+    if (!texto) { aviso('Escribe qué hay que cambiar.', true); return f.elements.change_request.focus(); }
+    await guardarVideo(f.dataset.id, { status: 'edicion', change_request: texto }, 'Cambios pedidos al editor');
   },
   async 'carpetas-mes'(f) {
     if (!revisarLinks(f, ['delivery_url', 'raw_url'])) return;
@@ -1365,6 +1458,8 @@ const ACC = {
   'plegar-todo'() { gruposProduccion().forEach(g => S.abiertos.delete(g.c.id)); guardarAbiertos(); render(); },
   'asignar-mes'(el, id) { modalAsignarMes(id); },
   'carpetas-mes'(el, id) { modalCarpetas(id); },
+  'pedir-cambios'(el, id) { modalPedirCambios(id); },
+  'ver-guion'(el, id) { if (S.guiones.has(id)) S.guiones.delete(id); else S.guiones.add(id); render(); },
   async 'aprobar-ciclo'(el, id) {
     const n = S.videos.filter(v => v.cycle_id === id && v.status === 'revision').length;
     if (!await confirmar(`¿Aprobar ${n} ${n === 1 ? 'video' : 'videos'} en revisión?`, 'Hazlo cuando ya los hayas visto. Una vez aprobados, el editor ya no puede moverlos; después los entregas al cliente.', 'Aprobar')) return;
