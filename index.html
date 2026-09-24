@@ -113,7 +113,13 @@ main.app{max-width:var(--ancho);margin:0 auto;padding:1.75rem 1.25rem 5rem}
 .grupo.n-hecho{border-left-color:var(--verde)}
 .g-cab{display:grid;grid-template-columns:minmax(0,1fr) 230px;gap:.85rem 1.5rem;padding:1rem 1.1rem .95rem}
 .g-cliente{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:1.75rem;line-height:1;margin:0}
+.g-plegar{display:inline-flex;align-items:center;gap:.55rem;background:none;border:0;padding:0;margin:0;color:inherit;font:inherit;text-transform:inherit;letter-spacing:inherit;text-align:left;cursor:pointer}
+.g-plegar:hover{color:var(--verde)}
+.g-flecha{flex:none;width:.42em;height:.42em;border-right:3px solid currentColor;border-bottom:3px solid currentColor;transform:rotate(-45deg);transition:transform .15s;margin:0 .1em}
+.g-plegar[aria-expanded="true"] .g-flecha{transform:rotate(45deg) translate(-2px,-2px)}
 .g-mes{color:var(--crema-2);font-weight:600;margin:.3rem 0 0;font-size:.95rem}
+.g-resumen{color:var(--crema-3);font-weight:500}
+@media (prefers-reduced-motion:reduce){.g-flecha{transition:none}}
 .g-datos{display:flex;flex-wrap:wrap;gap:.35rem 1.4rem;font-size:.86rem;color:var(--crema-2);margin-top:.6rem}
 .g-datos b{color:var(--crema);font-weight:600}
 .plazo-vencido,.plazo-vencido b{color:var(--rojo)}
@@ -264,7 +270,7 @@ main.app{max-width:var(--ancho);margin:0 auto;padding:1.75rem 1.25rem 5rem}
 .campo{display:grid;gap:.35rem;margin-bottom:1rem;min-width:0}
 .campo>label,.campo .lbl{font-weight:600;font-size:.88rem}
 .campo .ayuda{font-size:.8rem;color:var(--crema-3);margin:0}
-.campo input:not([type=checkbox]),.campo select,.campo textarea{width:100%;background:var(--negro);border:1px solid var(--linea-2);border-radius:var(--r2);padding:.6rem .7rem;color:var(--crema)}
+.campo input:not([type=checkbox]):not([type=radio]),.campo select,.campo textarea{width:100%;background:var(--negro);border:1px solid var(--linea-2);border-radius:var(--r2);padding:.6rem .7rem;color:var(--crema)}
 .campo input:disabled,.campo select:disabled{opacity:.55}
 .campo textarea{min-height:8rem;resize:vertical;line-height:1.45}
 .campo input:focus,.campo select:focus,.campo textarea:focus{border-color:var(--verde);outline:none}
@@ -325,6 +331,10 @@ const S = {
   filtro: { cliente: 'todos', estado: 'todos', mios: false, entregados: false },
   calInicio: null, verTodos: {}, cargadoEn: 0
 };
+
+// Meses desplegados en Producción: se recuerdan en este navegador
+S.abiertos = (() => { try { return new Set(JSON.parse(localStorage.getItem('portal.abiertos') || '[]')); } catch (e) { return new Set(); } })();
+function guardarAbiertos() { try { localStorage.setItem('portal.abiertos', JSON.stringify([...S.abiertos].slice(-200))); } catch (e) { /* sin almacenamiento */ } }
 
 // ---------- Utilidades ----------------------------------------------
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -541,17 +551,24 @@ function nivelGrupo(g) {
   return plazo(g.c.editor_due).nivel;
 }
 
-function cabGrupo(g) {
-  const { c, cli, todos } = g, esAdmin = S.perfil.role === 'admin';
+// Resumen corto de estados para el mes plegado: "2 en revisión · 3 en edición · 7 grabados"
+const RESUMEN = [['sin_guion', 'sin guion', 'sin guion'], ['guion', 'con guion', 'con guion'], ['grabado', 'grabado', 'grabados'],
+  ['edicion', 'en edición', 'en edición'], ['revision', 'en revisión', 'en revisión'], ['listo', 'aprobado', 'aprobados'], ['entregado', 'entregado', 'entregados']];
+const resumenEstados = vs => RESUMEN.map(([k, uno, varios]) => { const n = vs.filter(v => v.status === k).length; return n ? `${n} ${n === 1 ? uno : varios}` : ''; }).filter(Boolean).join(' · ');
+
+function cabGrupo(g, abierto) {
+  const { c, cli, todos } = g, esAdmin = S.perfil.role === 'admin', yo = S.perfil.id;
   const nivel = nivelGrupo(g), p = plazo(c.editor_due);
   const cuenta = sts => todos.filter(v => sts.includes(v.status)).length;
   const porGrabar = cuenta(['sin_guion', 'guion']);
+  const enRevision = cuenta(['revision']);
   const aprobados = cuenta(['listo']);
   const terminados = cuenta(['revision', 'listo', 'entregado']);
+  const porEmpezar = todos.filter(v => v.status === 'grabado' && (!v.editor_id || v.editor_id === yo)).length;
   return `<div class="g-cab">
     <div class="g-info">
-      <h2 class="g-cliente">${esc(cli ? cli.name : 'Cliente')}</h2>
-      <p class="g-mes">${esc(c.name)}</p>
+      <h2 class="g-cliente"><button class="g-plegar" data-accion="plegar" data-id="${c.id}" aria-expanded="${abierto}"><span class="g-flecha" aria-hidden="true"></span>${esc(cli ? cli.name : 'Cliente')}</button></h2>
+      <p class="g-mes">${esc(c.name)}${abierto ? '' : ` <span class="g-resumen">· ${esc(resumenEstados(todos))}</span>`}</p>
       <div class="g-datos">
         <span>Grabación <b>${rango(c.record_start, c.record_end)}</b></span>
         <span class="${nivel !== 'hecho' ? 'plazo-' + p.nivel : ''}">Límite de edición <b>${fDia(c.editor_due)}</b>${nivel !== 'hecho' ? ` (${p.txt})` : ''}</span>
@@ -565,9 +582,13 @@ function cabGrupo(g) {
     </div>
     ${esAdmin ? `<div class="g-acc">
       ${porGrabar ? `<button class="btn btn-s" data-accion="marcar-grabado" data-id="${c.id}">Marcar ${porGrabar} como grabados</button>` : ''}
+      <button class="btn btn-s" data-accion="asignar-mes" data-id="${c.id}">Asignar editor</button>
+      ${enRevision ? `<button class="btn btn-s" data-accion="aprobar-ciclo" data-id="${c.id}">Aprobar ${enRevision} en revisión</button>` : ''}
       ${aprobados ? `<button class="btn btn-s btn-p" data-accion="entregar-ciclo" data-id="${c.id}">Entregar ${aprobados} al cliente</button>` : ''}
       <button class="btn btn-s btn-t" data-accion="editar-ciclo" data-id="${c.id}">Editar mes</button>
-    </div>` : ''}
+    </div>` : (porEmpezar ? `<div class="g-acc">
+      <button class="btn btn-s btn-p" data-accion="empezar-ciclo" data-id="${c.id}">Empezar ${porEmpezar === 1 ? 'el video grabado' : `los ${porEmpezar} grabados`}</button>
+    </div>` : '')}
   </div>`;
 }
 
@@ -598,6 +619,9 @@ function filaVideo(v) {
 function vistaProduccion() {
   const esAdmin = S.perfil.role === 'admin', f = S.filtro;
   const grupos = gruposProduccion();
+  // Con un filtro de estado o "solo mis videos", los meses se muestran abiertos para ver lo que coincide
+  const filtrando = f.estado !== 'todos' || f.mios;
+  const todosAbiertos = grupos.length > 0 && grupos.every(g => S.abiertos.has(g.c.id));
   const conMeses = S.clientes.filter(cl => S.ciclos.some(c => c.client_id === cl.id));
   let vacio;
   if (!grupos.length) {
@@ -620,13 +644,14 @@ function vistaProduccion() {
       </select>
       ${!esAdmin ? `<label class="interruptor"><input type="checkbox" data-cambio="filtro-mios"${f.mios ? ' checked' : ''}> Solo mis videos</label>` : ''}
       <label class="interruptor"><input type="checkbox" data-cambio="filtro-entregados"${f.entregados ? ' checked' : ''}> ${esAdmin ? 'Ver meses entregados' : 'Ver aprobados y entregados'}</label>
+      ${grupos.length > 1 && !filtrando ? `<button class="btn btn-s btn-t" data-accion="${todosAbiertos ? 'plegar-todo' : 'desplegar-todo'}">${todosAbiertos ? 'Plegar todo' : 'Desplegar todo'}</button>` : ''}
     </div>
   </div>
-  ${grupos.length ? grupos.map(g => `<section class="grupo n-${nivelGrupo(g)}">
-      ${cabGrupo(g)}
-      <div class="filas">${g.visibles.map(filaVideo).join('')}</div>
-      ${esAdmin ? `<div class="g-pie"><button class="btn btn-s btn-t" data-accion="agregar-video" data-id="${g.c.id}">Agregar video</button></div>` : ''}
-    </section>`).join('') : vacio}`;
+  ${grupos.length ? grupos.map(g => { const abierto = filtrando || S.abiertos.has(g.c.id); return `<section class="grupo n-${nivelGrupo(g)}">
+      ${cabGrupo(g, abierto)}
+      ${abierto ? `<div class="filas">${g.visibles.map(filaVideo).join('')}</div>
+      ${esAdmin ? `<div class="g-pie"><button class="btn btn-s btn-t" data-accion="agregar-video" data-id="${g.c.id}">Agregar video</button></div>` : ''}` : ''}
+    </section>`; }).join('') : vacio}`;
 }
 
 // ---------- Calendario ------------------------------------------------
@@ -999,7 +1024,9 @@ function modalCiclo(idCiclo, idCliente) {
     <div class="resumen" id="c-resumen"></div>
     <div class="campo"><label for="c-raw">Carpeta de crudos en Drive</label><input id="c-raw" name="raw_url" type="url" inputmode="url" placeholder="https://drive.google.com/..." value="${esc(d.raw_url || '')}">
       <p class="ayuda">La ven los editores, nunca el cliente. Puedes agregarla después de grabar.</p></div>
-    ${c ? '' : `<div class="campo"><label for="c-n">Número de videos</label><input id="c-n" name="count" type="number" min="1" max="40" value="${cl.videos_per_cycle}" style="max-width:8rem"></div>`}
+    ${c ? '' : `<div class="campo"><label for="c-n">Número de videos</label><input id="c-n" name="count" type="number" min="1" max="40" value="${cl.videos_per_cycle}" style="max-width:8rem">
+      ${(eds => eds.length === 1 ? `<p class="ayuda">Se asignan solos a ${esc(nombreDe(eds[0]))}, el editor de este cliente.</p>`
+        : `<p class="ayuda">${eds.length ? 'Este cliente tiene varios editores' : 'Este cliente no tiene editor'}: después usa “Asignar editor” en Producción.</p>`)(editoresDeCliente(cl.id))}</div>`}
     <div class="d-pie">
       ${c ? `<button type="button" class="btn btn-t btn-peligro izq" data-accion="borrar-ciclo" data-id="${c.id}">Borrar mes</button>` : ''}
       <button type="button" class="btn" data-accion="cerrar">Cancelar</button>
@@ -1049,6 +1076,30 @@ function montarCiclo(f, nuevo) {
   ['record_end', 'editor_due'].forEach(n => $(n).addEventListener('change', resumen));
   if ($('count')) $('count').addEventListener('input', resumen);
   resumen();
+}
+
+// Asignar un editor a todos los videos de un mes
+const EDITABLES = ['sin_guion', 'guion', 'grabado', 'edicion', 'revision'];
+function modalAsignarMes(idCiclo) {
+  const c = S.ciclos.find(x => x.id === idCiclo); if (!c) return;
+  const cl = clientePorId(c.client_id);
+  const vs = S.videos.filter(v => v.cycle_id === c.id && EDITABLES.includes(v.status));
+  const libres = vs.filter(v => !v.editor_id).length;
+  const suyos = editoresDeCliente(c.client_id);
+  const equipo = suyos.concat(S.perfiles.filter(p => p.role === 'admin'));
+  abrirModal(`<form data-form="asignar-mes" data-id="${c.id}" novalidate>
+    <div class="d-cab"><div><h2 class="d-titulo">Asignar editor</h2><p class="d-sub">${esc(cl ? cl.name : '')}, ${esc(c.name)}</p></div></div>
+    ${vs.length ? `
+    <div class="campo"><label for="a-editor">Editor</label>
+      <select id="a-editor" name="editor_id">${equipo.map(p => `<option value="${p.id}">${esc(nombreDe(p))}${p.role === 'admin' ? ' (administrador)' : ''}</option>`).join('')}<option value="">Sin editor (quitar)</option></select>
+      ${suyos.length ? '' : '<p class="ayuda">Este cliente no tiene editores asignados. Asígnalos en Accesos para que aparezcan aquí.</p>'}</div>
+    <div class="campo" role="radiogroup" aria-label="Qué videos">
+      <label class="interruptor" style="min-height:2rem"><input type="radio" name="alcance" value="todos" checked> Todos los videos del mes (${vs.length})</label>
+      <label class="interruptor" style="min-height:2rem"><input type="radio" name="alcance" value="libres"${libres ? '' : ' disabled'}> Solo los que no tienen editor (${libres})</label>
+      <p class="ayuda">Los videos aprobados o entregados no cambian.</p></div>`
+    : '<p class="ayuda">Todos los videos de este mes ya están aprobados o entregados.</p>'}
+    <div class="d-pie"><button type="button" class="btn" data-accion="cerrar">Cancelar</button>${vs.length ? '<button type="submit" class="btn btn-p">Asignar</button>' : ''}</div>
+  </form>`);
 }
 
 // Clientes que lleva un editor
@@ -1160,10 +1211,24 @@ const FORMS = {
       } else {
         const n = Math.round(Number(d.count));
         if (!(n >= 1 && n <= 40)) return aviso('El número de videos tiene que estar entre 1 y 40.', true);
-        await q(sb.rpc('create_cycle', { p_client: f.dataset.cliente, p_name: d.name, p_record_start: d.record_start, p_record_end: d.record_end, p_editor_due: d.editor_due, p_delivery: d.delivery_date, p_raw_url: d.raw_url || null, p_count: n }));
+        const nuevo = await q(sb.rpc('create_cycle', { p_client: f.dataset.cliente, p_name: d.name, p_record_start: d.record_start, p_record_end: d.record_end, p_editor_due: d.editor_due, p_delivery: d.delivery_date, p_raw_url: d.raw_url || null, p_count: n }));
+        if (nuevo) { S.abiertos.add(nuevo); guardarAbiertos(); }
       }
       cerrarModal();
       aviso(f.dataset.id ? 'Mes actualizado' : 'Mes creado');
+      await recargar();
+    } catch (e) { aviso(humano(e), true); }
+  },
+  async 'asignar-mes'(f) {
+    const id = f.dataset.id, editor = f.elements.editor_id.value || null;
+    const alcance = (f.querySelector('input[name=alcance]:checked') || {}).value || 'todos';
+    let peticion = sb.from('videos').update({ editor_id: editor }).eq('cycle_id', id).in('status', EDITABLES);
+    if (alcance === 'libres') peticion = peticion.is('editor_id', null);
+    try {
+      const hechos = await q(peticion.select('id'));
+      const n = (hechos || []).length, p = perfilPorId(editor);
+      cerrarModal();
+      aviso(editor ? `${n} ${n === 1 ? 'video asignado' : 'videos asignados'} a ${nombreCorto(p) || 'ese editor'}` : `Se quitó el editor a ${n} ${n === 1 ? 'video' : 'videos'}`);
       await recargar();
     } catch (e) { aviso(humano(e), true); }
   },
@@ -1240,6 +1305,29 @@ const ACC = {
     await guardarVideo(id, cambios, 'Video en edición');
   },
   async aprobar(el, id) { await guardarVideo(id, { status: 'listo' }, 'Video aprobado'); },
+  plegar(el, id) {
+    if (S.abiertos.has(id)) S.abiertos.delete(id); else S.abiertos.add(id);
+    guardarAbiertos(); render();
+  },
+  'desplegar-todo'() { gruposProduccion().forEach(g => S.abiertos.add(g.c.id)); guardarAbiertos(); render(); },
+  'plegar-todo'() { gruposProduccion().forEach(g => S.abiertos.delete(g.c.id)); guardarAbiertos(); render(); },
+  'asignar-mes'(el, id) { modalAsignarMes(id); },
+  async 'aprobar-ciclo'(el, id) {
+    const n = S.videos.filter(v => v.cycle_id === id && v.status === 'revision').length;
+    if (!await confirmar(`¿Aprobar ${n} ${n === 1 ? 'video' : 'videos'} en revisión?`, 'Hazlo cuando ya los hayas visto. Una vez aprobados, el editor ya no puede moverlos; después los entregas al cliente.', 'Aprobar')) return;
+    try { await q(sb.from('videos').update({ status: 'listo' }).eq('cycle_id', id).eq('status', 'revision')); aviso(n === 1 ? 'Video aprobado' : `${n} videos aprobados`); await recargar(); }
+    catch (e) { aviso(humano(e), true); }
+  },
+  async 'empezar-ciclo'(el, id) {
+    const yo = S.perfil.id;
+    const n = S.videos.filter(v => v.cycle_id === id && v.status === 'grabado' && (!v.editor_id || v.editor_id === yo)).length;
+    if (!await confirmar(`¿Empezar ${n === 1 ? 'el video grabado' : `los ${n} videos grabados`}?`, 'Pasan a "En edición" a tu nombre. Los que tenga otro editor no se tocan.', 'Empezar')) return;
+    try {
+      await q(sb.from('videos').update({ status: 'edicion', editor_id: yo }).eq('cycle_id', id).eq('status', 'grabado').or(`editor_id.is.null,editor_id.eq.${yo}`));
+      S.abiertos.add(id); guardarAbiertos();
+      aviso(n === 1 ? 'Video en edición' : `${n} videos en edición`); await recargar();
+    } catch (e) { aviso(humano(e), true); }
+  },
   async 'marcar-grabado'(el, id) {
     const n = S.videos.filter(v => v.cycle_id === id && (v.status === 'sin_guion' || v.status === 'guion')).length;
     if (!await confirmar(`¿Marcar ${n} videos como grabados?`, 'Úsalo al terminar la sesión de grabación: los editores verán que ya pueden empezar.', 'Marcar como grabados')) return;
