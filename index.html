@@ -1,0 +1,1300 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#000000">
+<title>Portal de Connect Studios</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23000'/%3E%3Crect x='14' y='10' width='36' height='44' rx='4' fill='none' stroke='%23F3E7C8' stroke-width='5'/%3E%3Crect x='14' y='44' width='36' height='10' fill='%23E3B23C'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400..700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --negro:#000;
+  --panel:#12100C;
+  --panel-2:#1C1914;
+  --linea:#2C2720;
+  --linea-2:#443C30;
+  --crema:#F3E7C8;
+  --crema-2:#CBBE9E;
+  --crema-3:#8C816B;
+  --dorado:#E3B23C;
+  --dorado-2:#F0C65E;
+  --verde:#9CC08A;
+  --rojo:#F0705A;
+  --display:'Anton',Impact,'Arial Narrow',sans-serif;
+  --texto:'Archivo',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --r1:4px;--r2:8px;
+  --ancho:1180px;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;min-height:100vh;background:var(--negro);color:var(--crema);font-family:var(--texto);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;padding-bottom:env(safe-area-inset-bottom,0px)}
+a{color:var(--dorado);text-underline-offset:2px}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--dorado);outline-offset:2px}
+[hidden]{display:none!important}
+.nota{font-size:.82rem;color:var(--crema-3)}
+.vacio{color:var(--crema-3);font-weight:500}
+
+/* Botones */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.45em;min-height:2.25rem;padding:0 .95rem;border:1px solid var(--linea-2);border-radius:var(--r2);background:transparent;color:var(--crema);font-weight:600;font-size:.9rem;cursor:pointer;white-space:nowrap;text-decoration:none}
+.btn:hover{background:var(--panel-2);border-color:var(--crema-3)}
+.btn-p{background:var(--dorado);border-color:var(--dorado);color:#000}
+.btn-p:hover{background:var(--dorado-2);border-color:var(--dorado-2)}
+.btn-s{min-height:1.9rem;padding:0 .7rem;font-size:.82rem}
+.btn-t{border-color:transparent;color:var(--crema-2)}
+.btn-t:hover{color:var(--crema);border-color:transparent}
+.btn-peligro{color:var(--rojo);border-color:rgba(240,112,90,.45)}
+.btn-peligro:hover{color:var(--rojo);border-color:var(--rojo)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+
+/* Barra superior */
+.barra{position:sticky;top:0;z-index:30;background:rgba(0,0,0,.9);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid var(--linea);padding-top:env(safe-area-inset-top,0px)}
+.barra-in{max-width:var(--ancho);margin:0 auto;padding:.7rem 1.25rem;display:flex;align-items:center;gap:.5rem 1.25rem;flex-wrap:wrap}
+.marca{display:flex;align-items:baseline;gap:.55rem}
+.marca b{font-family:var(--display);font-weight:400;font-size:1.4rem;line-height:1;letter-spacing:.015em;text-transform:uppercase}
+.marca span{font-size:.85rem;color:var(--crema-3);font-weight:500}
+.nav{display:flex;gap:.2rem;overflow-x:auto;scrollbar-width:none}
+.nav::-webkit-scrollbar{display:none}
+.nav button{border:0;background:none;padding:.45rem .75rem;border-radius:var(--r2);color:var(--crema-2);font-weight:600;font-size:.92rem;cursor:pointer;white-space:nowrap}
+.nav button:hover{color:var(--crema);background:var(--panel-2)}
+.nav button[aria-current="page"]{background:var(--crema);color:#000}
+.punto{display:inline-grid;place-items:center;min-width:1.15rem;height:1.15rem;padding:0 .3rem;margin-left:.25rem;border-radius:999px;background:var(--dorado);color:#000;font-size:.68rem;font-weight:800;vertical-align:1px}
+.quien{margin-left:auto;display:flex;align-items:center;gap:.6rem;font-size:.85rem}
+.quien-txt{display:grid;line-height:1.15;text-align:right}
+.quien-txt strong{font-weight:600}
+.quien-txt small{color:var(--crema-3);font-size:.74rem}
+@media (max-width:720px){.nav{order:3;width:100%}}
+
+main.app{max-width:var(--ancho);margin:0 auto;padding:1.75rem 1.25rem 5rem}
+.encabezado{display:flex;align-items:flex-end;justify-content:space-between;gap:1rem 1.5rem;flex-wrap:wrap;margin-bottom:1.4rem}
+.encabezado h1{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:clamp(2.2rem,5vw,3.1rem);line-height:.95;margin:0}
+.sub{color:var(--crema-2);margin:.4rem 0 0;max-width:62ch}
+.controles{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center}
+.campo-in{height:2.25rem;background:var(--panel);border:1px solid var(--linea-2);border-radius:var(--r2);padding:0 .7rem;color:var(--crema);max-width:100%}
+.interruptor{display:inline-flex;align-items:center;gap:.45rem;font-size:.88rem;color:var(--crema-2);cursor:pointer;user-select:none}
+.interruptor input{accent-color:var(--dorado);width:1rem;height:1rem;margin:0}
+.caja-vacia{border:1px dashed var(--linea-2);border-radius:var(--r2);padding:2rem 1.5rem;color:var(--crema-2);max-width:40rem}
+.caja-vacia p{margin:0 0 1rem}
+.error-linea{color:var(--rojo);font-weight:600}
+
+/* Estados */
+.estado{display:inline-flex;align-items:center;height:1.55rem;padding:0 .6rem;border-radius:999px;border:1.5px solid transparent;font-size:.76rem;font-weight:700;white-space:nowrap;line-height:1}
+.e-sin_guion{border-style:dashed;border-color:var(--crema-3);color:var(--crema-3)}
+.e-guion{background:rgba(243,231,200,.13);color:var(--crema)}
+.e-grabado{background:var(--crema);color:#000}
+.e-edicion,.e-produccion{background:var(--dorado);color:#000}
+.e-revision{border-color:var(--dorado);color:var(--dorado)}
+.e-listo{border-color:var(--verde);color:var(--verde)}
+.e-entregado{background:var(--verde);color:#000}
+
+/* Tira de avance: un cuadro por video */
+.tira{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:3px;height:8px;min-width:96px}
+.tira i{border-radius:2px}
+.tira .s-sin_guion{border:1px dashed var(--crema-3)}
+.tira .s-guion{background:rgba(243,231,200,.3)}
+.tira .s-grabado{background:var(--crema)}
+.tira .s-edicion,.tira .s-produccion{background:var(--dorado)}
+.tira .s-revision{background:repeating-linear-gradient(135deg,var(--dorado) 0 3px,transparent 3px 6px);outline:1px solid rgba(227,178,60,.6);outline-offset:-1px}
+.tira .s-listo{border:1px solid var(--verde);background:rgba(156,192,138,.25)}
+.tira .s-entregado{background:var(--verde)}
+
+/* Producción */
+.grupo{background:var(--panel);border:1px solid var(--linea);border-left:4px solid var(--linea-2);border-radius:var(--r2);margin-bottom:1.1rem}
+.grupo.n-urgente{border-left-color:var(--dorado)}
+.grupo.n-vencido{border-left-color:var(--rojo)}
+.grupo.n-hecho{border-left-color:var(--verde)}
+.g-cab{display:grid;grid-template-columns:minmax(0,1fr) 230px;gap:.85rem 1.5rem;padding:1rem 1.1rem .95rem}
+.g-cliente{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:1.75rem;line-height:1;margin:0}
+.g-mes{color:var(--crema-2);font-weight:600;margin:.3rem 0 0;font-size:.95rem}
+.g-datos{display:flex;flex-wrap:wrap;gap:.35rem 1.4rem;font-size:.86rem;color:var(--crema-2);margin-top:.6rem}
+.g-datos b{color:var(--crema);font-weight:600}
+.plazo-vencido,.plazo-vencido b{color:var(--rojo)}
+.plazo-urgente b{color:var(--dorado)}
+.g-der{display:flex;flex-direction:column;align-items:flex-end;gap:.45rem;padding-top:.35rem}
+.g-der .tira{width:100%}
+.g-acc{grid-column:1/-1;display:flex;gap:.4rem;flex-wrap:wrap}
+.filas{border-top:1px solid var(--linea)}
+.fila{display:grid;grid-template-columns:2.6rem minmax(0,1fr) auto;align-items:center;gap:.4rem .9rem;padding:.6rem 1.1rem;border-top:1px solid var(--linea)}
+.fila:first-child{border-top:0}
+.filas .fila:hover{background:var(--panel-2)}
+.f-num{font-family:var(--display);font-size:1.35rem;color:var(--crema-3);line-height:1}
+.f-cuerpo{min-width:0}
+.f-titulo{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.f-meta{font-size:.8rem;color:var(--crema-3);display:flex;gap:.3rem .9rem;flex-wrap:wrap;margin-top:.1rem}
+.f-der{display:grid;grid-template-columns:7.6rem 5.4rem 10rem;align-items:center;gap:.6rem}
+.f-der .estado{justify-self:start}
+.f-der.solo{display:flex}
+.f-editor{font-size:.82rem;color:var(--crema-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.f-acc{display:flex;gap:.35rem;justify-content:flex-end}
+.g-pie{padding:.45rem 1.1rem;border-top:1px solid var(--linea)}
+@media (max-width:720px){
+  .fila{grid-template-columns:2.2rem minmax(0,1fr)}
+  .f-der{grid-column:2;display:flex;flex-wrap:wrap;align-items:center;gap:.4rem .7rem}
+  .f-acc{margin-left:auto}
+  .g-cab{grid-template-columns:1fr}
+  .g-der{align-items:flex-start;padding-top:0}
+}
+
+/* Vista del cliente: el mes como hoja de contactos de reels */
+.mes-tabs{display:flex;gap:.35rem;margin-bottom:1.6rem;overflow-x:auto;padding-bottom:2px}
+.mes-tabs button{border:1px solid var(--linea-2);background:none;border-radius:999px;padding:.35rem .9rem;color:var(--crema-2);font-weight:600;cursor:pointer;white-space:nowrap}
+.mes-tabs button[aria-pressed="true"]{background:var(--crema);color:#000;border-color:var(--crema)}
+.cli-empresa{margin:0 0 .35rem;color:var(--crema-2);font-weight:600}
+.mes-grande{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:clamp(3.2rem,11vw,7.5rem);line-height:.86;margin:0;letter-spacing:.005em}
+.mes-info{display:flex;flex-wrap:wrap;gap:.8rem 2.6rem;margin:1.3rem 0 1.5rem;color:var(--crema-2);font-size:.95rem}
+.mes-info b{display:block;color:var(--crema);font-size:1.2rem;font-weight:600}
+.avance{display:flex;align-items:center;gap:.6rem 1rem;margin-bottom:1.3rem;flex-wrap:wrap;color:var(--crema-2)}
+.avance .tira{flex:1 1 260px;max-width:420px;height:10px}
+.hoja{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px}
+@media (max-width:980px){.hoja{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media (max-width:560px){.hoja{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}}
+.cuadro{position:relative;aspect-ratio:9/16;background:var(--panel);border:1px solid var(--linea);border-radius:var(--r2);padding:.7rem .65rem 1rem;display:flex;flex-direction:column;align-items:flex-start;gap:.4rem;text-align:left;cursor:pointer;overflow:hidden;color:var(--crema)}
+.cuadro:hover{border-color:var(--crema-3);background:var(--panel-2)}
+.c-num{font-family:var(--display);font-size:clamp(1.7rem,4vw,2.6rem);line-height:.9}
+.c-tit{margin-top:auto;font-weight:600;font-size:.86rem;line-height:1.25;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere;-webkit-hyphens:auto;hyphens:auto}
+.cuadro .estado{font-size:.66rem;height:auto;min-height:1.3rem;padding:.2rem .45rem;max-width:100%;white-space:normal;line-height:1.15}
+.cuadro::after{content:"";position:absolute;left:0;right:0;bottom:0;height:5px;background:var(--linea-2)}
+.cuadro.s-guion::after{background:rgba(243,231,200,.4)}
+.cuadro.s-grabado::after{background:var(--crema)}
+.cuadro.s-produccion::after{background:var(--dorado)}
+.cuadro.s-entregado{border-color:rgba(156,192,138,.55)}
+.cuadro.s-entregado::after{background:var(--verde)}
+.aviso-vista{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;border:1px solid var(--dorado);color:var(--dorado);border-radius:var(--r2);padding:.6rem .9rem;margin-bottom:1.6rem;font-weight:600}
+
+/* Calendario: línea de tiempo tipo editor de video */
+.lt{--lbl:150px;overflow-x:auto;border:1px solid var(--linea);border-radius:var(--r2);background:var(--panel)}
+@media (max-width:560px){.lt{--lbl:104px}}
+.lt-in{position:relative}
+.lt-fila{display:flex;position:relative;min-height:48px;border-top:1px solid var(--linea)}
+.lt-fila:first-of-type{border-top:0}
+.lt-lbl{position:sticky;left:0;z-index:5;flex:0 0 var(--lbl);width:var(--lbl);background:var(--panel);border-right:1px solid var(--linea);padding:.5rem .75rem;display:flex;flex-direction:column;justify-content:center;font-weight:700;font-size:.88rem;line-height:1.2;overflow:hidden}
+.lt-lbl small{font-weight:500;color:var(--crema-3);font-size:.72rem}
+.lt-pista{position:relative;flex:0 0 auto}
+.lt-regla{min-height:44px}
+.lt-mes{position:absolute;top:5px;z-index:2;font-weight:700;font-size:.78rem;white-space:nowrap;padding-left:5px}
+.lt-dia{position:absolute;bottom:5px;z-index:2;width:var(--dw);text-align:center;font-size:.64rem;color:var(--crema-3);font-variant-numeric:tabular-nums}
+.lt-fondo{position:absolute;top:0;bottom:0;pointer-events:none;z-index:1}
+.lt-finde{position:absolute;top:0;bottom:0;width:var(--dw);background:rgba(243,231,200,.035)}
+.lt-corte{position:absolute;top:0;bottom:0;width:1px;background:var(--linea-2)}
+.lt-hoy{position:absolute;top:0;bottom:0;width:2px;background:var(--dorado);z-index:4;pointer-events:none}
+.lt-hoy span{position:absolute;top:3px;left:5px;font-size:.66rem;font-weight:800;color:var(--dorado)}
+.clip{position:absolute;top:11px;height:26px;border-radius:var(--r1);border:0;padding:0 .4rem;display:flex;align-items:center;font-size:.7rem;font-weight:700;white-space:nowrap;overflow:hidden;cursor:pointer;z-index:3}
+.clip-grab{background:var(--crema);color:#000}
+.clip-edit{background:var(--dorado);color:#000}
+.clip-rev{background:repeating-linear-gradient(135deg,rgba(227,178,60,.5) 0 5px,rgba(227,178,60,.16) 5px 10px);color:var(--crema)}
+.hito{position:absolute;top:7px;width:2px;height:34px;background:var(--verde);z-index:3}
+.hito::after{content:"";position:absolute;top:0;left:2px;border-left:10px solid var(--verde);border-top:6px solid transparent;border-bottom:6px solid transparent}
+.carga{position:absolute;top:14px;width:calc(var(--dw) - 2px);margin-left:1px;height:20px;display:grid;place-items:center;font-size:.7rem;font-weight:800;border-radius:3px;z-index:3}
+.carga.c1{background:rgba(243,231,200,.2);color:var(--crema)}
+.carga.c2{background:var(--rojo);color:#000}
+.leyenda{display:flex;flex-wrap:wrap;gap:.5rem 1.3rem;margin:.9rem 0 0;font-size:.82rem;color:var(--crema-2)}
+.leyenda i{display:inline-block;width:18px;height:10px;border-radius:2px;margin-right:.4rem;vertical-align:-1px}
+
+/* Clientes */
+.cli{border-top:1px solid var(--linea);padding:1.3rem 0}
+.cli:first-of-type{border-top:0;padding-top:.6rem}
+.cli-cab{display:flex;align-items:flex-start;justify-content:space-between;gap:.8rem 1rem;flex-wrap:wrap}
+.cli-nombre{font-family:var(--display);font-weight:400;font-size:2rem;text-transform:uppercase;line-height:1;margin:0}
+.cli-nombre.pausado{color:var(--crema-3)}
+.cli-meta{color:var(--crema-2);font-size:.88rem;margin:.35rem 0 0}
+.ciclos{margin-top:.85rem;display:grid;gap:.45rem}
+.ciclo{display:grid;grid-template-columns:minmax(8rem,1fr) minmax(0,2.2fr) minmax(130px,1fr) auto;gap:.5rem 1rem;align-items:center;background:var(--panel);border:1px solid var(--linea);border-radius:var(--r2);padding:.6rem .8rem;font-size:.88rem}
+.ciclo-av{display:grid;gap:.3rem}
+@media (max-width:760px){.ciclo{grid-template-columns:1fr}}
+
+/* Accesos */
+.tabla-env{overflow-x:auto}
+.tabla{width:100%;border-collapse:collapse;font-size:.9rem;min-width:640px}
+.tabla th{text-align:left;font-weight:600;color:var(--crema-3);font-size:.8rem;padding:.5rem .6rem;border-bottom:1px solid var(--linea)}
+.tabla td{padding:.6rem;border-bottom:1px solid var(--linea);vertical-align:middle}
+.tabla tr.pendiente td{background:rgba(227,178,60,.07)}
+.tabla .campo-in{width:100%;min-width:9rem}
+.aviso-linea{border-left:3px solid var(--dorado);padding:.3rem .8rem;color:var(--crema);margin:0 0 1rem}
+
+/* Ventanas */
+.velo{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.74);display:flex;align-items:flex-start;justify-content:center;padding:max(5vh,env(safe-area-inset-top,0px)) 1rem 2rem;overflow-y:auto}
+.dialogo{width:100%;max-width:640px;background:var(--panel);border:1px solid var(--linea-2);border-radius:12px;padding:1.4rem 1.4rem 1.2rem;animation:entra .16s ease-out}
+@keyframes entra{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.dialogo{animation:none}}
+.d-cab{display:flex;gap:1rem;align-items:flex-start;margin-bottom:1.2rem}
+.d-num{font-family:var(--display);font-size:3.2rem;line-height:.85}
+.d-titulo{font-size:1.2rem;font-weight:700;margin:0;line-height:1.25}
+.d-sub{color:var(--crema-2);font-size:.9rem;margin:.3rem 0 0}
+.campo{display:grid;gap:.35rem;margin-bottom:1rem;min-width:0}
+.campo>label,.campo .lbl{font-weight:600;font-size:.88rem}
+.campo .ayuda{font-size:.8rem;color:var(--crema-3);margin:0}
+.campo input:not([type=checkbox]),.campo select,.campo textarea{width:100%;background:var(--negro);border:1px solid var(--linea-2);border-radius:var(--r2);padding:.6rem .7rem;color:var(--crema)}
+.campo input:disabled,.campo select:disabled{opacity:.55}
+.campo textarea{min-height:8rem;resize:vertical;line-height:1.45}
+.campo input:focus,.campo select:focus,.campo textarea:focus{border-color:var(--dorado);outline:none}
+.fila-campos{display:grid;grid-template-columns:1fr 1fr;gap:0 1rem}
+@media (max-width:560px){.fila-campos{grid-template-columns:1fr}}
+.resumen{background:var(--negro);border:1px solid var(--linea);border-radius:var(--r2);padding:.7rem .85rem;font-size:.88rem;color:var(--crema-2);margin-bottom:1rem}
+.resumen b{color:var(--crema)}
+.resumen .ojo{color:var(--dorado);display:block;margin-top:.3rem}
+.d-pie{display:flex;gap:.5rem;justify-content:flex-end;flex-wrap:wrap;margin-top:1.3rem;padding-top:1rem;border-top:1px solid var(--linea)}
+.d-pie .izq{margin-right:auto}
+.guion-texto{white-space:pre-wrap;background:var(--negro);border:1px solid var(--linea);border-radius:var(--r2);padding:.8rem;max-height:40vh;overflow:auto;font-size:.92rem;line-height:1.55;margin:0}
+
+/* Entrada */
+.entrada{min-height:100vh;display:grid;align-content:center;padding:2.5rem 1.5rem calc(2.5rem + env(safe-area-inset-bottom,0px));max-width:var(--ancho);margin:0 auto}
+.marca-xl{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:clamp(3.6rem,14vw,9.5rem);line-height:.88;margin:0}
+.marca-xl.m{font-size:clamp(2.6rem,8vw,5rem)}
+.entrada p{max-width:46ch;color:var(--crema-2);font-size:1.08rem;margin:1.4rem 0 1.6rem}
+.entrada .nota{font-size:.85rem;margin-top:1.2rem}
+.btn-grande{min-height:3rem;padding:0 1.4rem;font-size:1rem}
+
+/* Aviso flotante */
+.aviso{position:fixed;left:50%;bottom:calc(1.25rem + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:60;background:var(--crema);color:#000;font-weight:600;padding:.7rem 1.1rem;border-radius:var(--r2);max-width:min(92vw,540px);box-shadow:0 12px 32px rgba(0,0,0,.55)}
+.aviso.error{background:var(--rojo)}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="modal"></div>
+<div id="aviso" class="aviso" role="status" aria-live="polite" hidden></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.1/dist/umd/supabase.js"></script>
+<script>
+'use strict';
+// =====================================================================
+//  CONFIGURACIÓN: lo único que tienes que editar (GUIA.md, paso 3)
+// =====================================================================
+const CONFIG = {
+  SUPABASE_URL: 'https://ypguioklwhyixacfuksu.supabase.co',
+  SUPABASE_KEY: 'sb_publishable_qjTIY_M5HJ9R653m_uOmXw_bBbVTibS', // la Publishable key. NUNCA la Secret.
+  DIAS_COLCHON: 5,  // días antes de la entrega en que el editor debe terminar
+  WHATSAPP: '523323362662'      // opcional: tu número con lada, ej. '523312345678'
+};
+// =====================================================================
+
+const configLista = () => !/TU-PROYECTO|PEGA_AQUI/.test(CONFIG.SUPABASE_URL + CONFIG.SUPABASE_KEY);
+const sb = (configLista() && window.supabase)
+  ? window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY, {
+      auth: { flowType: 'pkce', persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+    })
+  : null;
+
+const S = {
+  sesion: null, perfil: null,
+  vista: 'produccion',
+  clientes: [], ciclos: [], videos: [], perfiles: [],
+  portal: null, cicloCliente: null, previa: null,
+  filtro: { cliente: 'todos', estado: 'todos', mios: false, entregados: false },
+  calInicio: null, verTodos: {}, cargadoEn: 0
+};
+
+// ---------- Utilidades ----------------------------------------------
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const urlSegura = u => (typeof u === 'string' && /^https?:\/\/\S+$/i.test(u.trim())) ? u.trim() : null;
+const enlace = (u, txt) => { const s = urlSegura(u); return s ? `<a href="${esc(s)}" target="_blank" rel="noopener noreferrer">${esc(txt)}</a>` : ''; };
+const pad = n => String(n).padStart(2, '0');
+const agrupar = (arr, k) => arr.reduce((m, x) => ((m[x[k]] = m[x[k]] || []).push(x), m), {});
+const clientePorId = id => S.clientes.find(c => c.id === id);
+const perfilPorId = id => S.perfiles.find(p => p.id === id);
+const nombreDe = p => p ? (p.full_name || (p.email || '').split('@')[0] || 'Sin nombre') : '';
+const nombreCorto = p => nombreDe(p).split(' ')[0];
+const ROL = { pendiente: 'Pendiente', admin: 'Administrador', editor: 'Editor', cliente: 'Cliente' };
+
+const MESES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+const MESES_C = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+const DIAS_C = ['dom','lun','mar','mié','jue','vie','sáb'];
+const aFecha = s => { const [y, m, d] = String(s).slice(0, 10).split('-').map(Number); return new Date(y, m - 1, d); };
+const aISO = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const hoy = () => { const n = new Date(); return new Date(n.getFullYear(), n.getMonth(), n.getDate()); };
+const sumarDias = (d, n) => { const x = new Date(d.getFullYear(), d.getMonth(), d.getDate()); x.setDate(x.getDate() + n); return x; };
+const diasEntre = (a, b) => Math.round((b - a) / 86400000);
+const primerDia = d => new Date(d.getFullYear(), d.getMonth(), 1);
+const fCorta = s => { const d = aFecha(s); return `${d.getDate()} ${MESES_C[d.getMonth()]}`; };
+const fDia = s => { const d = aFecha(s); return `${DIAS_C[d.getDay()]} ${d.getDate()} ${MESES_C[d.getMonth()]}`; };
+const fLarga = s => { const d = aFecha(s); return `${d.getDate()} de ${MESES[d.getMonth()]}`; };
+const nombreMes = d => `${MESES[d.getMonth()][0].toUpperCase()}${MESES[d.getMonth()].slice(1)} ${d.getFullYear()}`;
+function rango(a, b) {
+  if (a === b) return fCorta(a);
+  const x = aFecha(a), y = aFecha(b);
+  if (x.getMonth() === y.getMonth() && x.getFullYear() === y.getFullYear()) return `${x.getDate()}–${y.getDate()} ${MESES_C[y.getMonth()]}`;
+  return `${fCorta(a)} – ${fCorta(b)}`;
+}
+function rangoLargo(a, b) {
+  if (a === b) return `el ${fLarga(a)}`;
+  const x = aFecha(a), y = aFecha(b);
+  if (x.getMonth() === y.getMonth()) {
+    return diasEntre(x, y) === 1
+      ? `el ${x.getDate()} y ${y.getDate()} de ${MESES[y.getMonth()]}`
+      : `del ${x.getDate()} al ${y.getDate()} de ${MESES[y.getMonth()]}`;
+  }
+  return `del ${fLarga(a)} al ${fLarga(b)}`;
+}
+// Tu regla: si grabas del 1 al 15, entregas el 1 del mes siguiente; si grabas del 16 en adelante, el 15.
+function sugerirEntrega(inicioISO) {
+  const d = aFecha(inicioISO);
+  return d.getDate() <= 15 ? new Date(d.getFullYear(), d.getMonth() + 1, 1) : new Date(d.getFullYear(), d.getMonth() + 1, 15);
+}
+function plazo(iso) {
+  const n = diasEntre(hoy(), aFecha(iso));
+  if (n < 0) return { txt: `vencido hace ${-n} ${n === -1 ? 'día' : 'días'}`, nivel: 'vencido' };
+  if (n === 0) return { txt: 'vence hoy', nivel: 'urgente' };
+  if (n === 1) return { txt: 'vence mañana', nivel: 'urgente' };
+  return { txt: `faltan ${n} días`, nivel: n <= 3 ? 'urgente' : 'ok' };
+}
+
+const ESTADOS = { sin_guion: 'Falta guion', guion: 'Guion listo', grabado: 'Grabado', edicion: 'En edición', revision: 'En revisión', listo: 'Aprobado', entregado: 'Entregado' };
+const ESTADOS_CLIENTE = { sin_guion: 'Falta tu guion', guion: 'Guion recibido', grabado: 'Grabado', produccion: 'En edición', entregado: 'Entregado' };
+const pill = (st, cliente) => `<span class="estado e-${esc(st)}">${esc((cliente ? ESTADOS_CLIENTE : ESTADOS)[st] || st)}</span>`;
+const tira = vs => `<div class="tira" aria-hidden="true">${vs.map(v => `<i class="s-${esc(v.status)}"></i>`).join('')}</div>`;
+
+function humano(e) {
+  const m = (e && (e.message || e.error_description || e.msg)) || String(e || '');
+  if (/fechas_grabacion/.test(m)) return 'La grabación no puede terminar antes de empezar.';
+  if (/fechas_entrega/.test(m)) return 'La entrega no puede ser antes de que termine la grabación.';
+  if (/fecha_editor/.test(m)) return 'La fecha límite del editor tiene que quedar entre la grabación y la entrega.';
+  if (/_url_check/.test(m)) return 'Los links tienen que empezar con https://';
+  if (/script_text_check/.test(m)) return 'El guion es demasiado largo; mejor compártelo como link.';
+  if (/team_notes_check/.test(m)) return 'Las notas son demasiado largas.';
+  if (/videos_per_cycle_check/.test(m)) return 'El número de videos por mes tiene que estar entre 1 y 40.';
+  if (/name_check/.test(m)) return 'Escribe un nombre.';
+  if (/duplicate key|_number_key/.test(m)) return 'Ya existe un video con ese número en este mes.';
+  if (/JWT|jwt expired|invalid claim/i.test(m)) return 'Tu sesión expiró. Sal y vuelve a entrar.';
+  if (/Failed to fetch|NetworkError|Load failed/i.test(m)) return 'No hay conexión con la base de datos. Revisa tu internet. Si eres el administrador, revisa que el proyecto de Supabase no esté en pausa.';
+  return m || 'Algo falló. Intenta de nuevo.';
+}
+
+let timerAviso;
+function aviso(msg, error) {
+  const el = document.getElementById('aviso');
+  el.textContent = msg;
+  el.className = 'aviso' + (error ? ' error' : '');
+  el.hidden = false;
+  clearTimeout(timerAviso);
+  timerAviso = setTimeout(() => { el.hidden = true; }, error ? 7000 : 2600);
+}
+
+// ---------- Datos ----------------------------------------------------
+async function q(peticion) { const { data, error } = await peticion; if (error) throw error; return data; }
+
+async function cargarEquipo() {
+  const desde = aISO(sumarDias(hoy(), -150));
+  const [clientes, ciclos, perfiles, videos] = await Promise.all([
+    q(sb.from('clients').select('*').order('name')),
+    q(sb.from('cycles').select('*').order('delivery_date')),
+    q(sb.from('profiles').select('id,email,full_name,role,client_id,created_at').order('created_at')),
+    q(sb.from('videos').select('*, cycles!inner(delivery_date)').gte('cycles.delivery_date', desde).order('number'))
+  ]);
+  S.clientes = clientes || [];
+  S.ciclos = ciclos || [];
+  S.perfiles = perfiles || [];
+  S.videos = (videos || []).map(v => { const x = Object.assign({}, v); delete x.cycles; return x; });
+  S.cargadoEn = Date.now();
+}
+
+async function cargarCliente() {
+  S.portal = await q(sb.rpc('client_portal'));
+  S.cargadoEn = Date.now();
+  elegirMesCliente(S.portal);
+}
+
+function elegirMesCliente(P) {
+  const ciclos = (P && P.cycles) || [];
+  if (ciclos.some(c => c.id === S.cicloCliente)) return;
+  const h = aISO(hoy());
+  const proximos = ciclos.filter(c => c.delivery_date >= h).sort((a, b) => a.delivery_date.localeCompare(b.delivery_date));
+  S.cicloCliente = (proximos[0] || ciclos[0] || {}).id || null;
+}
+
+async function recargar(sinPintar) {
+  try {
+    if (S.perfil.role === 'cliente') await cargarCliente(); else await cargarEquipo();
+    if (!sinPintar) render();
+  } catch (e) { aviso(humano(e), true); }
+}
+
+// ---------- Pantallas sueltas --------------------------------------
+const app = document.getElementById('app');
+const pintar = html => { app.innerHTML = html; };
+
+function pantallaEntrada(error) {
+  return `<main class="entrada">
+    <h1 class="marca-xl">Connect<br>Studios</h1>
+    <p>Aquí sigues tus videos del mes, desde el guion hasta la entrega.</p>
+    ${error ? `<p class="error-linea">${esc(error)}</p>` : ''}
+    <div><button class="btn btn-p btn-grande" data-accion="entrar">Entrar con Google</button></div>
+    <p class="nota">¿Tu correo no es de Gmail? <a href="https://accounts.google.com/signup" target="_blank" rel="noopener noreferrer">Crea una cuenta de Google</a> con el correo que ya usas.</p>
+  </main>`;
+}
+
+function pantallaPendiente(email) {
+  const wa = CONFIG.WHATSAPP ? `https://wa.me/${encodeURIComponent(CONFIG.WHATSAPP)}?text=${encodeURIComponent('Hola, ya entré al portal con ' + email + '. ¿Me activan el acceso?')}` : '';
+  return `<main class="entrada">
+    <h1 class="marca-xl m">Falta tu acceso</h1>
+    <p>Entraste como <strong>${esc(email)}</strong>. Avísale a Connect Studios para que activen tu cuenta. Cuando lo hagan, toca “Revisar de nuevo”.</p>
+    <div class="controles">
+      <button class="btn btn-p" data-accion="reintentar">Revisar de nuevo</button>
+      ${wa ? `<a class="btn" href="${esc(wa)}" target="_blank" rel="noopener noreferrer">Avisar por WhatsApp</a>` : ''}
+      <button class="btn btn-t" data-accion="salir">Usar otra cuenta</button>
+    </div>
+  </main>`;
+}
+
+function pantallaSimple(titulo, texto, boton, accion) {
+  return `<main class="entrada">
+    <h1 class="marca-xl m">${esc(titulo)}</h1>
+    <p>${esc(texto)}</p>
+    ${boton ? `<div><button class="btn btn-p" data-accion="${esc(accion)}">${esc(boton)}</button></div>` : ''}
+  </main>`;
+}
+
+// ---------- Barra superior ------------------------------------------
+function barra() {
+  const p = S.perfil, esAdmin = p.role === 'admin';
+  const tabs = esAdmin ? [['produccion', 'Producción'], ['calendario', 'Calendario'], ['clientes', 'Clientes'], ['accesos', 'Accesos']] : [];
+  const pendientes = esAdmin ? S.perfiles.filter(x => x.role === 'pendiente').length : 0;
+  const actual = S.vista === 'previa' ? 'clientes' : S.vista;
+  return `<header class="barra"><div class="barra-in">
+    <div class="marca"><b>Connect Studios</b><span>Portal</span></div>
+    ${tabs.length ? `<nav class="nav" aria-label="Secciones">${tabs.map(([id, txt]) => `<button data-accion="ir" data-id="${id}"${actual === id ? ' aria-current="page"' : ''}>${txt}${id === 'accesos' && pendientes ? `<span class="punto" aria-label="${pendientes} pendientes">${pendientes}</span>` : ''}</button>`).join('')}</nav>` : ''}
+    <div class="quien">
+      <span class="quien-txt"><strong>${esc(nombreDe(p))}</strong><small>${esc(p.role === 'cliente' && S.portal && S.portal.client ? S.portal.client.name : ROL[p.role])}</small></span>
+      ${p.role !== 'cliente' ? '<button class="btn btn-s btn-t" data-accion="actualizar">Actualizar</button>' : ''}
+      <button class="btn btn-s" data-accion="salir">Salir</button>
+    </div>
+  </div></header>`;
+}
+
+function render() {
+  if (!S.perfil) return;
+  let cuerpo;
+  if (S.perfil.role === 'cliente') cuerpo = vistaCliente(S.portal, false);
+  else if (S.vista === 'previa' && S.perfil.role === 'admin') cuerpo = vistaPrevia();
+  else if (S.vista === 'calendario' && S.perfil.role === 'admin') cuerpo = vistaCalendario();
+  else if (S.vista === 'clientes' && S.perfil.role === 'admin') cuerpo = vistaClientes();
+  else if (S.vista === 'accesos' && S.perfil.role === 'admin') cuerpo = vistaAccesos();
+  else cuerpo = vistaProduccion();
+  pintar(barra() + `<main class="app">${cuerpo}</main>`);
+}
+
+// ---------- Producción (admin y editores) ---------------------------
+function gruposProduccion() {
+  const f = S.filtro, yo = S.perfil.id;
+  const porCiclo = agrupar(S.videos, 'cycle_id');
+  return S.ciclos
+    .filter(c => porCiclo[c.id] && (f.cliente === 'todos' || c.client_id === f.cliente))
+    .map(c => {
+      const todos = porCiclo[c.id].slice().sort((a, b) => a.number - b.number);
+      let visibles = todos;
+      if (f.estado !== 'todos') visibles = visibles.filter(v => v.status === f.estado);
+      if (f.mios) visibles = visibles.filter(v => v.editor_id === yo);
+      if (S.perfil.role === 'editor' && !f.entregados && f.estado === 'todos') visibles = visibles.filter(v => v.status !== 'listo' && v.status !== 'entregado');
+      return { c, cli: clientePorId(c.client_id), todos, visibles, entregado: todos.every(v => v.status === 'entregado') };
+    })
+    .filter(g => (f.entregados || !g.entregado) && g.visibles.length)
+    .sort((a, b) => (a.entregado - b.entregado) || a.c.editor_due.localeCompare(b.c.editor_due));
+}
+
+function nivelGrupo(g) {
+  if (g.todos.every(v => v.status === 'listo' || v.status === 'entregado')) return 'hecho';
+  return plazo(g.c.editor_due).nivel;
+}
+
+function cabGrupo(g) {
+  const { c, cli, todos } = g, esAdmin = S.perfil.role === 'admin';
+  const nivel = nivelGrupo(g), p = plazo(c.editor_due);
+  const cuenta = sts => todos.filter(v => sts.includes(v.status)).length;
+  const porGrabar = cuenta(['sin_guion', 'guion']);
+  const aprobados = cuenta(['listo']);
+  const terminados = cuenta(['revision', 'listo', 'entregado']);
+  return `<div class="g-cab">
+    <div class="g-info">
+      <h2 class="g-cliente">${esc(cli ? cli.name : 'Cliente')}</h2>
+      <p class="g-mes">${esc(c.name)}</p>
+      <div class="g-datos">
+        <span>Grabación <b>${rango(c.record_start, c.record_end)}</b></span>
+        <span class="${nivel !== 'hecho' ? 'plazo-' + p.nivel : ''}">Límite de edición <b>${fDia(c.editor_due)}</b>${nivel !== 'hecho' ? ` (${p.txt})` : ''}</span>
+        ${esAdmin ? `<span>Entrega al cliente <b>${fDia(c.delivery_date)}</b></span>` : ''}
+        ${c.raw_url ? enlace(c.raw_url, 'Crudos en Drive') : (esAdmin ? '<span class="nota">Sin carpeta de crudos</span>' : '')}
+      </div>
+    </div>
+    <div class="g-der">
+      <span class="nota">${terminados} de ${todos.length} terminados</span>
+      ${tira(todos)}
+    </div>
+    ${esAdmin ? `<div class="g-acc">
+      ${porGrabar ? `<button class="btn btn-s" data-accion="marcar-grabado" data-id="${c.id}">Marcar ${porGrabar} como grabados</button>` : ''}
+      ${aprobados ? `<button class="btn btn-s btn-p" data-accion="entregar-ciclo" data-id="${c.id}">Entregar ${aprobados} al cliente</button>` : ''}
+      <button class="btn btn-s btn-t" data-accion="editar-ciclo" data-id="${c.id}">Editar mes</button>
+    </div>` : ''}
+  </div>`;
+}
+
+function filaVideo(v) {
+  const esAdmin = S.perfil.role === 'admin', yo = S.perfil.id;
+  const ed = v.editor_id ? perfilPorId(v.editor_id) : null;
+  const guion = v.script_url ? enlace(v.script_url, 'Guion') : (v.script_text ? '<span>Guion escrito</span>' : '<span>Sin guion</span>');
+  let rapida = '';
+  if (esAdmin && v.status === 'revision') rapida = `<button class="btn btn-s btn-p" data-accion="aprobar" data-id="${v.id}">Aprobar</button>`;
+  if (!esAdmin && (!v.editor_id || v.editor_id === yo)) {
+    if (v.status === 'grabado') rapida = `<button class="btn btn-s" data-accion="empezar" data-id="${v.id}">Empezar</button>`;
+    else if (v.status === 'edicion') rapida = `<button class="btn btn-s btn-p" data-accion="termine" data-id="${v.id}">Terminé</button>`;
+  }
+  return `<div class="fila">
+    <span class="f-num">${pad(v.number)}</span>
+    <div class="f-cuerpo">
+      <div class="f-titulo">${v.title ? esc(v.title) : '<span class="vacio">Sin título</span>'}</div>
+      <div class="f-meta">${guion}${enlace(v.final_url, 'Video terminado')}${v.team_notes ? '<span>Tiene notas</span>' : ''}</div>
+    </div>
+    <div class="f-der">
+      ${pill(v.status)}
+      <span class="f-editor">${ed ? esc(nombreCorto(ed)) : '<span class="nota">Sin editor</span>'}</span>
+      <span class="f-acc">${rapida}<button class="btn btn-s btn-t" data-accion="abrir-video" data-id="${v.id}">Abrir</button></span>
+    </div>
+  </div>`;
+}
+
+function vistaProduccion() {
+  const esAdmin = S.perfil.role === 'admin', f = S.filtro;
+  const grupos = gruposProduccion();
+  const conMeses = S.clientes.filter(cl => S.ciclos.some(c => c.client_id === cl.id));
+  let vacio;
+  if (!grupos.length) {
+    if (esAdmin && !S.clientes.length) vacio = `<div class="caja-vacia"><p>Todavía no hay clientes. Da de alta el primero y crea su mes de contenido.</p><button class="btn btn-p" data-accion="nuevo-cliente">Nuevo cliente</button></div>`;
+    else if (esAdmin && !S.videos.length) vacio = `<div class="caja-vacia"><p>No hay meses en producción. Crea el mes de un cliente y aquí aparecerán sus videos.</p><button class="btn btn-p" data-accion="ir" data-id="clientes">Ir a Clientes</button></div>`;
+    else if (S.videos.length) vacio = `<div class="caja-vacia"><p>Nada coincide con estos filtros.</p></div>`;
+    else vacio = `<div class="caja-vacia"><p>No hay videos en producción por ahora. Cuando empiece un mes, aparecerá aquí.</p></div>`;
+  }
+  return `<div class="encabezado">
+    <div><h1>Producción</h1><p class="sub">${esAdmin ? 'Todos los meses en curso. Arriba lo que vence primero.' : 'Tus pendientes. Arriba lo que vence primero.'}</p></div>
+    <div class="controles">
+      <select class="campo-in" data-cambio="filtro-cliente" aria-label="Filtrar por cliente">
+        <option value="todos">Todos los clientes</option>
+        ${conMeses.map(cl => `<option value="${cl.id}"${f.cliente === cl.id ? ' selected' : ''}>${esc(cl.name)}</option>`).join('')}
+      </select>
+      <select class="campo-in" data-cambio="filtro-estado" aria-label="Filtrar por estado">
+        <option value="todos">Todos los estados</option>
+        ${Object.entries(ESTADOS).map(([k, t]) => `<option value="${k}"${f.estado === k ? ' selected' : ''}>${t}</option>`).join('')}
+      </select>
+      ${!esAdmin ? `<label class="interruptor"><input type="checkbox" data-cambio="filtro-mios"${f.mios ? ' checked' : ''}> Solo mis videos</label>` : ''}
+      <label class="interruptor"><input type="checkbox" data-cambio="filtro-entregados"${f.entregados ? ' checked' : ''}> ${esAdmin ? 'Ver meses entregados' : 'Ver aprobados y entregados'}</label>
+    </div>
+  </div>
+  ${grupos.length ? grupos.map(g => `<section class="grupo n-${nivelGrupo(g)}">
+      ${cabGrupo(g)}
+      <div class="filas">${g.visibles.map(filaVideo).join('')}</div>
+      ${esAdmin ? `<div class="g-pie"><button class="btn btn-s btn-t" data-accion="agregar-video" data-id="${g.c.id}">Agregar video</button></div>` : ''}
+    </section>`).join('') : vacio}`;
+}
+
+// ---------- Calendario ------------------------------------------------
+function vistaCalendario() {
+  const DW = 24, DIAS = 92;
+  const inicio = S.calInicio || primerDia(hoy());
+  const fin = sumarDias(inicio, DIAS - 1);
+  const iISO = aISO(inicio), fISO = aISO(fin);
+  const idx = iso => diasEntre(inicio, aFecha(iso));
+  const ancho = DIAS * DW;
+  const enRango = S.ciclos.filter(c => c.record_start <= fISO && c.delivery_date >= iISO);
+  const filasCli = S.clientes.filter(cl => cl.active || enRango.some(c => c.client_id === cl.id));
+
+  let regla = '', fondo = '';
+  for (let i = 0; i < DIAS; i++) {
+    const d = sumarDias(inicio, i), finde = d.getDay() === 0 || d.getDay() === 6;
+    if (i === 0 || d.getDate() === 1) regla += `<span class="lt-mes" style="left:${i * DW}px">${nombreMes(d)}</span>`;
+    regla += `<span class="lt-dia" style="left:${i * DW}px">${d.getDate()}</span>`;
+    if (finde) fondo += `<i class="lt-finde" style="left:${i * DW}px"></i>`;
+    if (d.getDate() === 1 && i > 0) fondo += `<i class="lt-corte" style="left:${i * DW}px"></i>`;
+  }
+  const t = idx(aISO(hoy()));
+  const lineaHoy = (t >= 0 && t < DIAS) ? `<div class="lt-hoy" style="left:calc(var(--lbl) + ${t * DW + DW / 2 - 1}px)"><span>Hoy</span></div>` : '';
+
+  const carga = new Array(DIAS).fill(0);
+  enRango.forEach(c => {
+    for (let i = Math.max(0, idx(c.record_start)); i <= Math.min(DIAS - 1, idx(c.record_end)); i++) carga[i]++;
+  });
+  const celdasCarga = carga.map((n, i) => n ? `<span class="carga ${n > 1 ? 'c2' : 'c1'}" style="left:${i * DW}px" title="${n} ${n > 1 ? 'grabaciones' : 'grabación'} el ${fLarga(aISO(sumarDias(inicio, i)))}">${n}</span>` : '').join('');
+
+  const tramo = (a, b, cls, txt, c, titulo) => {
+    let i0 = idx(a), i1 = idx(b);
+    if (i1 < i0 || i1 < 0 || i0 > DIAS - 1) return '';
+    i0 = Math.max(0, i0); i1 = Math.min(DIAS - 1, i1);
+    if (cls === 'clip-grab' && (i1 - i0 + 1) * DW < 90) txt = 'Rec';
+    return `<button class="clip ${cls}" style="left:${i0 * DW + 1}px;width:${(i1 - i0 + 1) * DW - 2}px" data-accion="editar-ciclo" data-id="${c.id}" title="${esc(titulo)}">${esc(txt)}</button>`;
+  };
+  const filas = filasCli.map(cl => {
+    const clips = enRango.filter(c => c.client_id === cl.id).map(c => {
+      const e = idx(c.delivery_date);
+      return tramo(c.record_start, c.record_end, 'clip-grab', 'Grabación', c, `${c.name}: grabación ${rango(c.record_start, c.record_end)}`)
+        + tramo(aISO(sumarDias(aFecha(c.record_end), 1)), c.editor_due, 'clip-edit', `Edición ${c.name}`, c, `${c.name}: edición hasta ${fDia(c.editor_due)}`)
+        + tramo(aISO(sumarDias(aFecha(c.editor_due), 1)), aISO(sumarDias(aFecha(c.delivery_date), -1)), 'clip-rev', 'Revisión', c, `${c.name}: tu revisión antes de entregar`)
+        + ((e >= 0 && e < DIAS) ? `<span class="hito" style="left:${e * DW + DW / 2 - 1}px" title="${esc(c.name)}: entrega ${fDia(c.delivery_date)}"></span>` : '');
+    }).join('');
+    return `<div class="lt-fila"><div class="lt-lbl">${esc(cl.name)}${cl.active ? '' : '<small>En pausa</small>'}</div><div class="lt-pista" style="width:${ancho}px">${clips}</div></div>`;
+  }).join('');
+
+  return `<div class="encabezado">
+    <div><h1>Calendario</h1><p class="sub">Grabaciones, edición y entregas de todos tus clientes en una sola línea de tiempo. Si dos clientes graban el mismo día, el número se pone en rojo.</p></div>
+    <div class="controles">
+      <button class="btn btn-s" data-accion="cal-mover" data-id="-1" aria-label="Mes anterior">‹</button>
+      <button class="btn btn-s" data-accion="cal-mover" data-id="0">Hoy</button>
+      <button class="btn btn-s" data-accion="cal-mover" data-id="1" aria-label="Mes siguiente">›</button>
+    </div>
+  </div>
+  ${filasCli.length ? `<div class="lt" style="--dw:${DW}px"><div class="lt-in" style="width:calc(var(--lbl) + ${ancho}px)">
+    <div class="lt-fondo" style="left:var(--lbl);width:${ancho}px">${fondo}</div>
+    ${lineaHoy}
+    <div class="lt-fila lt-regla"><div class="lt-lbl"><small>${rango(iISO, fISO)}</small></div><div class="lt-pista" style="width:${ancho}px">${regla}</div></div>
+    <div class="lt-fila"><div class="lt-lbl">Grabaciones<small>por día</small></div><div class="lt-pista" style="width:${ancho}px">${celdasCarga}</div></div>
+    ${filas}
+  </div></div>
+  <div class="leyenda">
+    <span><i style="background:var(--crema)"></i>Grabación</span>
+    <span><i style="background:var(--dorado)"></i>Edición</span>
+    <span><i style="background:repeating-linear-gradient(135deg,rgba(227,178,60,.6) 0 4px,rgba(227,178,60,.18) 4px 8px)"></i>Tu revisión</span>
+    <span><i style="background:var(--verde);width:4px"></i>Entrega al cliente</span>
+    <span><i style="background:var(--dorado);width:2px"></i>Hoy</span>
+  </div>
+  ${enRango.length ? '<p class="nota">Toca cualquier tramo para cambiar las fechas de ese mes.</p>' : '<p class="nota">No hay meses en estas fechas. Créalos desde Clientes.</p>'}` :
+  `<div class="caja-vacia"><p>Cuando tengas clientes, aquí verás tu capacidad de grabación y edición mes con mes.</p><button class="btn btn-p" data-accion="ir" data-id="clientes">Ir a Clientes</button></div>`}`;
+}
+
+// ---------- Clientes --------------------------------------------------
+function vistaClientes() {
+  return `<div class="encabezado">
+    <div><h1>Clientes</h1><p class="sub">Cada mes de contenido nace aquí, con sus videos y sus fechas.</p></div>
+    <div class="controles"><button class="btn btn-p" data-accion="nuevo-cliente">Nuevo cliente</button></div>
+  </div>
+  ${S.clientes.length ? S.clientes.map(bloqueCliente).join('') : `<div class="caja-vacia"><p>Todavía no hay clientes. Tip: crea uno llamado “Demo” con un mes de ejemplo para enseñarle el portal a tus prospectos.</p><button class="btn btn-p" data-accion="nuevo-cliente">Nuevo cliente</button></div>`}`;
+}
+
+function bloqueCliente(cl) {
+  const cs = S.ciclos.filter(c => c.client_id === cl.id).sort((a, b) => b.delivery_date.localeCompare(a.delivery_date));
+  const usuarios = S.perfiles.filter(p => p.role === 'cliente' && p.client_id === cl.id);
+  const mostrar = S.verTodos[cl.id] ? cs : cs.slice(0, 4);
+  return `<section class="cli">
+    <div class="cli-cab">
+      <div>
+        <h2 class="cli-nombre${cl.active ? '' : ' pausado'}">${esc(cl.name)}</h2>
+        <p class="cli-meta">${cl.videos_per_cycle} videos por mes${cl.active ? '' : ', en pausa'}. ${usuarios.length ? `Con acceso: ${usuarios.map(u => esc(nombreDe(u))).join(', ')}.` : 'Nadie de este cliente tiene acceso todavía.'}</p>
+      </div>
+      <div class="controles">
+        ${cs.length ? `<button class="btn btn-s btn-t" data-accion="previa" data-id="${cl.id}">Ver como cliente</button>` : ''}
+        <button class="btn btn-s" data-accion="editar-cliente" data-id="${cl.id}">Editar</button>
+        <button class="btn btn-s btn-p" data-accion="nuevo-ciclo" data-id="${cl.id}">Nuevo mes</button>
+      </div>
+    </div>
+    ${cs.length ? `<div class="ciclos">${mostrar.map(filaCiclo).join('')}</div>` : '<p class="nota">Sin meses todavía.</p>'}
+    ${cs.length > 4 && !S.verTodos[cl.id] ? `<button class="btn btn-s btn-t" data-accion="ver-todos" data-id="${cl.id}">Ver los ${cs.length} meses</button>` : ''}
+  </section>`;
+}
+
+function filaCiclo(c) {
+  const vs = S.videos.filter(v => v.cycle_id === c.id).sort((a, b) => a.number - b.number);
+  const ent = vs.filter(v => v.status === 'entregado').length;
+  return `<div class="ciclo">
+    <b>${esc(c.name)}</b>
+    <span class="nota">Graba ${rango(c.record_start, c.record_end)}. Edición hasta ${fCorta(c.editor_due)}. Entrega ${fCorta(c.delivery_date)}.</span>
+    ${vs.length ? `<div class="ciclo-av">${tira(vs)}<span class="nota">${ent} de ${vs.length} entregados</span></div>` : `<button class="btn btn-s btn-t" data-accion="historial" data-id="${c.id}">Ver videos</button>`}
+    <button class="btn btn-s btn-t" data-accion="editar-ciclo" data-id="${c.id}">Editar</button>
+  </div>`;
+}
+
+// ---------- Accesos ----------------------------------------------------
+function vistaAccesos() {
+  const orden = { pendiente: 0, admin: 1, editor: 2, cliente: 3 };
+  const lista = S.perfiles.slice().sort((a, b) => (orden[a.role] - orden[b.role]) || nombreDe(a).localeCompare(nombreDe(b)));
+  const pend = lista.filter(p => p.role === 'pendiente').length;
+  return `<div class="encabezado">
+    <div><h1>Accesos</h1><p class="sub">Quien entra con Google aparece aquí como pendiente y no ve nada hasta que le asignes un rol.</p></div>
+  </div>
+  ${pend ? `<p class="aviso-linea">${pend === 1 ? 'Hay 1 persona esperando acceso.' : `Hay ${pend} personas esperando acceso.`}</p>` : ''}
+  <div class="tabla-env"><table class="tabla">
+    <thead><tr><th>Persona</th><th>Rol</th><th>Cliente</th><th>Primer acceso</th></tr></thead>
+    <tbody>${lista.map(p => `<tr class="${p.role === 'pendiente' ? 'pendiente' : ''}">
+      <td><input class="campo-in" value="${esc(p.full_name || '')}" placeholder="Nombre" data-cambio="perfil-nombre" data-id="${p.id}" aria-label="Nombre de ${esc(p.email || '')}">
+        <div class="nota">${esc(p.email || '')}${p.id === S.perfil.id ? ' (tú)' : ''}</div></td>
+      <td><select class="campo-in" data-cambio="perfil-rol" data-id="${p.id}" aria-label="Rol">${Object.entries(ROL).map(([k, t]) => `<option value="${k}"${p.role === k ? ' selected' : ''}>${t}</option>`).join('')}</select></td>
+      <td>${p.role === 'cliente'
+        ? `<select class="campo-in" data-cambio="perfil-cliente" data-id="${p.id}" aria-label="Cliente"><option value="">Elige cliente</option>${S.clientes.map(cl => `<option value="${cl.id}"${p.client_id === cl.id ? ' selected' : ''}>${esc(cl.name)}</option>`).join('')}</select>`
+        : '<span class="nota">No aplica</span>'}</td>
+      <td class="nota">${p.created_at ? fCorta(p.created_at) : ''}</td>
+    </tr>`).join('')}</tbody>
+  </table></div>
+  <p class="nota" style="margin-top:1rem">Para dar acceso, mándale a la persona el link del portal. Para quitarlo, cámbiala a Pendiente. Para borrarla por completo, elimínala en Supabase (Authentication, Users).</p>`;
+}
+
+// ---------- Vista del cliente -----------------------------------------
+function vistaCliente(P, previa) {
+  if (!P || !P.client) {
+    return `<div class="caja-vacia"><p>Tu cuenta ya está activa, pero falta ligarla a tu empresa. Avísale a Connect Studios y en cuanto lo hagan verás aquí tus videos.</p><button class="btn" data-accion="actualizar">Revisar de nuevo</button></div>`;
+  }
+  const ciclos = P.cycles || [];
+  if (!ciclos.length) {
+    return `<p class="cli-empresa">${esc(P.client.name)}</p><h1 class="mes-grande">Bienvenido</h1>
+      <div class="caja-vacia" style="margin-top:1.5rem"><p>Aún no hay meses programados. Cuando agendemos tu grabación, aquí verás cada video, del guion a la entrega.</p></div>`;
+  }
+  const c = ciclos.find(x => x.id === S.cicloCliente) || ciclos[0];
+  const vs = c.videos || [];
+  const conGuion = vs.filter(v => v.status !== 'sin_guion').length;
+  const entregados = vs.filter(v => v.status === 'entregado').length;
+  let mensaje;
+  if (vs.length && entregados === vs.length) mensaje = `Tus ${vs.length} videos están entregados.`;
+  else if (aISO(hoy()) > c.record_end) mensaje = `Estamos editando. Van ${entregados} de ${vs.length} entregados.`;
+  else if (conGuion < vs.length) mensaje = `Llevas ${conGuion} de ${vs.length} guiones. Súbelos antes de la grabación.`;
+  else mensaje = `Tus ${vs.length} guiones están listos para grabar.`;
+  return `${ciclos.length > 1 ? `<div class="mes-tabs" role="group" aria-label="Meses">${ciclos.map(x => `<button data-accion="ver-mes" data-id="${x.id}" aria-pressed="${x.id === c.id}">${esc(x.name)}</button>`).join('')}</div>` : ''}
+    <p class="cli-empresa">${esc(P.client.name)}</p>
+    <h1 class="mes-grande">${esc(c.name)}</h1>
+    <div class="mes-info">
+      <div>Grabamos<b>${esc(rangoLargo(c.record_start, c.record_end))}</b></div>
+      <div>Recibes tus videos<b>el ${esc(fLarga(c.delivery_date))}</b></div>
+      ${urlSegura(P.client.shared_url) ? `<div>Carpeta compartida<b>${enlace(P.client.shared_url, 'Abrir en Drive')}</b></div>` : ''}
+    </div>
+    <div class="avance">${tira(vs)}<span>${esc(mensaje)}</span></div>
+    <div class="hoja">${vs.map(v => cuadro(v, previa)).join('')}</div>
+    <p class="nota" style="margin-top:1.25rem">${previa ? 'En esta vista previa, tocar un video abre su ficha interna.' : 'Toca un video para subir o cambiar su guion. Cuando esté entregado, desde ahí lo abres.'}</p>`;
+}
+
+function cuadro(v, previa) {
+  const titulo = v.title ? esc(v.title) : (v.status === 'sin_guion' ? 'Agrega tu guion' : 'Sin título');
+  return `<button class="cuadro s-${esc(v.status)}" data-accion="${previa ? 'abrir-video' : 'abrir-guion'}" data-id="${v.id}" aria-label="Video ${v.number}: ${esc(v.title || 'sin título')}. ${esc(ESTADOS_CLIENTE[v.status] || '')}">
+    <span class="c-num">${pad(v.number)}</span>
+    ${pill(v.status, true)}
+    <span class="c-tit${v.title ? '' : ' vacio'}">${titulo}</span>
+  </button>`;
+}
+
+function portalLocal(idCliente) {
+  const cl = clientePorId(idCliente);
+  const cycles = S.ciclos.filter(c => c.client_id === idCliente)
+    .sort((a, b) => b.delivery_date.localeCompare(a.delivery_date))
+    .map(c => ({
+      id: c.id, name: c.name, record_start: c.record_start, record_end: c.record_end, delivery_date: c.delivery_date,
+      videos: S.videos.filter(v => v.cycle_id === c.id).sort((a, b) => a.number - b.number).map(v => ({
+        id: v.id, number: v.number, title: v.title, script_url: v.script_url, script_text: v.script_text,
+        status: ['edicion', 'revision', 'listo'].includes(v.status) ? 'produccion' : v.status,
+        final_url: v.status === 'entregado' ? v.final_url : null
+      }))
+    })).filter(c => c.videos.length);
+  return { client: cl ? { id: cl.id, name: cl.name, shared_url: cl.shared_url } : null, cycles };
+}
+
+function vistaPrevia() {
+  const P = portalLocal(S.previa);
+  const cl = clientePorId(S.previa);
+  return `<div class="aviso-vista"><span>Así ve el portal ${esc(cl ? cl.name : 'tu cliente')}.</span><button class="btn btn-s" data-accion="ir" data-id="clientes">Salir de la vista previa</button></div>
+    ${vistaCliente(P, true)}`;
+}
+
+// ---------- Ventanas ---------------------------------------------------
+const raizModal = document.getElementById('modal');
+let alCerrarModal = null, focoPrevio = null;
+
+function abrirModal(html, alMontar, alCerrar) {
+  if (raizModal.innerHTML) cerrarModal();
+  focoPrevio = document.activeElement;
+  alCerrarModal = alCerrar || null;
+  raizModal.innerHTML = `<div class="velo"><div class="dialogo" role="dialog" aria-modal="true">${html}</div></div>`;
+  const dlg = raizModal.querySelector('.dialogo');
+  if (alMontar) alMontar(dlg);
+  const primero = dlg.querySelector('input:not([disabled]):not([type=checkbox]),textarea:not([disabled]),select:not([disabled]),button');
+  if (primero) primero.focus();
+}
+
+function cerrarModal() {
+  if (!raizModal.innerHTML) return;
+  raizModal.innerHTML = '';
+  const f = alCerrarModal; alCerrarModal = null;
+  if (f) f();
+  if (focoPrevio && document.contains(focoPrevio) && focoPrevio.focus) focoPrevio.focus();
+}
+
+let resolverConfirmacion = null;
+function confirmar(titulo, texto, ok, peligro) {
+  return new Promise(res => {
+    resolverConfirmacion = res;
+    abrirModal(`<div class="d-cab"><div><h2 class="d-titulo">${esc(titulo)}</h2>${texto ? `<p class="d-sub">${esc(texto)}</p>` : ''}</div></div>
+      <div class="d-pie"><button class="btn" data-accion="conf-no">Cancelar</button><button class="btn ${peligro ? 'btn-peligro' : 'btn-p'}" data-accion="conf-si">${esc(ok || 'Confirmar')}</button></div>`,
+      null, () => { if (resolverConfirmacion) { resolverConfirmacion(false); resolverConfirmacion = null; } });
+  });
+}
+
+// Ficha de un video (equipo)
+function modalVideo(id) {
+  const v = S.videos.find(x => x.id === id); if (!v) return;
+  const c = S.ciclos.find(x => x.id === v.cycle_id), cl = c ? clientePorId(c.client_id) : null;
+  const esAdmin = S.perfil.role === 'admin', yo = S.perfil.id;
+  const bloqueado = !esAdmin && ['listo', 'entregado'].includes(v.status);
+  const ajeno = !esAdmin && v.editor_id && v.editor_id !== yo;
+  const equipo = S.perfiles.filter(p => p.role === 'admin' || p.role === 'editor');
+  const opciones = esAdmin ? Object.keys(ESTADOS) : Array.from(new Set([v.status, 'edicion', 'revision']));
+  const etiqueta = s => (!esAdmin && s === 'revision') ? 'Terminado (a revisión)' : ESTADOS[s];
+  abrirModal(`<form data-form="video" data-id="${v.id}" novalidate>
+    <div class="d-cab"><span class="d-num">${pad(v.number)}</span><div>
+      <h2 class="d-titulo">${v.title ? esc(v.title) : 'Sin título'}</h2>
+      <p class="d-sub">${esc(cl ? cl.name : '')}, ${esc(c ? c.name : '')}</p></div></div>
+    ${esAdmin ? `
+      <div class="campo"><label for="f-titulo">Título</label><input id="f-titulo" name="title" maxlength="200" value="${esc(v.title || '')}"></div>
+      <div class="campo"><label for="f-gurl">Link del guion</label><input id="f-gurl" name="script_url" type="url" inputmode="url" placeholder="https://" value="${esc(v.script_url || '')}"></div>
+      <div class="campo"><label for="f-gtxt">Guion escrito</label><textarea id="f-gtxt" name="script_text" maxlength="20000">${esc(v.script_text || '')}</textarea></div>`
+    : `<div class="campo"><span class="lbl">Guion</span>
+        ${v.script_url ? `<p style="margin:0">${enlace(v.script_url, 'Abrir guion')}</p>` : ''}
+        ${v.script_text ? `<pre class="guion-texto">${esc(v.script_text)}</pre>` : ''}
+        ${!v.script_url && !v.script_text ? '<p class="ayuda">El cliente todavía no sube guion.</p>' : ''}
+      </div>`}
+    <div class="fila-campos">
+      <div class="campo"><label for="f-estado">Estado</label>
+        <select id="f-estado" name="status"${bloqueado || ajeno ? ' disabled' : ''}>${opciones.map(s => `<option value="${s}"${v.status === s ? ' selected' : ''}>${esc(etiqueta(s))}</option>`).join('')}</select>
+        ${bloqueado ? '<p class="ayuda">Aprobado. Solo el administrador puede reabrirlo.</p>' : ''}
+        ${ajeno ? `<p class="ayuda">Lo tiene ${esc(nombreCorto(perfilPorId(v.editor_id)) || 'otro editor')}.</p>` : ''}
+      </div>
+      <div class="campo"><label for="f-editor">Editor</label>
+        ${esAdmin
+          ? `<select id="f-editor" name="editor_id"><option value="">Sin asignar</option>${equipo.map(p => `<option value="${p.id}"${v.editor_id === p.id ? ' selected' : ''}>${esc(nombreDe(p))}</option>`).join('')}</select>`
+          : (ajeno
+            ? `<input id="f-editor" disabled value="${esc(nombreDe(perfilPorId(v.editor_id)) || 'Otro editor')}">`
+            : `<label class="interruptor" style="min-height:2.6rem"><input type="checkbox" name="mio"${v.editor_id === yo ? ' checked' : ''}${bloqueado ? ' disabled' : ''}> Este video es mío</label>`)}
+      </div>
+    </div>
+    <div class="campo"><label for="f-final">Link del video terminado</label>
+      <input id="f-final" name="final_url" type="url" inputmode="url" placeholder="https://drive.google.com/..." value="${esc(v.final_url || '')}"${bloqueado || ajeno ? ' disabled' : ''}>
+      <p class="ayuda">El cliente lo ve solo cuando el video se entrega. Revisa que el archivo de Drive esté compartido.</p></div>
+    <div class="campo"><label for="f-notas">Notas del equipo</label>
+      <textarea id="f-notas" name="team_notes" maxlength="5000" placeholder="Música, cortes, cambios pedidos">${esc(v.team_notes || '')}</textarea>
+      <p class="ayuda">El cliente no ve estas notas.</p></div>
+    <div class="d-pie">
+      ${esAdmin ? `<button type="button" class="btn btn-t btn-peligro izq" data-accion="borrar-video" data-id="${v.id}">Borrar video</button>` : ''}
+      <button type="button" class="btn" data-accion="cerrar">Cancelar</button>
+      <button type="submit" class="btn btn-p">Guardar cambios</button>
+    </div>
+  </form>`);
+}
+
+function modalTermine(id) {
+  const v = S.videos.find(x => x.id === id); if (!v) return;
+  abrirModal(`<form data-form="termine" data-id="${v.id}" novalidate>
+    <div class="d-cab"><span class="d-num">${pad(v.number)}</span><div>
+      <h2 class="d-titulo">Marcar como terminado</h2><p class="d-sub">${v.title ? esc(v.title) : 'Sin título'}</p></div></div>
+    <div class="campo"><label for="t-final">Link del video terminado</label>
+      <input id="t-final" name="final_url" type="url" inputmode="url" required placeholder="https://drive.google.com/..." value="${esc(v.final_url || '')}">
+      <p class="ayuda">Pasa a revisión. Una vez aprobado, ya no podrás moverlo.</p></div>
+    <div class="d-pie"><button type="button" class="btn" data-accion="cerrar">Cancelar</button><button type="submit" class="btn btn-p">Mandar a revisión</button></div>
+  </form>`);
+}
+
+// Guion (cliente)
+function modalGuion(id) {
+  const c = ((S.portal && S.portal.cycles) || []).find(x => x.id === S.cicloCliente);
+  const v = c && c.videos.find(x => x.id === id); if (!v) return;
+  const editable = v.status === 'sin_guion' || v.status === 'guion';
+  if (!editable) {
+    abrirModal(`<div class="d-cab"><span class="d-num">${pad(v.number)}</span><div>
+        <h2 class="d-titulo">${v.title ? esc(v.title) : 'Sin título'}</h2><p class="d-sub">${pill(v.status, true)}</p></div></div>
+      ${v.status === 'entregado' && urlSegura(v.final_url) ? `<p><a class="btn btn-p btn-grande" href="${esc(urlSegura(v.final_url))}" target="_blank" rel="noopener noreferrer">Ver video</a></p>` : ''}
+      ${v.status !== 'entregado' ? '<p class="ayuda">Este video ya se grabó. Si necesitas un cambio, escríbenos directamente.</p>' : ''}
+      ${v.script_url ? `<p>${enlace(v.script_url, 'Abrir guion')}</p>` : ''}
+      ${v.script_text ? `<pre class="guion-texto">${esc(v.script_text)}</pre>` : ''}
+      <div class="d-pie"><button class="btn" data-accion="cerrar">Cerrar</button></div>`);
+    return;
+  }
+  abrirModal(`<form data-form="guion" data-id="${v.id}" novalidate>
+    <div class="d-cab"><span class="d-num">${pad(v.number)}</span><div>
+      <h2 class="d-titulo">Guion del video ${v.number}</h2><p class="d-sub">Sube un link o escríbelo aquí. Puedes cambiarlo hasta el día de la grabación.</p></div></div>
+    <div class="campo"><label for="g-titulo">¿De qué trata este video?</label><input id="g-titulo" name="title" maxlength="200" placeholder="Ej. Tres errores al elegir proveedor" value="${esc(v.title || '')}"></div>
+    <div class="campo"><label for="g-url">Link al guion</label><input id="g-url" name="script_url" type="url" inputmode="url" placeholder="https://docs.google.com/..." value="${esc(v.script_url || '')}">
+      <p class="ayuda">Google Docs, Notion o lo que uses. Revisa que cualquiera con el link pueda verlo.</p></div>
+    <div class="campo"><label for="g-texto">O escríbelo aquí</label><textarea id="g-texto" name="script_text" maxlength="20000">${esc(v.script_text || '')}</textarea></div>
+    <div class="d-pie"><button type="button" class="btn" data-accion="cerrar">Cancelar</button><button type="submit" class="btn btn-p">Guardar guion</button></div>
+  </form>`);
+}
+
+// Mes (crear o editar)
+function modalCiclo(idCiclo, idCliente) {
+  const c = idCiclo ? S.ciclos.find(x => x.id === idCiclo) : null;
+  const cl = clientePorId(c ? c.client_id : idCliente); if (!cl) return;
+  let d;
+  if (c) d = Object.assign({}, c);
+  else {
+    const previo = S.ciclos.filter(x => x.client_id === cl.id).sort((a, b) => b.record_start.localeCompare(a.record_start))[0];
+    let ini = hoy();
+    if (previo) { const p = aFecha(previo.record_start); ini = new Date(p.getFullYear(), p.getMonth() + 1, Math.min(p.getDate(), 28)); }
+    const entrega = sugerirEntrega(aISO(ini));
+    d = { name: nombreMes(entrega), record_start: aISO(ini), record_end: aISO(sumarDias(ini, 1)),
+          editor_due: aISO(sumarDias(entrega, -CONFIG.DIAS_COLCHON)), delivery_date: aISO(entrega), raw_url: '' };
+  }
+  abrirModal(`<form data-form="ciclo" data-id="${c ? c.id : ''}" data-cliente="${cl.id}" novalidate>
+    <div class="d-cab"><div><h2 class="d-titulo">${c ? 'Editar mes' : 'Nuevo mes'}</h2><p class="d-sub">${esc(cl.name)}</p></div></div>
+    <div class="campo"><label for="c-nombre">Nombre del mes</label><input id="c-nombre" name="name" required maxlength="80" value="${esc(d.name)}">
+      <p class="ayuda">Es lo que ve el cliente en grande. Normalmente, el mes en que se publica el contenido.</p></div>
+    <div class="fila-campos">
+      <div class="campo"><label for="c-ini">Grabación: primer día</label><input id="c-ini" name="record_start" type="date" required value="${d.record_start}"></div>
+      <div class="campo"><label for="c-fin">Grabación: último día</label><input id="c-fin" name="record_end" type="date" required value="${d.record_end}"></div>
+      <div class="campo"><label for="c-ed">Límite del editor</label><input id="c-ed" name="editor_due" type="date" required value="${d.editor_due}"></div>
+      <div class="campo"><label for="c-ent">Entrega al cliente</label><input id="c-ent" name="delivery_date" type="date" required value="${d.delivery_date}"></div>
+    </div>
+    <div class="resumen" id="c-resumen"></div>
+    <div class="campo"><label for="c-raw">Carpeta de crudos en Drive</label><input id="c-raw" name="raw_url" type="url" inputmode="url" placeholder="https://drive.google.com/..." value="${esc(d.raw_url || '')}">
+      <p class="ayuda">La ven los editores, nunca el cliente. Puedes agregarla después de grabar.</p></div>
+    ${c ? '' : `<div class="campo"><label for="c-n">Número de videos</label><input id="c-n" name="count" type="number" min="1" max="40" value="${cl.videos_per_cycle}" style="max-width:8rem"></div>`}
+    <div class="d-pie">
+      ${c ? `<button type="button" class="btn btn-t btn-peligro izq" data-accion="borrar-ciclo" data-id="${c.id}">Borrar mes</button>` : ''}
+      <button type="button" class="btn" data-accion="cerrar">Cancelar</button>
+      <button type="submit" class="btn btn-p">${c ? 'Guardar cambios' : 'Crear mes'}</button>
+    </div>
+  </form>`, dlg => montarCiclo(dlg.querySelector('form'), !c));
+}
+
+function montarCiclo(f, nuevo) {
+  const $ = n => f.elements[n];
+  let nombreTocado = !nuevo;
+  $('name').addEventListener('input', () => { nombreTocado = true; });
+  const resumen = () => {
+    const [a, b, e, g] = ['record_start', 'record_end', 'editor_due', 'delivery_date'].map(n => $(n).value);
+    const caja = f.querySelector('#c-resumen');
+    if (!a || !b || !e || !g) { caja.textContent = ''; return; }
+    const edicion = diasEntre(aFecha(b), aFecha(e)), revision = diasEntre(aFecha(e), aFecha(g));
+    const n = Number(($('count') && $('count').value) || S.videos.filter(v => v.cycle_id === f.dataset.id).length || 12);
+    let ojo = '';
+    if (b < a) ojo = 'La grabación termina antes de empezar.';
+    else if (g < b) ojo = 'La entrega queda antes de que termine la grabación.';
+    else if (e < a || e > g) ojo = 'El límite del editor tiene que quedar entre la grabación y la entrega.';
+    else if (edicion < 7) ojo = `Ojo: menos de una semana para editar ${n} videos.`;
+    else if (revision < 2) ojo = 'Ojo: casi no te queda margen para revisar antes de entregar.';
+    caja.innerHTML = `El editor tiene <b>${Math.max(edicion, 0)} días</b> para editar y tú <b>${Math.max(revision, 0)} días</b> para revisar antes de entregar.${ojo ? `<span class="ojo">${esc(ojo)}</span>` : ''}`;
+  };
+  $('record_start').addEventListener('change', () => {
+    if (!$('record_start').value) return;
+    if (!$('record_end').value || $('record_end').value < $('record_start').value) $('record_end').value = $('record_start').value;
+    if (nuevo) {
+      const ent = sugerirEntrega($('record_start').value);
+      $('delivery_date').value = aISO(ent);
+      $('editor_due').value = aISO(sumarDias(ent, -CONFIG.DIAS_COLCHON));
+      if (!nombreTocado) $('name').value = nombreMes(ent);
+    }
+    resumen();
+  });
+  $('delivery_date').addEventListener('change', () => {
+    if (!$('delivery_date').value) return;
+    if (nuevo) {
+      const ent = aFecha($('delivery_date').value);
+      $('editor_due').value = aISO(sumarDias(ent, -CONFIG.DIAS_COLCHON));
+      if (!nombreTocado) $('name').value = nombreMes(ent);
+    }
+    resumen();
+  });
+  ['record_end', 'editor_due'].forEach(n => $(n).addEventListener('change', resumen));
+  if ($('count')) $('count').addEventListener('input', resumen);
+  resumen();
+}
+
+// Cliente (crear o editar)
+function modalCliente(id) {
+  const cl = id ? clientePorId(id) : null;
+  abrirModal(`<form data-form="cliente" data-id="${cl ? cl.id : ''}" novalidate>
+    <div class="d-cab"><div><h2 class="d-titulo">${cl ? 'Editar cliente' : 'Nuevo cliente'}</h2></div></div>
+    <div class="campo"><label for="k-nombre">Nombre</label><input id="k-nombre" name="name" required maxlength="80" value="${esc(cl ? cl.name : '')}" placeholder="Nombre de la marca o negocio"></div>
+    <div class="campo"><label for="k-n">Videos por mes</label><input id="k-n" name="videos_per_cycle" type="number" min="1" max="40" value="${cl ? cl.videos_per_cycle : 12}" style="max-width:8rem"></div>
+    <div class="campo"><label for="k-url">Carpeta compartida con el cliente (opcional)</label><input id="k-url" name="shared_url" type="url" inputmode="url" placeholder="https://drive.google.com/..." value="${esc(cl ? cl.shared_url || '' : '')}">
+      <p class="ayuda">El cliente la ve en su portal. No pongas aquí la carpeta de crudos.</p></div>
+    ${cl ? `<div class="campo"><label class="interruptor"><input type="checkbox" name="active"${cl.active ? ' checked' : ''}> Cliente activo</label><p class="ayuda">Si lo pausas, deja de aparecer en el calendario, pero su historial se conserva.</p></div>` : ''}
+    <div class="d-pie">
+      ${cl ? `<button type="button" class="btn btn-t btn-peligro izq" data-accion="borrar-cliente" data-id="${cl.id}">Borrar cliente</button>` : ''}
+      <button type="button" class="btn" data-accion="cerrar">Cancelar</button>
+      <button type="submit" class="btn btn-p">${cl ? 'Guardar cambios' : 'Crear cliente'}</button>
+    </div>
+  </form>`);
+}
+
+// ---------- Formularios -----------------------------------------------
+const valor = (f, n) => { const el = f.elements[n]; if (!el || el.disabled) return undefined; return String(el.value).trim(); };
+function revisarLinks(f, nombres) {
+  for (const n of nombres) {
+    const x = valor(f, n);
+    if (x && !urlSegura(x)) { aviso('Los links tienen que empezar con https://', true); f.elements[n].focus(); return false; }
+  }
+  return true;
+}
+
+async function guardarVideo(id, cambios, ok) {
+  try {
+    await q(sb.from('videos').update(cambios).eq('id', id));
+    cerrarModal();
+    aviso(ok || 'Cambios guardados');
+    await recargar();
+  } catch (e) { aviso(humano(e), true); }
+}
+
+const FORMS = {
+  async video(f) {
+    const id = f.dataset.id, v = S.videos.find(x => x.id === id); if (!v) return;
+    if (!revisarLinks(f, ['script_url', 'final_url'])) return;
+    const esAdmin = S.perfil.role === 'admin', yo = S.perfil.id, cambios = {};
+    const poner = (k, x) => { if (x === undefined) return; const nuevo = x === '' ? null : x; if ((v[k] ?? null) !== nuevo) cambios[k] = nuevo; };
+    if (esAdmin) {
+      poner('title', valor(f, 'title'));
+      poner('script_url', valor(f, 'script_url'));
+      poner('script_text', valor(f, 'script_text'));
+      poner('editor_id', valor(f, 'editor_id'));
+    }
+    poner('status', valor(f, 'status'));
+    poner('final_url', valor(f, 'final_url'));
+    poner('team_notes', valor(f, 'team_notes'));
+    if (!esAdmin) {
+      const mio = f.elements.mio;
+      if (mio && !mio.disabled) {
+        if (mio.checked && !v.editor_id) cambios.editor_id = yo;
+        if (!mio.checked && v.editor_id === yo) cambios.editor_id = null;
+      }
+      if (!v.editor_id && cambios.status && !('editor_id' in cambios)) cambios.editor_id = yo;
+    }
+    if (!Object.keys(cambios).length) return cerrarModal();
+    await guardarVideo(id, cambios);
+  },
+  async termine(f) {
+    const id = f.dataset.id, v = S.videos.find(x => x.id === id); if (!v) return;
+    const url = urlSegura(valor(f, 'final_url'));
+    if (!url) { aviso('Pega el link del video terminado (empieza con https://)', true); f.elements.final_url.focus(); return; }
+    const cambios = { status: 'revision', final_url: url };
+    if (!v.editor_id) cambios.editor_id = S.perfil.id;
+    await guardarVideo(id, cambios, 'Enviado a revisión');
+  },
+  async guion(f) {
+    if (!revisarLinks(f, ['script_url'])) return;
+    const url = valor(f, 'script_url'), texto = valor(f, 'script_text');
+    try {
+      await q(sb.rpc('client_submit_script', { p_video_id: f.dataset.id, p_title: valor(f, 'title') || '', p_script_url: url || '', p_script_text: texto || '' }));
+      cerrarModal();
+      aviso(url || texto ? 'Guion guardado' : 'Guion quitado');
+      await recargar();
+    } catch (e) { aviso(humano(e), true); }
+  },
+  async ciclo(f) {
+    const d = {};
+    ['name', 'record_start', 'record_end', 'editor_due', 'delivery_date', 'raw_url', 'count'].forEach(n => { d[n] = valor(f, n); });
+    if (!d.name) { aviso('Escribe el nombre del mes.', true); return f.elements.name.focus(); }
+    if (!d.record_start || !d.record_end || !d.editor_due || !d.delivery_date) return aviso('Completa las cuatro fechas.', true);
+    if (d.record_end < d.record_start) return aviso('La grabación no puede terminar antes de empezar.', true);
+    if (d.delivery_date < d.record_end) return aviso('La entrega no puede ser antes de que termine la grabación.', true);
+    if (d.editor_due < d.record_start || d.editor_due > d.delivery_date) return aviso('El límite del editor tiene que quedar entre la grabación y la entrega.', true);
+    if (!revisarLinks(f, ['raw_url'])) return;
+    try {
+      if (f.dataset.id) {
+        await q(sb.from('cycles').update({ name: d.name, record_start: d.record_start, record_end: d.record_end, editor_due: d.editor_due, delivery_date: d.delivery_date, raw_url: d.raw_url || null }).eq('id', f.dataset.id));
+      } else {
+        const n = Math.round(Number(d.count));
+        if (!(n >= 1 && n <= 40)) return aviso('El número de videos tiene que estar entre 1 y 40.', true);
+        await q(sb.rpc('create_cycle', { p_client: f.dataset.cliente, p_name: d.name, p_record_start: d.record_start, p_record_end: d.record_end, p_editor_due: d.editor_due, p_delivery: d.delivery_date, p_raw_url: d.raw_url || null, p_count: n }));
+      }
+      cerrarModal();
+      aviso(f.dataset.id ? 'Mes actualizado' : 'Mes creado');
+      await recargar();
+    } catch (e) { aviso(humano(e), true); }
+  },
+  async cliente(f) {
+    const nombre = valor(f, 'name'), n = Math.round(Number(valor(f, 'videos_per_cycle')));
+    if (!nombre) { aviso('Escribe el nombre del cliente.', true); return f.elements.name.focus(); }
+    if (!(n >= 1 && n <= 40)) return aviso('Los videos por mes tienen que estar entre 1 y 40.', true);
+    if (!revisarLinks(f, ['shared_url'])) return;
+    const datos = { name: nombre, videos_per_cycle: n, shared_url: valor(f, 'shared_url') || null };
+    if (f.elements.active) datos.active = f.elements.active.checked;
+    try {
+      if (f.dataset.id) await q(sb.from('clients').update(datos).eq('id', f.dataset.id));
+      else await q(sb.from('clients').insert(datos));
+      cerrarModal();
+      aviso(f.dataset.id ? 'Cliente actualizado' : 'Cliente creado');
+      await recargar();
+    } catch (e) { aviso(humano(e), true); }
+  }
+};
+
+// ---------- Acciones --------------------------------------------------
+async function actualizarPerfil(id, cambios, repintar) {
+  try {
+    await q(sb.from('profiles').update(cambios).eq('id', id));
+    aviso('Acceso actualizado');
+    if (id === S.perfil.id) return arrancar();
+    await recargar(!repintar);
+    if (!repintar) { const p = perfilPorId(id); if (p) Object.assign(p, cambios); }
+  } catch (e) { aviso(humano(e), true); await recargar(); }
+}
+
+const ACC = {
+  entrar() {
+    sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: location.origin + location.pathname, queryParams: { prompt: 'select_account' } } })
+      .then(r => { if (r && r.error) aviso(humano(r.error), true); });
+  },
+  async salir() { try { await sb.auth.signOut(); } catch (e) { /* sin sesión */ } S.perfil = null; arrancar(); },
+  reintentar() { arrancar(); },
+  'recargar-pagina'() { location.reload(); },
+  async actualizar() { await recargar(); aviso('Actualizado'); },
+  ir(el, id) { S.vista = id; S.previa = null; render(); window.scrollTo(0, 0); },
+  previa(el, id) { S.previa = id; S.vista = 'previa'; S.cicloCliente = null; elegirMesCliente(portalLocal(id)); render(); window.scrollTo(0, 0); },
+  'ver-mes'(el, id) { S.cicloCliente = id; render(); },
+  'ver-todos'(el, id) { S.verTodos[id] = true; render(); },
+  'cal-mover'(el, id) {
+    const n = Number(id), base = S.calInicio || primerDia(hoy());
+    S.calInicio = n === 0 ? primerDia(hoy()) : new Date(base.getFullYear(), base.getMonth() + n, 1);
+    render();
+  },
+  cerrar() { cerrarModal(); },
+  'conf-si'() { const r = resolverConfirmacion; resolverConfirmacion = null; cerrarModal(); if (r) r(true); },
+  'conf-no'() { cerrarModal(); },
+  'abrir-video'(el, id) { modalVideo(id); },
+  'abrir-guion'(el, id) { modalGuion(id); },
+  termine(el, id) { modalTermine(id); },
+  async empezar(el, id) {
+    const v = S.videos.find(x => x.id === id); if (!v) return;
+    const cambios = { status: 'edicion' };
+    if (!v.editor_id) cambios.editor_id = S.perfil.id;
+    await guardarVideo(id, cambios, 'Video en edición');
+  },
+  async aprobar(el, id) { await guardarVideo(id, { status: 'listo' }, 'Video aprobado'); },
+  async 'marcar-grabado'(el, id) {
+    const n = S.videos.filter(v => v.cycle_id === id && (v.status === 'sin_guion' || v.status === 'guion')).length;
+    if (!await confirmar(`¿Marcar ${n} videos como grabados?`, 'Úsalo al terminar la sesión de grabación: los editores verán que ya pueden empezar.', 'Marcar como grabados')) return;
+    try { await q(sb.from('videos').update({ status: 'grabado' }).eq('cycle_id', id).in('status', ['sin_guion', 'guion'])); aviso('Marcados como grabados'); await recargar(); }
+    catch (e) { aviso(humano(e), true); }
+  },
+  async 'entregar-ciclo'(el, id) {
+    const n = S.videos.filter(v => v.cycle_id === id && v.status === 'listo').length;
+    if (!await confirmar(`¿Entregar ${n} videos al cliente?`, 'El cliente verá el link de cada video aprobado. Los que no estén aprobados se quedan como están.', 'Entregar')) return;
+    try { await q(sb.from('videos').update({ status: 'entregado' }).eq('cycle_id', id).eq('status', 'listo')); aviso('Videos entregados'); await recargar(); }
+    catch (e) { aviso(humano(e), true); }
+  },
+  async 'agregar-video'(el, id) {
+    const max = S.videos.filter(v => v.cycle_id === id).reduce((m, v) => Math.max(m, v.number), 0);
+    try { await q(sb.from('videos').insert({ cycle_id: id, number: max + 1 })); aviso(`Video ${max + 1} agregado`); await recargar(); }
+    catch (e) { aviso(humano(e), true); }
+  },
+  async 'borrar-video'(el, id) {
+    const v = S.videos.find(x => x.id === id); if (!v) return;
+    if (!await confirmar(`¿Borrar el video ${v.number}?`, 'Se borra su guion, sus notas y su link. No se puede deshacer.', 'Borrar video', true)) return;
+    try { await q(sb.from('videos').delete().eq('id', id)); aviso('Video borrado'); await recargar(); }
+    catch (e) { aviso(humano(e), true); }
+  },
+  'nuevo-cliente'() { modalCliente(null); },
+  'editar-cliente'(el, id) { modalCliente(id); },
+  async 'borrar-cliente'(el, id) {
+    const cl = clientePorId(id); if (!cl) return;
+    const n = S.ciclos.filter(c => c.client_id === id).length;
+    if (!await confirmar(`¿Borrar a ${cl.name}?`, `Se borran también sus ${n} meses y todos sus videos. Si solo dejó de trabajar contigo, mejor ponlo en pausa.`, 'Borrar cliente', true)) return;
+    try { await q(sb.from('clients').delete().eq('id', id)); aviso('Cliente borrado'); await recargar(); }
+    catch (e) { aviso(humano(e), true); }
+  },
+  'nuevo-ciclo'(el, id) { modalCiclo(null, id); },
+  'editar-ciclo'(el, id) { modalCiclo(id); },
+  async 'borrar-ciclo'(el, id) {
+    const c = S.ciclos.find(x => x.id === id); if (!c) return;
+    if (!await confirmar(`¿Borrar ${c.name}?`, 'Se borran todos los videos de este mes, con sus guiones y links. No se puede deshacer.', 'Borrar mes', true)) return;
+    try { await q(sb.from('cycles').delete().eq('id', id)); aviso('Mes borrado'); await recargar(); }
+    catch (e) { aviso(humano(e), true); }
+  },
+  async historial(el, id) {
+    const c = S.ciclos.find(x => x.id === id); if (!c) return;
+    try {
+      const vs = await q(sb.from('videos').select('*').eq('cycle_id', id).order('number'));
+      S.videos = S.videos.filter(v => v.cycle_id !== id).concat(vs || []);
+      render();
+      const cl = clientePorId(c.client_id);
+      abrirModal(`<div class="d-cab"><div><h2 class="d-titulo">${esc(cl ? cl.name : '')}: ${esc(c.name)}</h2><p class="d-sub">Entrega ${esc(fLarga(c.delivery_date))}</p></div></div>
+        <div class="filas">${(vs || []).map(v => `<div class="fila"><span class="f-num">${pad(v.number)}</span>
+          <div class="f-cuerpo"><div class="f-titulo">${v.title ? esc(v.title) : '<span class="vacio">Sin título</span>'}</div>
+          <div class="f-meta">${enlace(v.final_url, 'Video terminado')}${enlace(v.script_url, 'Guion')}</div></div>
+          <div class="f-der solo">${pill(v.status)}</div></div>`).join('')}</div>
+        <div class="d-pie"><button class="btn" data-accion="cerrar">Cerrar</button></div>`);
+    } catch (e) { aviso(humano(e), true); }
+  }
+};
+
+const CAMBIOS = {
+  'filtro-cliente'(el) { S.filtro.cliente = el.value; render(); },
+  'filtro-estado'(el) { S.filtro.estado = el.value; render(); },
+  'filtro-mios'(el) { S.filtro.mios = el.checked; render(); },
+  'filtro-entregados'(el) { S.filtro.entregados = el.checked; render(); },
+  'perfil-rol'(el) { actualizarPerfil(el.dataset.id, { role: el.value }, true); },
+  'perfil-cliente'(el) { actualizarPerfil(el.dataset.id, { client_id: el.value || null }, true); },
+  'perfil-nombre'(el) { actualizarPerfil(el.dataset.id, { full_name: el.value.trim() || null }, false); }
+};
+
+document.addEventListener('click', ev => {
+  const el = ev.target.closest('[data-accion]');
+  if (!el || el.disabled) return;
+  const fn = ACC[el.dataset.accion];
+  if (!fn) return;
+  ev.preventDefault();
+  Promise.resolve(fn(el, el.dataset.id, ev)).catch(e => aviso(humano(e), true));
+});
+document.addEventListener('change', ev => {
+  const el = ev.target.closest('[data-cambio]');
+  if (el && CAMBIOS[el.dataset.cambio]) CAMBIOS[el.dataset.cambio](el);
+});
+document.addEventListener('submit', ev => {
+  const f = ev.target.closest('form[data-form]');
+  if (!f || !FORMS[f.dataset.form]) return;
+  ev.preventDefault();
+  const btn = f.querySelector('[type=submit]');
+  if (btn) btn.disabled = true;
+  Promise.resolve(FORMS[f.dataset.form](f))
+    .catch(e => aviso(humano(e), true))
+    .finally(() => { if (btn && document.contains(btn)) btn.disabled = false; });
+});
+raizModal.addEventListener('click', ev => { if (ev.target.classList.contains('velo')) cerrarModal(); });
+document.addEventListener('keydown', ev => { if (ev.key === 'Escape' && raizModal.innerHTML) cerrarModal(); });
+const refrescarSiToca = () => {
+  if (document.visibilityState === 'visible' && S.perfil && S.perfil.role !== 'pendiente'
+      && !raizModal.innerHTML && Date.now() - S.cargadoEn > 60000) recargar();
+};
+window.addEventListener('focus', refrescarSiToca);
+document.addEventListener('visibilitychange', refrescarSiToca);
+
+// ---------- Arranque --------------------------------------------------
+function leerErrorURL() {
+  const p = new URLSearchParams(location.search + '&' + location.hash.replace(/^#/, ''));
+  const e = p.get('error_description') || p.get('error');
+  if (!e) return '';
+  if (/signups? not allowed|not allowed for this instance/i.test(e)) return 'Tu cuenta no tiene acceso a este portal. Pídele acceso a Connect Studios.';
+  return 'No se pudo entrar: ' + e.replace(/\+/g, ' ');
+}
+function limpiarURL() { if (location.search || location.hash) history.replaceState(null, '', location.pathname); }
+
+let arrancando = null;
+function arrancar() {
+  if (!arrancando) arrancando = _arrancar().finally(() => { arrancando = null; });
+  return arrancando;
+}
+async function _arrancar() {
+  cerrarModal();
+  if (!window.supabase) return pintar(pantallaSimple('Sin conexión', 'No se pudo cargar el portal. Revisa tu internet y recarga la página.', 'Recargar', 'recargar-pagina'));
+  if (!configLista() || !sb) return pintar(pantallaSimple('Falta configurar', 'Abre index.html, llena CONFIG con la URL y la Publishable key de tu proyecto de Supabase, y vuelve a subirlo. Los pasos están en GUIA.md.'));
+  const errorURL = leerErrorURL();
+  pintar('<main class="entrada"><p class="nota">Cargando…</p></main>');
+  let sesion = null;
+  try { const r = await sb.auth.getSession(); sesion = r.data.session; } catch (e) { sesion = null; }
+  limpiarURL();
+  S.sesion = sesion;
+  if (!sesion) { S.perfil = null; return pintar(pantallaEntrada(errorURL)); }
+  try {
+    S.perfil = await q(sb.from('profiles').select('*').eq('id', sesion.user.id).maybeSingle());
+    if (!S.perfil || S.perfil.role === 'pendiente') {
+      const email = sesion.user.email || '';
+      S.perfil = null;
+      return pintar(pantallaPendiente(email));
+    }
+    if (S.perfil.role !== 'admin') S.vista = 'produccion';
+    await recargar();
+  } catch (e) {
+    pintar(pantallaSimple('No cargó', humano(e), 'Reintentar', 'reintentar'));
+  }
+}
+
+if (sb) {
+  sb.auth.onAuthStateChange(evento => {
+    if (evento === 'SIGNED_OUT' && S.perfil) setTimeout(arrancar, 0);
+    if (evento === 'SIGNED_IN' && !S.perfil && !arrancando) setTimeout(arrancar, 0);
+  });
+}
+arrancar();
+</script>
+</body>
+</html>
