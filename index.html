@@ -113,6 +113,19 @@ main.app{max-width:var(--ancho);margin:0 auto;padding:1.75rem 1.25rem 5rem}
 .grupo.n-urgente{border-left-color:var(--dorado)}
 .grupo.n-vencido{border-left-color:var(--rojo)}
 .grupo.n-hecho{border-left-color:var(--verde)}
+/* Producción: cliente → meses → videos */
+.cli-prod{background:var(--panel);border:1px solid var(--linea);border-left:4px solid var(--linea-2);border-radius:12px;margin-bottom:1rem}
+.cli-prod.n-urgente{border-left-color:var(--amarillo)}
+.cli-prod.n-vencido{border-left-color:var(--rojo)}
+.cli-prod.n-hecho{border-left-color:var(--verde)}
+.cp-cab{display:flex;align-items:flex-start;justify-content:space-between;gap:.8rem 1.4rem;flex-wrap:wrap;padding:1.05rem 1.15rem}
+.cp-nombre{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:2.1rem;line-height:1;margin:0}
+.cp-meta{color:var(--crema-2);font-size:.9rem;margin:.4rem 0 0}
+.cp-der{display:flex;flex-direction:column;align-items:flex-end;gap:.45rem;padding-top:.3rem}
+.cp-meses{display:grid;gap:.7rem;padding:0 .8rem .8rem}
+.cp-meses .grupo{margin-bottom:0;background:#0A0A0B}
+.cp-meses .g-cliente{font-size:1.45rem}
+@media (max-width:720px){.cp-der{align-items:flex-start;padding-top:0}.cp-meses{padding:0 .5rem .5rem}}
 .g-cab{display:grid;grid-template-columns:minmax(0,1fr) 230px;gap:.85rem 1.5rem;padding:1rem 1.1rem .95rem}
 .g-cliente{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:1.75rem;line-height:1;margin:0}
 .g-plegar{display:inline-flex;align-items:center;gap:.55rem;background:none;border:0;padding:0;margin:0;color:inherit;font:inherit;text-transform:inherit;letter-spacing:inherit;text-align:left;cursor:pointer}
@@ -277,6 +290,7 @@ main.app{max-width:var(--ancho);margin:0 auto;padding:1.75rem 1.25rem 5rem}
 .cli-nombre{font-family:var(--display);font-weight:400;font-size:2rem;text-transform:uppercase;line-height:1;margin:0}
 .cli-nombre.pausado{color:var(--crema-3)}
 .cli-meta{color:var(--crema-2);font-size:.88rem;margin:.35rem 0 0}
+.cli-meta b{color:var(--crema);font-weight:600}
 .ciclos{margin-top:.85rem;display:grid;gap:.45rem}
 .ciclo{display:grid;grid-template-columns:minmax(8rem,1fr) minmax(0,2.2fr) minmax(130px,1fr) auto;gap:.5rem 1rem;align-items:center;background:var(--panel);border:1px solid var(--linea);border-radius:var(--r2);padding:.6rem .8rem;font-size:.88rem}
 .ciclo-av{display:grid;gap:.3rem}
@@ -604,8 +618,8 @@ function cabGrupo(g, abierto) {
   const sinGrabar = todos.filter(v => (v.status === 'sin_guion' || v.status === 'guion') && (!v.editor_id || v.editor_id === yo)).length;
   return `<div class="g-cab">
     <div class="g-info">
-      <h2 class="g-cliente"><button class="g-plegar" data-accion="plegar" data-id="${c.id}" aria-expanded="${abierto}"><span class="g-flecha" aria-hidden="true"></span>${esc(cli ? cli.name : 'Cliente')}</button></h2>
-      <p class="g-mes">${esc(c.name)}${abierto ? '' : ` <span class="g-resumen">· ${esc(resumenEstados(todos))}</span>`}</p>
+      <h3 class="g-cliente"><button class="g-plegar" data-accion="plegar" data-id="${c.id}" aria-expanded="${abierto}" aria-label="${esc((cli ? cli.name + ', ' : '') + c.name)}"><span class="g-flecha" aria-hidden="true"></span>${esc(c.name)}</button></h3>
+      ${abierto ? '' : `<p class="g-mes"><span class="g-resumen">${esc(resumenEstados(todos))}</span></p>`}
       <div class="g-datos">
         <span>Grabación <b>${rango(c.record_start, c.record_end)}</b></span>
         <span class="limite${nivel !== 'hecho' ? ' plazo-' + p.nivel : ''}">Límite de edición <b>${fDia(c.editor_due)}</b>${nivel !== 'hecho' ? ` <em class="faltan">${p.txt}</em>` : ''}</span>
@@ -700,7 +714,14 @@ function vistaProduccion() {
   const grupos = gruposProduccion();
   // Con un filtro de estado o "solo mis videos", los meses se muestran abiertos para ver lo que coincide
   const filtrando = f.estado !== 'todos' || f.mios;
-  const todosAbiertos = grupos.length > 0 && grupos.every(g => S.abiertos.has(g.c.id));
+  // Primero por cliente (en el orden de su mes más urgente) y dentro, sus meses
+  const porCliente = [];
+  grupos.forEach(g => {
+    let b = porCliente.find(x => x.id === g.c.client_id);
+    if (!b) porCliente.push(b = { id: g.c.client_id, cli: g.cli, grupos: [] });
+    b.grupos.push(g);
+  });
+  const todosAbiertos = grupos.length > 0 && porCliente.every(b => S.abiertos.has('pc:' + b.id)) && grupos.every(g => S.abiertos.has(g.c.id));
   const conMeses = S.clientes.filter(cl => S.ciclos.some(c => c.client_id === cl.id));
   let vacio;
   if (!grupos.length) {
@@ -723,15 +744,48 @@ function vistaProduccion() {
       </select>
       ${!esAdmin ? `<label class="interruptor"><input type="checkbox" data-cambio="filtro-mios"${f.mios ? ' checked' : ''}> Solo mis videos</label>` : ''}
       <label class="interruptor"><input type="checkbox" data-cambio="filtro-entregados"${f.entregados ? ' checked' : ''}> ${esAdmin ? 'Ver meses entregados' : 'Ver aprobados y entregados'}</label>
-      ${grupos.length > 1 && !filtrando ? `<button class="btn btn-s btn-t" data-accion="${todosAbiertos ? 'plegar-todo' : 'desplegar-todo'}">${todosAbiertos ? 'Plegar todo' : 'Desplegar todo'}</button>` : ''}
+      ${grupos.length && !filtrando ? `<button class="btn btn-s btn-t" data-accion="${todosAbiertos ? 'plegar-todo' : 'desplegar-todo'}">${todosAbiertos ? 'Plegar todo' : 'Desplegar todo'}</button>` : ''}
     </div>
   </div>
   ${!esAdmin && S.clientes.length ? tableroEditor() : ''}
-  ${grupos.length ? grupos.map(g => { const abierto = filtrando || S.abiertos.has(g.c.id); return `<section class="grupo n-${nivelGrupo(g)}">
-      ${cabGrupo(g, abierto)}
-      ${abierto ? `<div class="filas">${g.visibles.map(filaVideo).join('')}</div>
-      ${esAdmin ? `<div class="g-pie"><button class="btn btn-s btn-t" data-accion="agregar-video" data-id="${g.c.id}">Agregar video</button></div>` : ''}` : ''}
-    </section>`; }).join('') : vacio}`;
+  ${porCliente.length ? porCliente.map(b => {
+    const abiertoCli = filtrando || S.abiertos.has('pc:' + b.id);
+    return `<section class="cli-prod n-${nivelCliente(b)}">
+      ${cabCliente(b, abiertoCli)}
+      ${abiertoCli ? `<div class="cp-meses">${b.grupos.map(g => { const abierto = filtrando || S.abiertos.has(g.c.id); return `<section class="grupo n-${nivelGrupo(g)}">
+        ${cabGrupo(g, abierto)}
+        ${abierto ? `<div class="filas">${g.visibles.map(filaVideo).join('')}</div>
+        ${esAdmin ? `<div class="g-pie"><button class="btn btn-s btn-t" data-accion="agregar-video" data-id="${g.c.id}">Agregar video</button></div>` : ''}` : ''}
+      </section>`; }).join('')}</div>` : ''}
+    </section>`;
+  }).join('') : vacio}`;
+}
+
+// Nivel de urgencia de un cliente: el de su mes más apurado
+function nivelCliente(b) {
+  const niveles = b.grupos.map(nivelGrupo);
+  return ['vencido', 'urgente', 'ok'].find(n => niveles.includes(n)) || 'hecho';
+}
+
+// Encabezado del cliente en Producción: nombre, meses, resumen y su próximo límite
+function cabCliente(b, abierto) {
+  const esAdmin = S.perfil.role === 'admin';
+  const todos = b.grupos.flatMap(g => g.todos);
+  const terminados = todos.filter(v => ['revision', 'listo', 'entregado'].includes(v.status)).length;
+  const prox = b.grupos.find(g => nivelGrupo(g) !== 'hecho');
+  const p = prox && plazo(prox.c.editor_due);
+  const n = b.grupos.length;
+  return `<div class="cp-cab">
+    <div>
+      <h2 class="cp-nombre"><button class="g-plegar" data-accion="plegar" data-id="pc:${b.id}" aria-expanded="${abierto}"><span class="g-flecha" aria-hidden="true"></span>${esc(b.cli ? b.cli.name : 'Cliente')}</button></h2>
+      <p class="cp-meta">${n} ${n === 1 ? 'mes' : 'meses'}: ${esc(b.grupos.map(g => g.c.name).join(', '))}${abierto ? '' : ` · <span class="g-resumen">${esc(resumenEstados(todos))}</span>`}</p>
+      ${prox ? `<p class="cp-meta limite plazo-${p.nivel}">Próximo límite de edición <b>${fDia(prox.c.editor_due)}</b> <em class="faltan">${p.txt}</em>${n > 1 ? ` <span class="nota">(${esc(prox.c.name)})</span>` : ''}</p>` : ''}
+    </div>
+    <div class="cp-der">
+      <span class="nota">${terminados} de ${todos.length} terminados</span>
+      ${esAdmin && b.cli ? `<button class="btn btn-s btn-t" data-accion="nuevo-ciclo" data-id="${b.id}">Nuevo mes</button>` : ''}
+    </div>
+  </div>`;
 }
 
 // ---------- Calendario ------------------------------------------------
@@ -828,11 +882,13 @@ function bloqueCliente(cl) {
   const usuarios = S.perfiles.filter(p => p.role === 'cliente' && p.client_id === cl.id);
   const editores = editoresDeCliente(cl.id);
   const mostrar = S.verTodos[cl.id] ? cs : cs.slice(0, 4);
+  const abierto = S.abiertos.has('cc:' + cl.id);
   return `<section class="cli">
     <div class="cli-cab">
       <div>
-        <h2 class="cli-nombre${cl.active ? '' : ' pausado'}">${esc(cl.name)}</h2>
-        <p class="cli-meta">${cl.videos_per_cycle} videos por mes${cl.active ? '' : ', en pausa'}. ${usuarios.length ? `Con acceso: ${usuarios.map(u => esc(nombreDe(u))).join(', ')}.` : 'Nadie de este cliente tiene acceso todavía.'}
+        <h2 class="cli-nombre${cl.active ? '' : ' pausado'}"><button class="g-plegar" data-accion="plegar" data-id="cc:${cl.id}" aria-expanded="${abierto}"><span class="g-flecha" aria-hidden="true"></span>${esc(cl.name)}</button></h2>
+        <p class="cli-meta"><b>${cs.length ? `${cs.length} ${cs.length === 1 ? 'mes' : 'meses'}` : 'Sin meses'}</b>${cs.length && !abierto ? ` (${esc(cs.slice(0, 3).map(c => c.name).join(', '))}${cs.length > 3 ? '…' : ''})` : ''}.
+          ${cl.videos_per_cycle} videos por mes${cl.active ? '' : ', en pausa'}. ${usuarios.length ? `Con acceso: ${usuarios.map(u => esc(nombreDe(u))).join(', ')}.` : 'Nadie de este cliente tiene acceso todavía.'}
           ${editores.length ? `Editores: ${editores.map(u => esc(nombreDe(u))).join(', ')}.` : 'Sin editor asignado (se asigna en Accesos).'}</p>
       </div>
       <div class="controles">
@@ -841,8 +897,8 @@ function bloqueCliente(cl) {
         <button class="btn btn-s btn-p" data-accion="nuevo-ciclo" data-id="${cl.id}">Nuevo mes</button>
       </div>
     </div>
-    ${cs.length ? `<div class="ciclos">${mostrar.map(filaCiclo).join('')}</div>` : '<p class="nota">Sin meses todavía.</p>'}
-    ${cs.length > 4 && !S.verTodos[cl.id] ? `<button class="btn btn-s btn-t" data-accion="ver-todos" data-id="${cl.id}">Ver los ${cs.length} meses</button>` : ''}
+    ${abierto ? `${cs.length ? `<div class="ciclos">${mostrar.map(filaCiclo).join('')}</div>` : '<p class="nota">Sin meses todavía.</p>'}
+    ${cs.length > 4 && !S.verTodos[cl.id] ? `<button class="btn btn-s btn-t" data-accion="ver-todos" data-id="${cl.id}">Ver los ${cs.length} meses</button>` : ''}` : ''}
   </section>`;
 }
 
@@ -1353,7 +1409,7 @@ const FORMS = {
         if (!(n >= 1 && n <= 40)) return aviso('El número de videos tiene que estar entre 1 y 40.', true);
         const nuevo = await q(sb.rpc('create_cycle', { p_client: f.dataset.cliente, p_name: d.name, p_record_start: d.record_start, p_record_end: d.record_end, p_editor_due: d.editor_due, p_delivery: d.delivery_date, p_raw_url: d.raw_url || null, p_count: n }));
         if (nuevo) {
-          S.abiertos.add(nuevo); guardarAbiertos();
+          S.abiertos.add(nuevo); S.abiertos.add('pc:' + f.dataset.cliente); S.abiertos.add('cc:' + f.dataset.cliente); guardarAbiertos();
           if (d.delivery_url) await q(sb.from('cycles').update({ delivery_url: d.delivery_url }).eq('id', nuevo));
         }
       }
@@ -1466,8 +1522,8 @@ const ACC = {
     if (S.abiertos.has(id)) S.abiertos.delete(id); else S.abiertos.add(id);
     guardarAbiertos(); render();
   },
-  'desplegar-todo'() { gruposProduccion().forEach(g => S.abiertos.add(g.c.id)); guardarAbiertos(); render(); },
-  'plegar-todo'() { gruposProduccion().forEach(g => S.abiertos.delete(g.c.id)); guardarAbiertos(); render(); },
+  'desplegar-todo'() { gruposProduccion().forEach(g => { S.abiertos.add(g.c.id); S.abiertos.add('pc:' + g.c.client_id); }); guardarAbiertos(); render(); },
+  'plegar-todo'() { gruposProduccion().forEach(g => { S.abiertos.delete(g.c.id); S.abiertos.delete('pc:' + g.c.client_id); }); guardarAbiertos(); render(); },
   'asignar-mes'(el, id) { modalAsignarMes(id); },
   'carpetas-mes'(el, id) { modalCarpetas(id); },
   'pedir-cambios'(el, id) { modalPedirCambios(id); },
@@ -1484,7 +1540,8 @@ const ACC = {
     if (!await confirmar(`¿Marcar ${n === 1 ? 'el video' : `los ${n} videos`} en edición?`, 'Pasan a "En edición" a tu nombre (los que tenga otro editor no se tocan). "Terminé" lo marcas en cada video cuando lo subas a la carpeta.', 'Marcar en edición')) return;
     try {
       await q(sb.from('videos').update({ status: 'edicion', editor_id: yo }).eq('cycle_id', id).eq('status', 'grabado').or(`editor_id.is.null,editor_id.eq.${yo}`));
-      S.abiertos.add(id); guardarAbiertos();
+      const c = S.ciclos.find(x => x.id === id);
+      S.abiertos.add(id); if (c) S.abiertos.add('pc:' + c.client_id); guardarAbiertos();
       aviso(n === 1 ? 'Video en edición' : `${n} videos en edición`); await recargar();
     } catch (e) { aviso(humano(e), true); }
   },
