@@ -22,7 +22,9 @@
   --crema-3:#8C816B;
   --dorado:#E3B23C;
   --dorado-2:#F0C65E;
-  --verde:#9CC08A;
+  --verde:#39FF88;   /* verde de marca, el de connectstudios.mx */
+  --verde-2:#7DFFB0;
+  --verde-t:rgba(57,255,136,.14);
   --rojo:#F0705A;
   --display:'Anton',Impact,'Arial Narrow',sans-serif;
   --texto:'Archivo',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
@@ -33,9 +35,9 @@
 *,*::before,*::after{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
 body{margin:0;min-height:100vh;background:var(--negro);color:var(--crema);font-family:var(--texto);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;padding-bottom:env(safe-area-inset-bottom,0px)}
-a{color:var(--dorado);text-underline-offset:2px}
+a{color:var(--verde);text-underline-offset:2px}
 button,input,select,textarea{font:inherit;color:inherit}
-:focus-visible{outline:2px solid var(--dorado);outline-offset:2px}
+:focus-visible{outline:2px solid var(--verde);outline-offset:2px}
 [hidden]{display:none!important}
 .nota{font-size:.82rem;color:var(--crema-3)}
 .vacio{color:var(--crema-3);font-weight:500}
@@ -43,8 +45,8 @@ button,input,select,textarea{font:inherit;color:inherit}
 /* Botones */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:.45em;min-height:2.25rem;padding:0 .95rem;border:1px solid var(--linea-2);border-radius:var(--r2);background:transparent;color:var(--crema);font-weight:600;font-size:.9rem;cursor:pointer;white-space:nowrap;text-decoration:none}
 .btn:hover{background:var(--panel-2);border-color:var(--crema-3)}
-.btn-p{background:var(--dorado);border-color:var(--dorado);color:#000}
-.btn-p:hover{background:var(--dorado-2);border-color:var(--dorado-2)}
+.btn-p{background:var(--verde);border-color:var(--verde);color:#000}
+.btn-p:hover{background:var(--verde-2);border-color:var(--verde-2)}
 .btn-s{min-height:1.9rem;padding:0 .7rem;font-size:.82rem}
 .btn-t{border-color:transparent;color:var(--crema-2)}
 .btn-t:hover{color:var(--crema);border-color:transparent}
@@ -57,6 +59,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 .barra-in{max-width:var(--ancho);margin:0 auto;padding:.7rem 1.25rem;display:flex;align-items:center;gap:.5rem 1.25rem;flex-wrap:wrap}
 .marca{display:flex;align-items:baseline;gap:.55rem}
 .marca b{font-family:var(--display);font-weight:400;font-size:1.4rem;line-height:1;letter-spacing:.015em;text-transform:uppercase}
+.marca b::after{content:"";display:inline-block;width:.3em;height:.3em;margin-left:.12em;background:var(--verde);vertical-align:.02em}
 .marca span{font-size:.85rem;color:var(--crema-3);font-weight:500}
 .nav{display:flex;gap:.2rem;overflow-x:auto;scrollbar-width:none}
 .nav::-webkit-scrollbar{display:none}
@@ -77,7 +80,7 @@ main.app{max-width:var(--ancho);margin:0 auto;padding:1.75rem 1.25rem 5rem}
 .controles{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center}
 .campo-in{height:2.25rem;background:var(--panel);border:1px solid var(--linea-2);border-radius:var(--r2);padding:0 .7rem;color:var(--crema);max-width:100%}
 .interruptor{display:inline-flex;align-items:center;gap:.45rem;font-size:.88rem;color:var(--crema-2);cursor:pointer;user-select:none}
-.interruptor input{accent-color:var(--dorado);width:1rem;height:1rem;margin:0}
+.interruptor input{accent-color:var(--verde);width:1rem;height:1rem;margin:0}
 .caja-vacia{border:1px dashed var(--linea-2);border-radius:var(--r2);padding:2rem 1.5rem;color:var(--crema-2);max-width:40rem}
 .caja-vacia p{margin:0 0 1rem}
 .error-linea{color:var(--rojo);font-weight:600}
@@ -100,7 +103,7 @@ main.app{max-width:var(--ancho);margin:0 auto;padding:1.75rem 1.25rem 5rem}
 .tira .s-grabado{background:var(--crema)}
 .tira .s-edicion,.tira .s-produccion{background:var(--dorado)}
 .tira .s-revision{background:repeating-linear-gradient(135deg,var(--dorado) 0 3px,transparent 3px 6px);outline:1px solid rgba(227,178,60,.6);outline-offset:-1px}
-.tira .s-listo{border:1px solid var(--verde);background:rgba(156,192,138,.25)}
+.tira .s-listo{border:1px solid var(--verde);background:var(--verde-t)}
 .tira .s-entregado{background:var(--verde)}
 
 /* Producción */
@@ -140,30 +143,63 @@ main.app{max-width:var(--ancho);margin:0 auto;padding:1.75rem 1.25rem 5rem}
   .g-der{align-items:flex-start;padding-top:0}
 }
 
-/* Vista del cliente: el mes como hoja de contactos de reels */
-.mes-tabs{display:flex;gap:.35rem;margin-bottom:1.6rem;overflow-x:auto;padding-bottom:2px}
+/* Vista del cliente: el mes como hoja de contactos de reels, con foto por estado */
+/* Fotos: Unsplash (licencia libre). sin-guion: Feodor Chistyakov · guion: Gabriel Weyand ·
+   grabado: Darko Sokoleski · edicion: Jakob Owens · entregado: Javier Esteban · set: Joshua Wann */
+[data-foto="sin_guion"]{--foto:url(img/sin-guion.webp);--filtro:grayscale(1) brightness(.62)}
+[data-foto="guion"]{--foto:url(img/guion.webp);--filtro:grayscale(.5) brightness(.8)}
+[data-foto="grabado"]{--foto:url(img/grabado.webp);--filtro:saturate(.75) brightness(.85)}
+[data-foto="produccion"]{--foto:url(img/edicion.webp);--filtro:saturate(.8) brightness(.8)}
+[data-foto="entregado"]{--foto:url(img/entregado.webp);--filtro:saturate(1.05)}
+.mes-tabs{display:flex;gap:.35rem;margin-bottom:1.1rem;overflow-x:auto;padding-bottom:2px}
 .mes-tabs button{border:1px solid var(--linea-2);background:none;border-radius:999px;padding:.35rem .9rem;color:var(--crema-2);font-weight:600;cursor:pointer;white-space:nowrap}
-.mes-tabs button[aria-pressed="true"]{background:var(--crema);color:#000;border-color:var(--crema)}
-.cli-empresa{margin:0 0 .35rem;color:var(--crema-2);font-weight:600}
-.mes-grande{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:clamp(3.2rem,11vw,7.5rem);line-height:.86;margin:0;letter-spacing:.005em}
-.mes-info{display:flex;flex-wrap:wrap;gap:.8rem 2.6rem;margin:1.3rem 0 1.5rem;color:var(--crema-2);font-size:.95rem}
+.mes-tabs button:hover{border-color:var(--crema-3);color:var(--crema)}
+.mes-tabs button[aria-pressed="true"]{background:var(--verde);color:#000;border-color:var(--verde)}
+.hero-cli{position:relative;isolation:isolate;overflow:hidden;min-height:clamp(290px,40vw,430px);display:flex;flex-direction:column;justify-content:flex-end;padding:clamp(1.3rem,4vw,2.6rem);margin-bottom:1.5rem;border:1px solid var(--linea);border-radius:14px;background:#050505}
+.hero-cli::before{content:"";position:absolute;inset:0;z-index:-2;background:url(img/set.webp) 60% 40%/cover;filter:saturate(.6)}
+.hero-cli::after{content:"";position:absolute;inset:0;z-index:-1;background:
+  linear-gradient(to top,#000 3%,rgba(0,0,0,.7) 38%,rgba(0,0,0,.2) 72%,rgba(0,0,0,.5)),
+  linear-gradient(to right,rgba(0,0,0,.78),rgba(0,0,0,0) 62%),
+  radial-gradient(120% 95% at 72% 32%,transparent 40%,rgba(0,0,0,.72))}
+.cli-empresa{margin:0 0 .6rem;color:var(--verde);font-weight:700;font-size:.8rem;letter-spacing:.16em;text-transform:uppercase}
+.mes-grande{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:clamp(3.2rem,11vw,7.5rem);line-height:.86;margin:0;letter-spacing:.005em;text-shadow:0 4px 30px rgba(0,0,0,.5)}
+.mes-info{display:flex;flex-wrap:wrap;gap:.8rem 2.6rem;margin:1.3rem 0 0;color:var(--crema-2);font-size:.95rem}
 .mes-info b{display:block;color:var(--crema);font-size:1.2rem;font-weight:600}
-.avance{display:flex;align-items:center;gap:.6rem 1rem;margin-bottom:1.3rem;flex-wrap:wrap;color:var(--crema-2)}
-.avance .tira{flex:1 1 260px;max-width:420px;height:10px}
+.mes-info .clave b{color:var(--verde)}
+.avance-cli{display:flex;align-items:center;gap:.8rem 1.4rem;flex-wrap:wrap;margin:0 0 1.4rem}
+.avance-num{font-family:var(--display);font-weight:400;font-size:clamp(2.6rem,6vw,3.6rem);line-height:.85;color:var(--verde);white-space:nowrap}
+.avance-num small{font-size:.45em;color:var(--crema-3);margin-left:.08em}
+.avance-txt{flex:1 1 240px;display:grid;gap:.55rem;color:var(--crema-2)}
+.avance-txt .tira{max-width:520px;height:10px}
 .hoja{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px}
 @media (max-width:980px){.hoja{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media (max-width:560px){.hoja{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}}
-.cuadro{position:relative;aspect-ratio:9/16;background:var(--panel);border:1px solid var(--linea);border-radius:var(--r2);padding:.7rem .65rem 1rem;display:flex;flex-direction:column;align-items:flex-start;gap:.4rem;text-align:left;cursor:pointer;overflow:hidden;color:var(--crema)}
-.cuadro:hover{border-color:var(--crema-3);background:var(--panel-2)}
-.c-num{font-family:var(--display);font-size:clamp(1.7rem,4vw,2.6rem);line-height:.9}
-.c-tit{margin-top:auto;font-weight:600;font-size:.86rem;line-height:1.25;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere;-webkit-hyphens:auto;hyphens:auto}
+.cuadro{position:relative;isolation:isolate;aspect-ratio:9/16;background:#070707;border:1px solid var(--linea);border-radius:10px;padding:.7rem .65rem 1rem;display:flex;flex-direction:column;align-items:flex-start;gap:.45rem;text-align:left;cursor:pointer;overflow:hidden;color:var(--crema);transition:border-color .2s,box-shadow .2s,transform .2s}
+.cuadro::before{content:"";position:absolute;inset:0;z-index:-1;background:
+  linear-gradient(to top,rgba(0,0,0,.96) 6%,rgba(0,0,0,.6) 36%,rgba(0,0,0,.06) 62%,rgba(0,0,0,.5)),
+  radial-gradient(130% 95% at 50% 42%,transparent 45%,rgba(0,0,0,.78)),
+  var(--foto,none) center/cover;
+  filter:var(--filtro,none);transition:transform .5s ease,filter .5s ease}
+.cuadro:hover{border-color:var(--crema-3);transform:translateY(-2px)}
+.cuadro:hover::before{transform:scale(1.06)}
+.c-num{font-family:var(--display);font-size:clamp(1.7rem,4vw,2.6rem);line-height:.9;text-shadow:0 2px 12px rgba(0,0,0,.7)}
+.c-pie{margin-top:auto;display:grid;gap:.35rem;width:100%}
+.c-tit{font-weight:600;font-size:.86rem;line-height:1.25;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere;-webkit-hyphens:auto;hyphens:auto;text-shadow:0 1px 8px rgba(0,0,0,.85)}
+.c-accion{font-size:.74rem;font-weight:700;color:var(--crema-2)}
+.s-sin_guion .c-accion,.s-entregado .c-accion{color:var(--verde)}
 .cuadro .estado{font-size:.66rem;height:auto;min-height:1.3rem;padding:.2rem .45rem;max-width:100%;white-space:normal;line-height:1.15}
-.cuadro::after{content:"";position:absolute;left:0;right:0;bottom:0;height:5px;background:var(--linea-2)}
-.cuadro.s-guion::after{background:rgba(243,231,200,.4)}
+.cuadro .e-sin_guion,.cuadro .e-guion{background:rgba(0,0,0,.6);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.cuadro .e-sin_guion{color:var(--crema);border-color:var(--crema-2)}
+.cuadro::after{content:"";position:absolute;left:0;right:0;bottom:0;height:4px;background:var(--linea-2)}
+.cuadro.s-guion::after{background:rgba(243,231,200,.45)}
 .cuadro.s-grabado::after{background:var(--crema)}
 .cuadro.s-produccion::after{background:var(--dorado)}
-.cuadro.s-entregado{border-color:rgba(156,192,138,.55)}
+.cuadro.s-entregado{border-color:rgba(57,255,136,.55);box-shadow:0 12px 32px -14px rgba(57,255,136,.5)}
+.cuadro.s-entregado:hover{border-color:var(--verde)}
 .cuadro.s-entregado::after{background:var(--verde)}
+.d-foto{position:relative;height:150px;margin:-1.4rem -1.4rem 1.1rem;border-radius:12px 12px 0 0;overflow:hidden;background:var(--foto,none) center 40%/cover}
+.d-foto::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,var(--panel),rgba(18,16,12,.15) 75%)}
+@media (prefers-reduced-motion:reduce){.cuadro,.cuadro::before{transition:none}.cuadro:hover,.cuadro:hover::before{transform:none}}
 .aviso-vista{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;border:1px solid var(--dorado);color:var(--dorado);border-radius:var(--r2);padding:.6rem .9rem;margin-bottom:1.6rem;font-weight:600}
 
 /* Calendario: línea de tiempo tipo editor de video */
@@ -231,7 +267,7 @@ main.app{max-width:var(--ancho);margin:0 auto;padding:1.75rem 1.25rem 5rem}
 .campo input:not([type=checkbox]),.campo select,.campo textarea{width:100%;background:var(--negro);border:1px solid var(--linea-2);border-radius:var(--r2);padding:.6rem .7rem;color:var(--crema)}
 .campo input:disabled,.campo select:disabled{opacity:.55}
 .campo textarea{min-height:8rem;resize:vertical;line-height:1.45}
-.campo input:focus,.campo select:focus,.campo textarea:focus{border-color:var(--dorado);outline:none}
+.campo input:focus,.campo select:focus,.campo textarea:focus{border-color:var(--verde);outline:none}
 .fila-campos{display:grid;grid-template-columns:1fr 1fr;gap:0 1rem}
 @media (max-width:560px){.fila-campos{grid-template-columns:1fr}}
 .resumen{background:var(--negro);border:1px solid var(--linea);border-radius:var(--r2);padding:.7rem .85rem;font-size:.88rem;color:var(--crema-2);margin-bottom:1rem}
@@ -245,6 +281,7 @@ main.app{max-width:var(--ancho);margin:0 auto;padding:1.75rem 1.25rem 5rem}
 .entrada{min-height:100vh;display:grid;align-content:center;padding:2.5rem 1.5rem calc(2.5rem + env(safe-area-inset-bottom,0px));max-width:var(--ancho);margin:0 auto}
 .marca-xl{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:clamp(3.6rem,14vw,9.5rem);line-height:.88;margin:0}
 .marca-xl.m{font-size:clamp(2.6rem,8vw,5rem)}
+.marca-xl:not(.m)::after{content:".";color:var(--verde)}
 .entrada p{max-width:46ch;color:var(--crema-2);font-size:1.08rem;margin:1.4rem 0 1.6rem}
 .entrada .nota{font-size:.85rem;margin-top:1.2rem}
 .btn-grande{min-height:3rem;padding:0 1.4rem;font-size:1rem}
@@ -283,7 +320,7 @@ const sb = (configLista() && window.supabase)
 const S = {
   sesion: null, perfil: null,
   vista: 'produccion',
-  clientes: [], ciclos: [], videos: [], perfiles: [],
+  clientes: [], ciclos: [], videos: [], perfiles: [], asignaciones: [],
   portal: null, cicloCliente: null, previa: null,
   filtro: { cliente: 'todos', estado: 'todos', mios: false, entregados: false },
   calInicio: null, verTodos: {}, cargadoEn: 0
@@ -299,6 +336,8 @@ const clientePorId = id => S.clientes.find(c => c.id === id);
 const perfilPorId = id => S.perfiles.find(p => p.id === id);
 const nombreDe = p => p ? (p.full_name || (p.email || '').split('@')[0] || 'Sin nombre') : '';
 const nombreCorto = p => nombreDe(p).split(' ')[0];
+const clientesDeEditor = id => S.asignaciones.filter(a => a.editor_id === id).map(a => clientePorId(a.client_id)).filter(Boolean);
+const editoresDeCliente = id => S.asignaciones.filter(a => a.client_id === id).map(a => perfilPorId(a.editor_id)).filter(p => p && p.role === 'editor');
 const ROL = { pendiente: 'Pendiente', admin: 'Administrador', editor: 'Editor', cliente: 'Cliente' };
 
 const MESES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
@@ -379,15 +418,17 @@ async function q(peticion) { const { data, error } = await peticion; if (error) 
 
 async function cargarEquipo() {
   const desde = aISO(sumarDias(hoy(), -150));
-  const [clientes, ciclos, perfiles, videos] = await Promise.all([
+  const [clientes, ciclos, perfiles, videos, asignaciones] = await Promise.all([
     q(sb.from('clients').select('*').order('name')),
     q(sb.from('cycles').select('*').order('delivery_date')),
     q(sb.from('profiles').select('id,email,full_name,role,client_id,created_at').order('created_at')),
-    q(sb.from('videos').select('*, cycles!inner(delivery_date)').gte('cycles.delivery_date', desde).order('number'))
+    q(sb.from('videos').select('*, cycles!inner(delivery_date)').gte('cycles.delivery_date', desde).order('number')),
+    q(sb.from('editor_clients').select('editor_id,client_id'))
   ]);
   S.clientes = clientes || [];
   S.ciclos = ciclos || [];
   S.perfiles = perfiles || [];
+  S.asignaciones = asignaciones || [];
   S.videos = (videos || []).map(v => { const x = Object.assign({}, v); delete x.cycles; return x; });
   S.cargadoEn = Date.now();
 }
@@ -562,6 +603,7 @@ function vistaProduccion() {
   if (!grupos.length) {
     if (esAdmin && !S.clientes.length) vacio = `<div class="caja-vacia"><p>Todavía no hay clientes. Da de alta el primero y crea su mes de contenido.</p><button class="btn btn-p" data-accion="nuevo-cliente">Nuevo cliente</button></div>`;
     else if (esAdmin && !S.videos.length) vacio = `<div class="caja-vacia"><p>No hay meses en producción. Crea el mes de un cliente y aquí aparecerán sus videos.</p><button class="btn btn-p" data-accion="ir" data-id="clientes">Ir a Clientes</button></div>`;
+    else if (!esAdmin && !S.clientes.length) vacio = `<div class="caja-vacia"><p>Aún no tienes clientes asignados. Avísale a Connect Studios y en cuanto te asignen uno verás aquí sus videos.</p><button class="btn" data-accion="actualizar">Revisar de nuevo</button></div>`;
     else if (S.videos.length) vacio = `<div class="caja-vacia"><p>Nada coincide con estos filtros.</p></div>`;
     else vacio = `<div class="caja-vacia"><p>No hay videos en producción por ahora. Cuando empiece un mes, aparecerá aquí.</p></div>`;
   }
@@ -671,12 +713,14 @@ function vistaClientes() {
 function bloqueCliente(cl) {
   const cs = S.ciclos.filter(c => c.client_id === cl.id).sort((a, b) => b.delivery_date.localeCompare(a.delivery_date));
   const usuarios = S.perfiles.filter(p => p.role === 'cliente' && p.client_id === cl.id);
+  const editores = editoresDeCliente(cl.id);
   const mostrar = S.verTodos[cl.id] ? cs : cs.slice(0, 4);
   return `<section class="cli">
     <div class="cli-cab">
       <div>
         <h2 class="cli-nombre${cl.active ? '' : ' pausado'}">${esc(cl.name)}</h2>
-        <p class="cli-meta">${cl.videos_per_cycle} videos por mes${cl.active ? '' : ', en pausa'}. ${usuarios.length ? `Con acceso: ${usuarios.map(u => esc(nombreDe(u))).join(', ')}.` : 'Nadie de este cliente tiene acceso todavía.'}</p>
+        <p class="cli-meta">${cl.videos_per_cycle} videos por mes${cl.active ? '' : ', en pausa'}. ${usuarios.length ? `Con acceso: ${usuarios.map(u => esc(nombreDe(u))).join(', ')}.` : 'Nadie de este cliente tiene acceso todavía.'}
+          ${editores.length ? `Editores: ${editores.map(u => esc(nombreDe(u))).join(', ')}.` : 'Sin editor asignado (se asigna en Accesos).'}</p>
       </div>
       <div class="controles">
         ${cs.length ? `<button class="btn btn-s btn-t" data-accion="previa" data-id="${cl.id}">Ver como cliente</button>` : ''}
@@ -710,18 +754,25 @@ function vistaAccesos() {
   </div>
   ${pend ? `<p class="aviso-linea">${pend === 1 ? 'Hay 1 persona esperando acceso.' : `Hay ${pend} personas esperando acceso.`}</p>` : ''}
   <div class="tabla-env"><table class="tabla">
-    <thead><tr><th>Persona</th><th>Rol</th><th>Cliente</th><th>Primer acceso</th></tr></thead>
+    <thead><tr><th>Persona</th><th>Rol</th><th>Cliente o clientes que edita</th><th>Primer acceso</th></tr></thead>
     <tbody>${lista.map(p => `<tr class="${p.role === 'pendiente' ? 'pendiente' : ''}">
       <td><input class="campo-in" value="${esc(p.full_name || '')}" placeholder="Nombre" data-cambio="perfil-nombre" data-id="${p.id}" aria-label="Nombre de ${esc(p.email || '')}">
         <div class="nota">${esc(p.email || '')}${p.id === S.perfil.id ? ' (tú)' : ''}</div></td>
       <td><select class="campo-in" data-cambio="perfil-rol" data-id="${p.id}" aria-label="Rol">${Object.entries(ROL).map(([k, t]) => `<option value="${k}"${p.role === k ? ' selected' : ''}>${t}</option>`).join('')}</select></td>
       <td>${p.role === 'cliente'
         ? `<select class="campo-in" data-cambio="perfil-cliente" data-id="${p.id}" aria-label="Cliente"><option value="">Elige cliente</option>${S.clientes.map(cl => `<option value="${cl.id}"${p.client_id === cl.id ? ' selected' : ''}>${esc(cl.name)}</option>`).join('')}</select>`
+        : p.role === 'editor' ? celdaEditor(p)
         : '<span class="nota">No aplica</span>'}</td>
       <td class="nota">${p.created_at ? fCorta(p.created_at) : ''}</td>
     </tr>`).join('')}</tbody>
   </table></div>
-  <p class="nota" style="margin-top:1rem">Para dar acceso, mándale a la persona el link del portal. Para quitarlo, cámbiala a Pendiente. Para borrarla por completo, elimínala en Supabase (Authentication, Users).</p>`;
+  <p class="nota" style="margin-top:1rem">Para dar acceso, mándale a la persona el link del portal. Cada editor solo ve los clientes que le asignes. Para quitarle el acceso a alguien, cámbialo a Pendiente. Para borrarlo por completo, elimínalo en Supabase (Authentication, Users).</p>`;
+}
+
+function celdaEditor(p) {
+  const cls = clientesDeEditor(p.id);
+  return `<button class="btn btn-s${cls.length ? '' : ' btn-p'}" data-accion="editor-clientes" data-id="${p.id}">${cls.length ? 'Cambiar clientes' : 'Asignar clientes'}</button>
+    <div class="nota">${cls.length ? cls.map(cl => esc(cl.name)).join(', ') : 'Sin clientes: no ve nada todavía'}</div>`;
 }
 
 // ---------- Vista del cliente -----------------------------------------
@@ -731,37 +782,46 @@ function vistaCliente(P, previa) {
   }
   const ciclos = P.cycles || [];
   if (!ciclos.length) {
-    return `<p class="cli-empresa">${esc(P.client.name)}</p><h1 class="mes-grande">Bienvenido</h1>
-      <div class="caja-vacia" style="margin-top:1.5rem"><p>Aún no hay meses programados. Cuando agendemos tu grabación, aquí verás cada video, del guion a la entrega.</p></div>`;
+    return `<section class="hero-cli"><p class="cli-empresa">${esc(P.client.name)}</p><h1 class="mes-grande">Bienvenido</h1></section>
+      <div class="caja-vacia"><p>Aún no hay meses programados. Cuando agendemos tu grabación, aquí verás cada video, del guion a la entrega.</p></div>`;
   }
   const c = ciclos.find(x => x.id === S.cicloCliente) || ciclos[0];
   const vs = c.videos || [];
   const conGuion = vs.filter(v => v.status !== 'sin_guion').length;
   const entregados = vs.filter(v => v.status === 'entregado').length;
-  let mensaje;
-  if (vs.length && entregados === vs.length) mensaje = `Tus ${vs.length} videos están entregados.`;
-  else if (aISO(hoy()) > c.record_end) mensaje = `Estamos editando. Van ${entregados} de ${vs.length} entregados.`;
+  let mensaje, cuenta = conGuion, que = 'guiones';
+  if (vs.length && entregados === vs.length) { mensaje = `Tus ${vs.length} videos están entregados.`; cuenta = entregados; que = 'entregados'; }
+  else if (aISO(hoy()) > c.record_end) { mensaje = `Estamos editando. Van ${entregados} de ${vs.length} entregados.`; cuenta = entregados; que = 'entregados'; }
   else if (conGuion < vs.length) mensaje = `Llevas ${conGuion} de ${vs.length} guiones. Súbelos antes de la grabación.`;
   else mensaje = `Tus ${vs.length} guiones están listos para grabar.`;
   return `${ciclos.length > 1 ? `<div class="mes-tabs" role="group" aria-label="Meses">${ciclos.map(x => `<button data-accion="ver-mes" data-id="${x.id}" aria-pressed="${x.id === c.id}">${esc(x.name)}</button>`).join('')}</div>` : ''}
-    <p class="cli-empresa">${esc(P.client.name)}</p>
-    <h1 class="mes-grande">${esc(c.name)}</h1>
-    <div class="mes-info">
-      <div>Grabamos<b>${esc(rangoLargo(c.record_start, c.record_end))}</b></div>
-      <div>Recibes tus videos<b>el ${esc(fLarga(c.delivery_date))}</b></div>
-      ${urlSegura(P.client.shared_url) ? `<div>Carpeta compartida<b>${enlace(P.client.shared_url, 'Abrir en Drive')}</b></div>` : ''}
+    <section class="hero-cli">
+      <p class="cli-empresa">${esc(P.client.name)}</p>
+      <h1 class="mes-grande">${esc(c.name)}</h1>
+      <div class="mes-info">
+        <div>Grabamos<b>${esc(rangoLargo(c.record_start, c.record_end))}</b></div>
+        <div class="clave">Recibes tus videos<b>el ${esc(fLarga(c.delivery_date))}</b></div>
+        ${urlSegura(P.client.shared_url) ? `<div>Carpeta compartida<b>${enlace(P.client.shared_url, 'Abrir en Drive')}</b></div>` : ''}
+      </div>
+    </section>
+    <div class="avance-cli">
+      <b class="avance-num" aria-label="${cuenta} de ${vs.length} ${que}">${pad(cuenta)}<small>/${pad(vs.length)}</small></b>
+      <div class="avance-txt"><span>${esc(mensaje)}</span>${tira(vs)}</div>
     </div>
-    <div class="avance">${tira(vs)}<span>${esc(mensaje)}</span></div>
     <div class="hoja">${vs.map(v => cuadro(v, previa)).join('')}</div>
     <p class="nota" style="margin-top:1.25rem">${previa ? 'En esta vista previa, tocar un video abre su ficha interna.' : 'Toca un video para subir o cambiar su guion. Cuando esté entregado, desde ahí lo abres.'}</p>`;
 }
 
+const ACCION_CUADRO = { sin_guion: '+ Agregar guion', guion: 'Ver o cambiar guion', entregado: '▶ Ver video' };
 function cuadro(v, previa) {
-  const titulo = v.title ? esc(v.title) : (v.status === 'sin_guion' ? 'Agrega tu guion' : 'Sin título');
-  return `<button class="cuadro s-${esc(v.status)}" data-accion="${previa ? 'abrir-video' : 'abrir-guion'}" data-id="${v.id}" aria-label="Video ${v.number}: ${esc(v.title || 'sin título')}. ${esc(ESTADOS_CLIENTE[v.status] || '')}">
+  const accion = ACCION_CUADRO[v.status];
+  return `<button class="cuadro s-${esc(v.status)}" data-foto="${esc(v.status)}" data-accion="${previa ? 'abrir-video' : 'abrir-guion'}" data-id="${v.id}" aria-label="Video ${v.number}: ${esc(v.title || 'sin título')}. ${esc(ESTADOS_CLIENTE[v.status] || '')}">
     <span class="c-num">${pad(v.number)}</span>
     ${pill(v.status, true)}
-    <span class="c-tit${v.title ? '' : ' vacio'}">${titulo}</span>
+    <span class="c-pie">
+      ${v.title ? `<span class="c-tit">${esc(v.title)}</span>` : ''}
+      ${accion ? `<span class="c-accion" aria-hidden="true">${accion}</span>` : ''}
+    </span>
   </button>`;
 }
 
@@ -827,7 +887,9 @@ function modalVideo(id) {
   const esAdmin = S.perfil.role === 'admin', yo = S.perfil.id;
   const bloqueado = !esAdmin && ['listo', 'entregado'].includes(v.status);
   const ajeno = !esAdmin && v.editor_id && v.editor_id !== yo;
-  const equipo = S.perfiles.filter(p => p.role === 'admin' || p.role === 'editor');
+  // Solo admins y los editores que llevan este cliente (más el que ya lo tenga, para no perderlo)
+  const delCliente = new Set(c ? editoresDeCliente(c.client_id).map(p => p.id) : []);
+  const equipo = S.perfiles.filter(p => p.role === 'admin' || (p.role === 'editor' && delCliente.has(p.id)) || p.id === v.editor_id);
   const opciones = esAdmin ? Object.keys(ESTADOS) : Array.from(new Set([v.status, 'edicion', 'revision']));
   const etiqueta = s => (!esAdmin && s === 'revision') ? 'Terminado (a revisión)' : ESTADOS[s];
   abrirModal(`<form data-form="video" data-id="${v.id}" novalidate>
@@ -888,8 +950,9 @@ function modalGuion(id) {
   const c = ((S.portal && S.portal.cycles) || []).find(x => x.id === S.cicloCliente);
   const v = c && c.videos.find(x => x.id === id); if (!v) return;
   const editable = v.status === 'sin_guion' || v.status === 'guion';
+  const foto = `<div class="d-foto" data-foto="${esc(v.status)}" aria-hidden="true"></div>`;
   if (!editable) {
-    abrirModal(`<div class="d-cab"><span class="d-num">${pad(v.number)}</span><div>
+    abrirModal(`${foto}<div class="d-cab"><span class="d-num">${pad(v.number)}</span><div>
         <h2 class="d-titulo">${v.title ? esc(v.title) : 'Sin título'}</h2><p class="d-sub">${pill(v.status, true)}</p></div></div>
       ${v.status === 'entregado' && urlSegura(v.final_url) ? `<p><a class="btn btn-p btn-grande" href="${esc(urlSegura(v.final_url))}" target="_blank" rel="noopener noreferrer">Ver video</a></p>` : ''}
       ${v.status !== 'entregado' ? '<p class="ayuda">Este video ya se grabó. Si necesitas un cambio, escríbenos directamente.</p>' : ''}
@@ -898,7 +961,7 @@ function modalGuion(id) {
       <div class="d-pie"><button class="btn" data-accion="cerrar">Cerrar</button></div>`);
     return;
   }
-  abrirModal(`<form data-form="guion" data-id="${v.id}" novalidate>
+  abrirModal(`<form data-form="guion" data-id="${v.id}" novalidate>${foto}
     <div class="d-cab"><span class="d-num">${pad(v.number)}</span><div>
       <h2 class="d-titulo">Guion del video ${v.number}</h2><p class="d-sub">Sube un link o escríbelo aquí. Puedes cambiarlo hasta el día de la grabación.</p></div></div>
     <div class="campo"><label for="g-titulo">¿De qué trata este video?</label><input id="g-titulo" name="title" maxlength="200" placeholder="Ej. Tres errores al elegir proveedor" value="${esc(v.title || '')}"></div>
@@ -986,6 +1049,19 @@ function montarCiclo(f, nuevo) {
   ['record_end', 'editor_due'].forEach(n => $(n).addEventListener('change', resumen));
   if ($('count')) $('count').addEventListener('input', resumen);
   resumen();
+}
+
+// Clientes que lleva un editor
+function modalEditorClientes(id) {
+  const p = perfilPorId(id); if (!p) return;
+  const suyos = new Set(clientesDeEditor(id).map(cl => cl.id));
+  abrirModal(`<form data-form="editor-clientes" data-id="${p.id}" novalidate>
+    <div class="d-cab"><div><h2 class="d-titulo">Clientes de ${esc(nombreDe(p))}</h2>
+      <p class="d-sub">Solo verá los meses y videos de los clientes que marques.</p></div></div>
+    ${S.clientes.length ? `<div class="campo" role="group" aria-label="Clientes">${S.clientes.map(cl => `<label class="interruptor" style="min-height:2.2rem"><input type="checkbox" name="cli" value="${cl.id}"${suyos.has(cl.id) ? ' checked' : ''}> ${esc(cl.name)}${cl.active ? '' : ' <span class="nota">(en pausa)</span>'}</label>`).join('')}</div>`
+      : '<p class="ayuda">Todavía no hay clientes. Créalos primero en Clientes.</p>'}
+    <div class="d-pie"><button type="button" class="btn" data-accion="cerrar">Cancelar</button><button type="submit" class="btn btn-p">Guardar</button></div>
+  </form>`);
 }
 
 // Cliente (crear o editar)
@@ -1091,6 +1167,20 @@ const FORMS = {
       await recargar();
     } catch (e) { aviso(humano(e), true); }
   },
+  async 'editor-clientes'(f) {
+    const id = f.dataset.id;
+    const antes = new Set(clientesDeEditor(id).map(cl => cl.id));
+    const ahora = new Set(Array.from(f.querySelectorAll('input[name=cli]:checked'), el => el.value));
+    const agregar = [...ahora].filter(x => !antes.has(x)), quitar = [...antes].filter(x => !ahora.has(x));
+    if (!agregar.length && !quitar.length) return cerrarModal();
+    try {
+      if (agregar.length) await q(sb.from('editor_clients').insert(agregar.map(client_id => ({ editor_id: id, client_id }))));
+      if (quitar.length) await q(sb.from('editor_clients').delete().eq('editor_id', id).in('client_id', quitar));
+      cerrarModal();
+      aviso('Clientes del editor actualizados');
+      await recargar();
+    } catch (e) { aviso(humano(e), true); await recargar(); }
+  },
   async cliente(f) {
     const nombre = valor(f, 'name'), n = Math.round(Number(valor(f, 'videos_per_cycle')));
     if (!nombre) { aviso('Escribe el nombre del cliente.', true); return f.elements.name.focus(); }
@@ -1173,6 +1263,7 @@ const ACC = {
     try { await q(sb.from('videos').delete().eq('id', id)); aviso('Video borrado'); await recargar(); }
     catch (e) { aviso(humano(e), true); }
   },
+  'editor-clientes'(el, id) { modalEditorClientes(id); },
   'nuevo-cliente'() { modalCliente(null); },
   'editar-cliente'(el, id) { modalCliente(id); },
   async 'borrar-cliente'(el, id) {

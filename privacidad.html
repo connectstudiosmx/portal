@@ -18,7 +18,7 @@
   --crema:#F3E7C8;
   --crema-2:#CBBE9E;
   --crema-3:#8C816B;
-  --dorado:#E3B23C;
+  --verde:#39FF88;
   --display:'Anton',Impact,'Arial Narrow',sans-serif;
   --texto:'Archivo',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
   color-scheme:dark;
@@ -26,8 +26,8 @@
 *,*::before,*::after{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--negro);color:var(--crema);font-family:var(--texto);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
-a{color:var(--dorado);text-underline-offset:2px}
-:focus-visible{outline:2px solid var(--dorado);outline-offset:2px}
+a{color:var(--verde);text-underline-offset:2px}
+:focus-visible{outline:2px solid var(--verde);outline-offset:2px}
 main{max-width:46rem;margin:0 auto;padding:3rem 1rem calc(4rem + env(safe-area-inset-bottom,0px))}
 .volver{display:inline-block;font-weight:600;font-size:.9rem;margin-bottom:2rem}
 h1{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:clamp(2.6rem,9vw,4.2rem);line-height:.92;margin:0}
@@ -38,7 +38,7 @@ p{margin:0 0 1rem}
 ul{margin:0 0 1rem;padding-left:1.2rem}
 li{margin:.3rem 0}
 strong{color:var(--crema);font-weight:600}
-.caja{background:var(--panel);border:1px solid var(--linea);border-left:4px solid var(--dorado);border-radius:8px;padding:1.1rem 1.2rem;margin:1.2rem 0}
+.caja{background:var(--panel);border:1px solid var(--linea);border-left:4px solid var(--verde);border-radius:8px;padding:1.1rem 1.2rem;margin:1.2rem 0}
 .caja p:last-child{margin-bottom:0}
 footer{margin-top:3rem;padding-top:1.2rem;border-top:1px solid var(--linea);color:var(--crema-3);font-size:.85rem}
 </style>
@@ -55,7 +55,7 @@ footer{margin-top:3rem;padding-top:1.2rem;border-top:1px solid var(--linea);colo
   <ul>
     <li><strong>De tu cuenta de Google</strong>, cuando entras con ella: tu nombre, tu correo electrónico y la información básica de perfil que Google comparte. Nunca vemos ni guardamos tu contraseña de Google.</li>
     <li><strong>Lo que tú o nuestro equipo capturan en el portal:</strong> guiones (texto o links), títulos, links a carpetas y videos, fechas de grabación y entrega, y notas de trabajo.</li>
-    <li><strong>Datos de control:</strong> tu rol en el portal (cliente, editor o administrador), la empresa a la que perteneces y las fechas en que se crean o cambian los registros.</li>
+    <li><strong>Datos de control:</strong> tu rol en el portal (cliente, editor o administrador), la empresa a la que perteneces o, si eres editor, los clientes que tienes asignados, y las fechas en que se crean o cambian los registros.</li>
   </ul>
   <p>No recabamos datos sensibles ni datos financieros.</p>
 
