@@ -172,6 +172,8 @@ main.app{max-width:var(--ancho);margin:0 auto;padding:1.75rem 1.25rem 5rem}
 .mes-info{display:flex;flex-wrap:wrap;gap:.8rem 2.6rem;margin:1.3rem 0 0;color:var(--crema-2);font-size:.95rem}
 .mes-info b{display:block;color:var(--crema);font-size:1.2rem;font-weight:600}
 .mes-info .clave b{color:var(--verde)}
+.hero-cta{display:flex;flex-wrap:wrap;align-items:center;gap:.6rem 1.1rem;margin-top:1.5rem}
+.hero-cta .nota{color:var(--crema-2);font-size:.88rem}
 .avance-cli{display:flex;align-items:center;gap:.8rem 1.4rem;flex-wrap:wrap;margin:0 0 1.4rem}
 .avance-num{font-family:var(--display);font-weight:400;font-size:clamp(2.6rem,6vw,3.6rem);line-height:.85;color:var(--verde);white-space:nowrap}
 .avance-num small{font-size:.45em;color:var(--crema-3);margin-left:.08em}
@@ -573,7 +575,10 @@ function cabGrupo(g, abierto) {
         <span>Grabación <b>${rango(c.record_start, c.record_end)}</b></span>
         <span class="${nivel !== 'hecho' ? 'plazo-' + p.nivel : ''}">Límite de edición <b>${fDia(c.editor_due)}</b>${nivel !== 'hecho' ? ` (${p.txt})` : ''}</span>
         ${esAdmin ? `<span>Entrega al cliente <b>${fDia(c.delivery_date)}</b></span>` : ''}
-        ${c.raw_url ? enlace(c.raw_url, 'Crudos en Drive') : (esAdmin ? '<span class="nota">Sin carpeta de crudos</span>' : '')}
+        ${esAdmin ? (c.raw_url ? enlace(c.raw_url, 'Crudos en Drive') : '<span class="nota">Sin carpeta de crudos</span>')
+          : (c.raw_url ? '' : '<span class="nota">Crudos: aún sin carpeta</span>')}
+        ${esAdmin ? (c.delivery_url ? enlace(c.delivery_url, 'Videos terminados en Drive') : '<span class="nota">Sin carpeta de videos</span>')
+          : (c.delivery_url ? '' : '<span class="nota">Terminados: aún sin carpeta</span>')}
       </div>
     </div>
     <div class="g-der">
@@ -583,11 +588,14 @@ function cabGrupo(g, abierto) {
     ${esAdmin ? `<div class="g-acc">
       ${porGrabar ? `<button class="btn btn-s" data-accion="marcar-grabado" data-id="${c.id}">Marcar ${porGrabar} como grabados</button>` : ''}
       <button class="btn btn-s" data-accion="asignar-mes" data-id="${c.id}">Asignar editor</button>
+      <button class="btn btn-s${c.delivery_url ? '' : ' btn-p'}" data-accion="carpetas-mes" data-id="${c.id}">${c.delivery_url ? 'Carpetas de Drive' : 'Asignar carpeta de Drive'}</button>
       ${enRevision ? `<button class="btn btn-s" data-accion="aprobar-ciclo" data-id="${c.id}">Aprobar ${enRevision} en revisión</button>` : ''}
       ${aprobados ? `<button class="btn btn-s btn-p" data-accion="entregar-ciclo" data-id="${c.id}">Entregar ${aprobados} al cliente</button>` : ''}
       <button class="btn btn-s btn-t" data-accion="editar-ciclo" data-id="${c.id}">Editar mes</button>
-    </div>` : (porEmpezar ? `<div class="g-acc">
-      <button class="btn btn-s btn-p" data-accion="empezar-ciclo" data-id="${c.id}">Empezar ${porEmpezar === 1 ? 'el video grabado' : `los ${porEmpezar} grabados`}</button>
+    </div>` : ((porEmpezar || c.raw_url || c.delivery_url) ? `<div class="g-acc">
+      ${porEmpezar ? `<button class="btn btn-s btn-p" data-accion="empezar-ciclo" data-id="${c.id}">Empezar ${porEmpezar === 1 ? 'el video grabado' : `los ${porEmpezar} grabados`}</button>` : ''}
+      ${urlSegura(c.raw_url) ? `<a class="btn btn-s" href="${esc(urlSegura(c.raw_url))}" target="_blank" rel="noopener noreferrer">Abrir crudos</a>` : ''}
+      ${urlSegura(c.delivery_url) ? `<a class="btn btn-s" href="${esc(urlSegura(c.delivery_url))}" target="_blank" rel="noopener noreferrer">Subir terminados</a>` : ''}
     </div>` : '')}
   </div>`;
 }
@@ -816,7 +824,7 @@ function vistaCliente(P, previa) {
   const entregados = vs.filter(v => v.status === 'entregado').length;
   let mensaje, cuenta = conGuion, que = 'guiones';
   if (vs.length && entregados === vs.length) { mensaje = `Tus ${vs.length} videos están entregados.`; cuenta = entregados; que = 'entregados'; }
-  else if (aISO(hoy()) > c.record_end) { mensaje = `Estamos editando. Van ${entregados} de ${vs.length} entregados.`; cuenta = entregados; que = 'entregados'; }
+  else if (aISO(hoy()) > c.record_end || entregados) { mensaje = `Estamos editando. Van ${entregados} de ${vs.length} entregados.`; cuenta = entregados; que = 'entregados'; }
   else if (conGuion < vs.length) mensaje = `Llevas ${conGuion} de ${vs.length} guiones. Súbelos antes de la grabación.`;
   else mensaje = `Tus ${vs.length} guiones están listos para grabar.`;
   return `${ciclos.length > 1 ? `<div class="mes-tabs" role="group" aria-label="Meses">${ciclos.map(x => `<button data-accion="ver-mes" data-id="${x.id}" aria-pressed="${x.id === c.id}">${esc(x.name)}</button>`).join('')}</div>` : ''}
@@ -828,6 +836,8 @@ function vistaCliente(P, previa) {
         <div class="clave">Recibes tus videos<b>el ${esc(fLarga(c.delivery_date))}</b></div>
         ${urlSegura(P.client.shared_url) ? `<div>Carpeta compartida<b>${enlace(P.client.shared_url, 'Abrir en Drive')}</b></div>` : ''}
       </div>
+      ${urlSegura(c.delivery_url) ? `<div class="hero-cta"><a class="btn btn-p btn-grande" href="${esc(urlSegura(c.delivery_url))}" target="_blank" rel="noopener noreferrer">▶ Ver y descargar tus videos</a>
+        <span class="nota">Todos los videos entregados de ${esc(c.name)}, en una carpeta de Drive.</span></div>` : ''}
     </section>
     <div class="avance-cli">
       <b class="avance-num" aria-label="${cuenta} de ${vs.length} ${que}">${pad(cuenta)}<small>/${pad(vs.length)}</small></b>
@@ -856,6 +866,8 @@ function portalLocal(idCliente) {
     .sort((a, b) => b.delivery_date.localeCompare(a.delivery_date))
     .map(c => ({
       id: c.id, name: c.name, record_start: c.record_start, record_end: c.record_end, delivery_date: c.delivery_date,
+      // Igual que client_portal: la carpeta aparece cuando ya hay algún video entregado
+      delivery_url: S.videos.some(v => v.cycle_id === c.id && v.status === 'entregado') ? c.delivery_url : null,
       videos: S.videos.filter(v => v.cycle_id === c.id).sort((a, b) => a.number - b.number).map(v => ({
         id: v.id, number: v.number, title: v.title, script_url: v.script_url, script_text: v.script_text,
         status: ['edicion', 'revision', 'listo'].includes(v.status) ? 'produccion' : v.status,
@@ -944,7 +956,7 @@ function modalVideo(id) {
             : `<label class="interruptor" style="min-height:2.6rem"><input type="checkbox" name="mio"${v.editor_id === yo ? ' checked' : ''}${bloqueado ? ' disabled' : ''}> Este video es mío</label>`)}
       </div>
     </div>
-    <div class="campo"><label for="f-final">Link del video terminado</label>
+    <div class="campo"><label for="f-final">Link de este video (opcional si ya está en la carpeta del mes)</label>
       <input id="f-final" name="final_url" type="url" inputmode="url" placeholder="https://drive.google.com/..." value="${esc(v.final_url || '')}"${bloqueado || ajeno ? ' disabled' : ''}>
       <p class="ayuda">El cliente lo ve solo cuando el video se entrega. Revisa que el archivo de Drive esté compartido.</p></div>
     <div class="campo"><label for="f-notas">Notas del equipo</label>
@@ -960,12 +972,15 @@ function modalVideo(id) {
 
 function modalTermine(id) {
   const v = S.videos.find(x => x.id === id); if (!v) return;
+  const c = S.ciclos.find(x => x.id === v.cycle_id), carpeta = c && urlSegura(c.delivery_url);
   abrirModal(`<form data-form="termine" data-id="${v.id}" novalidate>
     <div class="d-cab"><span class="d-num">${pad(v.number)}</span><div>
       <h2 class="d-titulo">Marcar como terminado</h2><p class="d-sub">${v.title ? esc(v.title) : 'Sin título'}</p></div></div>
-    <div class="campo"><label for="t-final">Link del video terminado</label>
-      <input id="t-final" name="final_url" type="url" inputmode="url" required placeholder="https://drive.google.com/..." value="${esc(v.final_url || '')}">
-      <p class="ayuda">Pasa a revisión. Una vez aprobado, ya no podrás moverlo.</p></div>
+    ${carpeta ? `<div class="resumen">Sube el video a la carpeta del mes y márcalo como terminado.
+      <p style="margin:.6rem 0 0"><a class="btn btn-s" href="${esc(carpeta)}" target="_blank" rel="noopener noreferrer">Abrir carpeta de terminados</a></p></div>` : ''}
+    <div class="campo"><label for="t-final">Link de este video${carpeta ? ' (opcional)' : ''}</label>
+      <input id="t-final" name="final_url" type="url" inputmode="url"${carpeta ? '' : ' required'} placeholder="https://drive.google.com/..." value="${esc(v.final_url || '')}">
+      <p class="ayuda">${carpeta ? 'Solo si quieres dejar el link directo a este video.' : 'Este mes todavía no tiene carpeta de terminados: pega el link del video.'} Pasa a revisión; una vez aprobado, ya no podrás moverlo.</p></div>
     <div class="d-pie"><button type="button" class="btn" data-accion="cerrar">Cancelar</button><button type="submit" class="btn btn-p">Mandar a revisión</button></div>
   </form>`);
 }
@@ -979,7 +994,9 @@ function modalGuion(id) {
   if (!editable) {
     abrirModal(`${foto}<div class="d-cab"><span class="d-num">${pad(v.number)}</span><div>
         <h2 class="d-titulo">${v.title ? esc(v.title) : 'Sin título'}</h2><p class="d-sub">${pill(v.status, true)}</p></div></div>
-      ${v.status === 'entregado' && urlSegura(v.final_url) ? `<p><a class="btn btn-p btn-grande" href="${esc(urlSegura(v.final_url))}" target="_blank" rel="noopener noreferrer">Ver video</a></p>` : ''}
+      ${v.status === 'entregado' && (urlSegura(v.final_url) || urlSegura(c.delivery_url)) ? `<p class="controles">
+        ${urlSegura(v.final_url) ? `<a class="btn btn-p btn-grande" href="${esc(urlSegura(v.final_url))}" target="_blank" rel="noopener noreferrer">Ver este video</a>` : ''}
+        ${urlSegura(c.delivery_url) ? `<a class="btn btn-grande${urlSegura(v.final_url) ? '' : ' btn-p'}" href="${esc(urlSegura(c.delivery_url))}" target="_blank" rel="noopener noreferrer">Abrir carpeta con tus videos</a>` : ''}</p>` : ''}
       ${v.status !== 'entregado' ? '<p class="ayuda">Este video ya se grabó. Si necesitas un cambio, escríbenos directamente.</p>' : ''}
       ${v.script_url ? `<p>${enlace(v.script_url, 'Abrir guion')}</p>` : ''}
       ${v.script_text ? `<pre class="guion-texto">${esc(v.script_text)}</pre>` : ''}
@@ -1024,6 +1041,8 @@ function modalCiclo(idCiclo, idCliente) {
     <div class="resumen" id="c-resumen"></div>
     <div class="campo"><label for="c-raw">Carpeta de crudos en Drive</label><input id="c-raw" name="raw_url" type="url" inputmode="url" placeholder="https://drive.google.com/..." value="${esc(d.raw_url || '')}">
       <p class="ayuda">La ven los editores, nunca el cliente. Puedes agregarla después de grabar.</p></div>
+    <div class="campo"><label for="c-final">Carpeta de videos terminados en Drive</label><input id="c-final" name="delivery_url" type="url" inputmode="url" placeholder="https://drive.google.com/..." value="${esc(d.delivery_url || '')}">
+      <p class="ayuda">Una para todo el mes. El editor sube ahí sus videos; el cliente la ve cuando le entregas.</p></div>
     ${c ? '' : `<div class="campo"><label for="c-n">Número de videos</label><input id="c-n" name="count" type="number" min="1" max="40" value="${cl.videos_per_cycle}" style="max-width:8rem">
       ${(eds => eds.length === 1 ? `<p class="ayuda">Se asignan solos a ${esc(nombreDe(eds[0]))}, el editor de este cliente.</p>`
         : `<p class="ayuda">${eds.length ? 'Este cliente tiene varios editores' : 'Este cliente no tiene editor'}: después usa “Asignar editor” en Producción.</p>`)(editoresDeCliente(cl.id))}</div>`}
@@ -1076,6 +1095,24 @@ function montarCiclo(f, nuevo) {
   ['record_end', 'editor_due'].forEach(n => $(n).addEventListener('change', resumen));
   if ($('count')) $('count').addEventListener('input', resumen);
   resumen();
+}
+
+// Carpetas de Drive del mes: crudos (solo equipo) y videos terminados (una para todo el mes)
+function modalCarpetas(idCiclo) {
+  const c = S.ciclos.find(x => x.id === idCiclo); if (!c) return;
+  const cl = clientePorId(c.client_id);
+  abrirModal(`<form data-form="carpetas-mes" data-id="${c.id}" novalidate>
+    <div class="d-cab"><div><h2 class="d-titulo">Carpetas de Drive</h2><p class="d-sub">${esc(cl ? cl.name : '')}, ${esc(c.name)}</p></div></div>
+    <div class="campo"><label for="k-final">Carpeta de videos terminados</label>
+      <input id="k-final" name="delivery_url" type="url" inputmode="url" placeholder="https://drive.google.com/drive/folders/..." value="${esc(c.delivery_url || '')}">
+      <p class="ayuda">Una sola carpeta para todos los videos del mes. El editor la ve siempre para subir ahí sus videos. El cliente la ve en su portal cuando le entregas el primer video.</p></div>
+    <div class="campo"><label for="k-crudos">Carpeta de crudos</label>
+      <input id="k-crudos" name="raw_url" type="url" inputmode="url" placeholder="https://drive.google.com/drive/folders/..." value="${esc(c.raw_url || '')}">
+      <p class="ayuda">La ven los editores, nunca el cliente.</p></div>
+    <div class="resumen"><b>Permisos en Drive:</b> comparte la carpeta de terminados como <b>Editor</b> con tu editor y como <b>Lector</b> con tu cliente, de preferencia cuando le entregues.
+      <span class="ojo">Si se la compartes antes, la verá en “Compartido conmigo” aunque el portal todavía no le muestre el botón.</span></div>
+    <div class="d-pie"><button type="button" class="btn" data-accion="cerrar">Cancelar</button><button type="submit" class="btn btn-p">Guardar carpetas</button></div>
+  </form>`);
 }
 
 // Asignar un editor a todos los videos de un mes
@@ -1180,9 +1217,12 @@ const FORMS = {
   },
   async termine(f) {
     const id = f.dataset.id, v = S.videos.find(x => x.id === id); if (!v) return;
-    const url = urlSegura(valor(f, 'final_url'));
-    if (!url) { aviso('Pega el link del video terminado (empieza con https://)', true); f.elements.final_url.focus(); return; }
-    const cambios = { status: 'revision', final_url: url };
+    const c = S.ciclos.find(x => x.id === v.cycle_id), carpeta = c && urlSegura(c.delivery_url);
+    const texto = valor(f, 'final_url'), url = urlSegura(texto);
+    if (texto && !url) { aviso('El link tiene que empezar con https://', true); f.elements.final_url.focus(); return; }
+    if (!url && !carpeta) { aviso('Pega el link del video terminado (empieza con https://)', true); f.elements.final_url.focus(); return; }
+    const cambios = { status: 'revision' };
+    if (url) cambios.final_url = url;
     if (!v.editor_id) cambios.editor_id = S.perfil.id;
     await guardarVideo(id, cambios, 'Enviado a revisión');
   },
@@ -1198,24 +1238,36 @@ const FORMS = {
   },
   async ciclo(f) {
     const d = {};
-    ['name', 'record_start', 'record_end', 'editor_due', 'delivery_date', 'raw_url', 'count'].forEach(n => { d[n] = valor(f, n); });
+    ['name', 'record_start', 'record_end', 'editor_due', 'delivery_date', 'raw_url', 'delivery_url', 'count'].forEach(n => { d[n] = valor(f, n); });
     if (!d.name) { aviso('Escribe el nombre del mes.', true); return f.elements.name.focus(); }
     if (!d.record_start || !d.record_end || !d.editor_due || !d.delivery_date) return aviso('Completa las cuatro fechas.', true);
     if (d.record_end < d.record_start) return aviso('La grabación no puede terminar antes de empezar.', true);
     if (d.delivery_date < d.record_end) return aviso('La entrega no puede ser antes de que termine la grabación.', true);
     if (d.editor_due < d.record_start || d.editor_due > d.delivery_date) return aviso('El límite del editor tiene que quedar entre la grabación y la entrega.', true);
-    if (!revisarLinks(f, ['raw_url'])) return;
+    if (!revisarLinks(f, ['raw_url', 'delivery_url'])) return;
     try {
       if (f.dataset.id) {
-        await q(sb.from('cycles').update({ name: d.name, record_start: d.record_start, record_end: d.record_end, editor_due: d.editor_due, delivery_date: d.delivery_date, raw_url: d.raw_url || null }).eq('id', f.dataset.id));
+        await q(sb.from('cycles').update({ name: d.name, record_start: d.record_start, record_end: d.record_end, editor_due: d.editor_due, delivery_date: d.delivery_date, raw_url: d.raw_url || null, delivery_url: d.delivery_url || null }).eq('id', f.dataset.id));
       } else {
         const n = Math.round(Number(d.count));
         if (!(n >= 1 && n <= 40)) return aviso('El número de videos tiene que estar entre 1 y 40.', true);
         const nuevo = await q(sb.rpc('create_cycle', { p_client: f.dataset.cliente, p_name: d.name, p_record_start: d.record_start, p_record_end: d.record_end, p_editor_due: d.editor_due, p_delivery: d.delivery_date, p_raw_url: d.raw_url || null, p_count: n }));
-        if (nuevo) { S.abiertos.add(nuevo); guardarAbiertos(); }
+        if (nuevo) {
+          S.abiertos.add(nuevo); guardarAbiertos();
+          if (d.delivery_url) await q(sb.from('cycles').update({ delivery_url: d.delivery_url }).eq('id', nuevo));
+        }
       }
       cerrarModal();
       aviso(f.dataset.id ? 'Mes actualizado' : 'Mes creado');
+      await recargar();
+    } catch (e) { aviso(humano(e), true); }
+  },
+  async 'carpetas-mes'(f) {
+    if (!revisarLinks(f, ['delivery_url', 'raw_url'])) return;
+    try {
+      await q(sb.from('cycles').update({ delivery_url: valor(f, 'delivery_url') || null, raw_url: valor(f, 'raw_url') || null }).eq('id', f.dataset.id));
+      cerrarModal();
+      aviso('Carpetas guardadas');
       await recargar();
     } catch (e) { aviso(humano(e), true); }
   },
@@ -1312,6 +1364,7 @@ const ACC = {
   'desplegar-todo'() { gruposProduccion().forEach(g => S.abiertos.add(g.c.id)); guardarAbiertos(); render(); },
   'plegar-todo'() { gruposProduccion().forEach(g => S.abiertos.delete(g.c.id)); guardarAbiertos(); render(); },
   'asignar-mes'(el, id) { modalAsignarMes(id); },
+  'carpetas-mes'(el, id) { modalCarpetas(id); },
   async 'aprobar-ciclo'(el, id) {
     const n = S.videos.filter(v => v.cycle_id === id && v.status === 'revision').length;
     if (!await confirmar(`¿Aprobar ${n} ${n === 1 ? 'video' : 'videos'} en revisión?`, 'Hazlo cuando ya los hayas visto. Una vez aprobados, el editor ya no puede moverlos; después los entregas al cliente.', 'Aprobar')) return;
