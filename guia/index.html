@@ -16,6 +16,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400..700&display=swap" rel="stylesheet">
+<script>document.documentElement.classList.add('js')</script>
 <style>
 :root{
   --negro:#000;
@@ -26,332 +27,590 @@
   --crema-2:#C9C5BD;
   --crema-3:#8A867F;
   --verde:#39FF88;
+  --verde-t:rgba(57,255,136,.14);
   --rojo:#F0705A;
   --display:'Anton',Impact,'Arial Narrow',sans-serif;
   --texto:'Archivo',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --suave:cubic-bezier(.2,.7,.2,1);
   color-scheme:dark;
 }
+@property --ang{syntax:'<angle>';inherits:false;initial-value:0deg}
 *,*::before,*::after{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
-body{margin:0;background:var(--negro);color:var(--crema);font-family:var(--texto);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--negro);color:var(--crema);font-family:var(--texto);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden}
 a{color:inherit}
+img{display:block;max-width:100%}
 :focus-visible{outline:2px solid var(--verde);outline-offset:3px}
 button,input{font:inherit;color:inherit}
 
-.envoltura{max-width:72rem;margin:0 auto;padding:0 clamp(1rem,4vw,2.5rem)}
-.top{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1.4rem 0}
-.logo{display:block;width:132px;height:auto}
-.logo-txt{font-family:var(--display);text-transform:uppercase;font-size:1.2rem;text-decoration:none}
-.top-link{font-size:.88rem;font-weight:600;color:var(--crema-2);text-decoration:none;border-bottom:1px solid var(--linea-2);padding-bottom:2px}
-.top-link:hover{color:var(--crema);border-color:var(--crema-3)}
+/* Grano de película */
+body::after{content:"";position:fixed;inset:0;z-index:90;pointer-events:none;opacity:.06;background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEgAAABICAAAAABwhuybAAAG60lEQVR42kWYy3EsyREEnZTGIc47LcSJ1YY4UZyANsFD1iwvMFhPz3RXVnyLWBgZE1pkZTi2IjN1LJPNMMbsmq6JyjKaZrAaW9iSrCukkDUNjaMYbYvtYpemiip0Jthlixtd297LWcmAOTJwNVkKbRskqQMXx0IW47Y4ra6BNC5N7ldjNxqotaEtKrK6NW4Cs0rMXLJKunXOjTrUjpHtZmlgHdBsm59vZNbSBovBGCut3oxNCFlLs2UgkGBs6raGYAmESShZM5kYNJm5yQbYXC2066LRBiEVusxQTUmySIykNNNBsKMkMua97GSd2wEKQzuYDWVjNMQDQMNkJtmk0GCztGWGkrLDx3CJW8jhh7axaQhJkeQ98i4STRdTugP5TJm2SZKariius2mdYkYkmbSdTWh2SIgfvLUrdK2oowx0xKxANkscLE3snDRgS2wsaQ7d1mhNWKct88hYkDZgdCVNKhBSZpNCzWpSaimFyJJkJAmHo7ZprcSZNDuAF7rFQnZzVtu5A0QSq2oOcTeVArUhws1pdoEtkoiH0cYF6UrpHL7lkOXGUjmYLlWYZcs08TbTSMPKvP27D2aDyghdl2a26SqstastmIZucOJyN6CNePqx3EyXnT5ZkxpGuo2sSTMTqiNLFtCsZcE6gCXsBjPNTvw+b8KydasCo94/07odwULoaMvpESRk3RHSqLGZXTuoO5GbAncPJyfsCfN9lCImaUhCsjWjdKRssngMJZTaZdkBFzoSWkpMulnrzelWbptp6kymhp0WPU02aYRzlNalmBW7HUnbhFpPMTpDj3PqjkHdQeqEOSQt0GbBdLYqdpo2szFNsSQmbUdMb1anw8mY2mjnxmKfAqTajtZa3DBd07QYGOFUo4abUs5Ik7RZFm+CDrpu0AB27FwEqXgkzxLL4fluX4/NPhgcS0Es2bGfrA0HjCY3tKyHrrbNkrBluKw+UYSc5caZNWNrNaO9vzv4b1m6qWKypVMaUk5xswGu2ynYZoj2gNqycrK8nlbKSVpWMGC20iTlFO6G9HBbaN5ob9trbqlLvC9xKaIhplFOoD1/LM9VPKipgzXqXISVJTmsGV0wpxWDmI6zq03EeagCw9ZZgnfTAlA3da2025lwTZeOzAPAJBdH2gLLssMcFUIibDlwMPPU4/F16Q4WRreuRHMeFrh8VdaGaRPdxcFnIRxGNnp22wssbXOC1J3HBo+3zUcA27AUJs26adseBpOQ+3Jd5qxskHHGlWfF3bI5O3TjENYdnU0kjNiVl2zmZQJD06UHlFwQNRf9ctkWemnu0S+H8PkYFC93TGt2CNqUsXyyjsbbKXkJL2dxHy8P3qrLLrayONeluwQ4hFz0MiNt1j2c3/24iMknjSurt4GG9UEsFwlz6c+0OzWiJQu0PT/KIkKfO59pxrhEYMW2ZkP9yLqBjV5Ovjk0/2fZ2tnb2Oyl4qHFuzAPpjokuNSdW26Us55DoytmVPKSqb1CcfnYbCm7JQ1MPNUpxPv1Kx0PMbi1tm6HZjc0zdpnzSc1d5XlugDjpFZJcgpK8onl0raLw3Pi4NjRsDQ3jIjnkTvYnqufpuKl4kg5vPVqWegiN7qk2eYWl744scVw3D8usjmz3INiTz5Pn4LrP9AxXkY9Tw3XK7beimoNCF4ibGlOTy5CXoQ+5Sv6jLbkgk9Oibr7cXaTaW5HKm4XsthlyaWjXbZ+oBbmbgI9XmbOqJWb9fWhLX0X6rwEcU9lstzunJGsoM1CGx5/ri8Gjz+7ytz2VP3p9ostIIPyb0q+6Jd/7T98fQH+C76B778S8ffrJ/7++vPz58+v/vBf/P7+87v8Hb+6b/62Px5cq1yjWH1ystdgjsatiI3LtTS1pMZhxcMRbuS422R78Xk5QdbgadlJ7R0ynDGNSpfXMemZC+cbqbfhOfl8PZxO8VTuzgLu3Ycs4CXxyY3QHZ8MlC4MyUWgvnsPE5B/2uDoC2xrSHcb9spuekn35B05B4jeicemdLeaJWw1Zctzw2tzrKdiXMRwd5gQs6tITYgriw4zw9KY1CtMB3tcV4N3AJOeTb1TmSXIHqFvdc+4Gw19fb4uni7Q2IW98kUuR0BuyaPbYKWvzbun8+yq+Gi3XsZ6w74pXqoa9TRgcMa2uCRgypnfrVOO0rlVXsDD7RooT4ZfJ78IYXsHMrW3Xa/2384J16W2q/U81GxhBca2W+bFUHEVy9hOxXLVeIsvTbu2D7RnWc2Fl2K9zNURl7x6TJoLat5xG56eHirvXAhzBnIIOhpeVyZpLU0u+CYZwj0D76hluyB4BSxJPH/iWk0DR8deiSilPeeWe8pRr+6OQfik36aVnvnQxnG5qjN3SOAh5n8raMC6GpgJegAAAABJRU5ErkJggg==) repeat}
 
-/* Portada */
-.portada{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:3rem clamp(2rem,5vw,5rem);align-items:center;padding:clamp(2rem,6vh,5rem) 0 clamp(3rem,8vh,6rem)}
-.ceja{display:inline-flex;align-items:center;gap:.5rem;font-size:.74rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--verde);margin:0 0 1.2rem}
-.ceja::before{content:"";width:.5rem;height:.5rem;border-radius:50%;background:var(--verde)}
-h1{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:clamp(3rem,6.6vw,5.6rem);line-height:.92;margin:0}
-h1 em{font-style:normal;color:var(--verde)}
+.envoltura{max-width:76rem;margin:0 auto;padding:0 clamp(1rem,4vw,2.5rem)}
+
+/* ---------- Portada ---------- */
+.portada-env{position:relative;overflow:hidden;isolation:isolate;min-height:100vh;min-height:100svh;display:flex;flex-direction:column}
+.fondo{position:absolute;inset:-8% 0 0;z-index:-3;background:url(../img/set.webp) center 40%/cover no-repeat;filter:saturate(.75) brightness(.5);transform:scale(1.08);will-change:transform}
+.js .fondo{animation:acerca 2.4s var(--suave) both}
+@keyframes acerca{from{transform:scale(1.25);filter:saturate(.7) brightness(.1)}to{transform:scale(1.08)}}
+.portada-env::before{content:"";position:absolute;inset:0;z-index:-2;background:linear-gradient(90deg,rgba(0,0,0,.92) 0%,rgba(0,0,0,.72) 45%,rgba(0,0,0,.35) 100%),linear-gradient(0deg,#000 0%,rgba(0,0,0,0) 30%)}
+.brillo{position:absolute;z-index:-1;width:46rem;height:46rem;border-radius:50%;background:radial-gradient(circle,rgba(57,255,136,.16) 0%,rgba(57,255,136,0) 62%);left:-14rem;top:10%;animation:flota 14s ease-in-out infinite alternate;pointer-events:none}
+@keyframes flota{from{transform:translate(0,0)}to{transform:translate(12rem,6rem)}}
+
+.top{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1.4rem 0}
+.logo{width:132px;height:auto}
+.logo-txt{font-family:var(--display);text-transform:uppercase;font-size:1.2rem;text-decoration:none}
+.top-link{position:relative;font-size:.88rem;font-weight:600;color:var(--crema-2);text-decoration:none;padding-bottom:3px}
+.top-link::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:var(--verde);transform:scaleX(.35);transform-origin:left;transition:transform .35s var(--suave)}
+.top-link:hover{color:var(--crema)}
+.top-link:hover::after{transform:scaleX(1)}
+
+.portada{flex:1;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:3rem clamp(2rem,5vw,5rem);align-items:center;padding:clamp(1.5rem,5vh,4rem) 0 clamp(3rem,8vh,5rem)}
+.ceja{display:inline-flex;align-items:center;gap:.55rem;font-size:.74rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--verde);margin:0 0 1.2rem}
+.ceja i{width:.5rem;height:.5rem;border-radius:50%;background:var(--verde);box-shadow:0 0 0 0 rgba(57,255,136,.6);animation:late 2s infinite}
+@keyframes late{0%{box-shadow:0 0 0 0 rgba(57,255,136,.55)}70%{box-shadow:0 0 0 10px rgba(57,255,136,0)}100%{box-shadow:0 0 0 0 rgba(57,255,136,0)}}
+h1{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:clamp(2.7rem,6.2vw,5.4rem);line-height:.93;margin:0}
+h1 .l{display:block;overflow:hidden;padding-bottom:.04em}
+h1 .l>span{display:inline-block}
+.js h1 .l>span{transform:translateY(105%);animation:sube .9s var(--suave) forwards}
+h1 .l:nth-child(2)>span{animation-delay:.1s}
+h1 .l:nth-child(3)>span{animation-delay:.2s}
+h1 .l:nth-child(4)>span{animation-delay:.3s}
+@keyframes sube{to{transform:none}}
+h1 em{font-style:normal;color:var(--verde);position:relative}
+h1 em::after{content:"";position:absolute;left:0;right:.25em;bottom:.06em;height:.07em;background:var(--verde);transform:scaleX(0);transform-origin:left;animation:subraya .8s var(--suave) 1.1s forwards}
+@keyframes subraya{to{transform:scaleX(1)}}
+.cuenta{font-variant-numeric:tabular-nums}
 .bajada{color:var(--crema-2);font-size:1.08rem;max-width:34rem;margin:1.4rem 0 2rem}
 .bloques{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.6rem;max-width:34rem}
-.bloque{border:1px solid var(--linea);border-radius:10px;padding:.85rem .9rem;background:var(--panel)}
+.bloque{position:relative;overflow:hidden;border:1px solid var(--linea);border-radius:12px;padding:.9rem .95rem;background:rgba(11,11,12,.7);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);transition:transform .35s var(--suave),border-color .35s}
+.bloque::before{content:"";position:absolute;inset:auto 0 0;height:2px;background:var(--verde);transform:scaleX(0);transform-origin:left;transition:transform .45s var(--suave)}
+.bloque:hover{transform:translateY(-4px);border-color:var(--linea-2)}
+.bloque:hover::before{transform:scaleX(1)}
 .bloque b{display:block;font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:1.25rem;line-height:1;letter-spacing:.01em}
 .bloque span{display:block;font-size:.78rem;color:var(--crema-3);margin-top:.35rem;line-height:1.35}
 
-.tarjeta{background:var(--panel);border:1px solid var(--linea);border-radius:14px;padding:clamp(1.3rem,3vw,2rem)}
+/* Entrada escalonada de la portada */
+.js .entra{opacity:0;transform:translateY(18px);animation:aparece .8s var(--suave) forwards}
+@keyframes aparece{to{opacity:1;transform:none}}
+
+.tarjeta{position:relative;background:rgba(11,11,12,.82);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--linea);border-radius:16px;padding:clamp(1.3rem,3vw,2rem);box-shadow:0 30px 80px rgba(0,0,0,.5)}
 .tarjeta h2{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:1.7rem;line-height:1;margin:0 0 .4rem}
 .tarjeta .intro{color:var(--crema-3);font-size:.9rem;margin:0 0 1.5rem}
 .campo{margin-bottom:1rem}
 .campo label{display:block;font-size:.8rem;font-weight:600;color:var(--crema-2);margin-bottom:.4rem}
 .campo label small{color:var(--crema-3);font-weight:500}
-.campo input{display:block;width:100%;background:#050505;border:1px solid var(--linea);border-radius:8px;padding:.75rem .85rem;font-size:1rem;transition:border-color .15s}
+.campo input{display:block;width:100%;background:rgba(0,0,0,.6);border:1px solid var(--linea);border-radius:8px;padding:.75rem .85rem;font-size:1rem;transition:border-color .2s,box-shadow .2s}
 .campo input::placeholder{color:#5E5B56}
 .campo input:hover{border-color:var(--linea-2)}
-.campo input:focus{outline:none;border-color:var(--verde)}
-.campo [aria-invalid="true"]{border-color:var(--rojo)}
+.campo input:focus{outline:none;border-color:var(--verde);box-shadow:0 0 0 4px var(--verde-t)}
+.campo [aria-invalid="true"]{border-color:var(--rojo);animation:tiembla .35s}
+@keyframes tiembla{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
 .err{display:block;color:var(--rojo);font-size:.8rem;font-weight:600;margin-top:.35rem}
 .err:empty{display:none}
 .trampa{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
-.enviar{display:flex;align-items:center;justify-content:center;gap:.6rem;width:100%;min-height:3.2rem;margin-top:.5rem;border:0;border-radius:999px;background:var(--verde);color:#000;font-weight:700;font-size:1rem;cursor:pointer;transition:transform .15s,box-shadow .15s,opacity .15s}
-.enviar:hover{transform:translateY(-1px);box-shadow:0 8px 28px rgba(57,255,136,.22)}
-.enviar[disabled]{opacity:.6;cursor:progress;transform:none;box-shadow:none}
-.enviar svg{width:18px;height:18px}
+.enviar{position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;gap:.6rem;width:100%;min-height:3.2rem;margin-top:.5rem;border:0;border-radius:999px;background:var(--verde);color:#000;font-weight:700;font-size:1rem;cursor:pointer;transition:transform .2s,box-shadow .2s,opacity .2s}
+.enviar::before{content:"";position:absolute;top:0;bottom:0;width:40%;left:-60%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);transform:skewX(-20deg);animation:destello 3.2s ease-in-out 1.6s infinite}
+@keyframes destello{0%{left:-60%}35%,100%{left:130%}}
+.enviar:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(57,255,136,.3)}
+.enviar[disabled]{opacity:.7;cursor:progress;transform:none;box-shadow:none}
+.enviar svg{width:18px;height:18px;transition:transform .3s var(--suave)}
+.enviar:hover svg{transform:translateY(3px)}
 .error-gral{color:var(--rojo);font-weight:600;font-size:.9rem;margin:.9rem 0 0}
 .error-gral:empty{display:none}
 .legal{color:var(--crema-3);font-size:.78rem;margin:1rem 0 0;text-align:center}
 .legal a{text-underline-offset:2px}
 .tarjeta-lista{display:none}
 .abierta .tarjeta form{display:none}
-.abierta .tarjeta-lista{display:block}
+.abierta .tarjeta-lista{display:block;animation:aparece .6s var(--suave) both}
 .tarjeta-lista p{color:var(--crema-2);margin:0 0 1.2rem}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;min-height:2.75rem;padding:0 1.2rem;border:1px solid var(--linea-2);border-radius:999px;font-weight:600;font-size:.92rem;text-decoration:none;background:none;cursor:pointer;transition:border-color .15s,background .15s}
-.btn:hover{border-color:var(--crema-3);background:#111}
+.palomita{width:3rem;height:3rem;border-radius:50%;display:grid;place-items:center;background:var(--verde);color:#000;margin-bottom:1.1rem;animation:pop .5s var(--suave) both}
+.palomita svg{width:22px;height:22px}
+@keyframes pop{from{transform:scale(0)}70%{transform:scale(1.12)}to{transform:scale(1)}}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;min-height:2.75rem;padding:0 1.2rem;border:1px solid var(--linea-2);border-radius:999px;font-weight:600;font-size:.92rem;text-decoration:none;background:none;cursor:pointer;transition:border-color .2s,background .2s,transform .2s,box-shadow .2s}
+.btn:hover{border-color:var(--crema-3);background:#111;transform:translateY(-2px)}
 .btn-v{background:var(--verde);border-color:var(--verde);color:#000}
-.btn-v:hover{background:var(--verde);box-shadow:0 8px 28px rgba(57,255,136,.22)}
-.btn svg{width:17px;height:17px}
+.btn-v:hover{background:var(--verde);box-shadow:0 10px 30px rgba(57,255,136,.28)}
+.btn svg{width:17px;height:17px;transition:transform .3s var(--suave)}
+.btn:hover svg{transform:translateX(3px)}
 
-/* Guía */
-.guia{display:none;border-top:1px solid var(--linea);padding:clamp(3rem,8vh,5rem) 0 2rem}
-.abierta .guia{display:block;animation:entra .6s ease both}
-.lectura{max-width:46rem;margin:0 auto}
-.guia h2{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:clamp(2.2rem,5vw,3.2rem);line-height:.95;margin:0 0 1.2rem}
+.bajar{display:flex;justify-content:center;padding-bottom:1.6rem}
+.bajar span{width:1.5rem;height:2.4rem;border:1.5px solid var(--crema-3);border-radius:999px;position:relative}
+.bajar span::after{content:"";position:absolute;left:50%;top:.45rem;width:3px;height:.5rem;margin-left:-1.5px;border-radius:3px;background:var(--verde);animation:rueda 1.8s ease-in-out infinite}
+@keyframes rueda{0%{opacity:0;transform:translateY(-3px)}30%{opacity:1}100%{opacity:0;transform:translateY(12px)}}
+
+/* ---------- Cinta ---------- */
+.cinta{border-block:1px solid var(--linea);overflow:hidden;background:#050505;padding:.95rem 0}
+.cinta-in{display:flex;width:max-content;animation:corre 38s linear infinite}
+.cinta-in span{font-family:var(--display);text-transform:uppercase;font-size:1.35rem;letter-spacing:.03em;white-space:nowrap;padding-right:2.2rem;color:var(--crema-3)}
+.cinta-in span b{font-weight:400;color:var(--crema)}
+.cinta-in span i{font-style:normal;color:var(--verde);padding-left:2.2rem}
+@keyframes corre{to{transform:translateX(-50%)}}
+
+/* ---------- Guía ---------- */
+.guia{display:none;position:relative}
+.abierta .guia{display:block}
+
+.indice{position:sticky;top:0;z-index:40;background:rgba(0,0,0,.78);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--linea)}
+.indice-in{display:flex;gap:.3rem;overflow-x:auto;scrollbar-width:none;padding:.6rem 0}
+.indice-in::-webkit-scrollbar{display:none}
+.indice a{flex:none;text-decoration:none;font-size:.84rem;font-weight:600;color:var(--crema-3);padding:.4rem .85rem;border-radius:999px;transition:color .25s,background .25s}
+.indice a:hover{color:var(--crema)}
+.indice a.activo{background:var(--crema);color:#000}
+.progreso{position:absolute;left:0;bottom:-1px;height:2px;width:100%;background:var(--verde);transform:scaleX(0);transform-origin:left;box-shadow:0 0 12px rgba(57,255,136,.6)}
+
+.antes{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.8fr);gap:clamp(2rem,5vw,4.5rem);align-items:center;padding:clamp(4rem,10vh,7rem) 0 clamp(3rem,8vh,5rem)}
+.titulo-g{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:clamp(2.6rem,6vw,4.4rem);line-height:.92;margin:0 0 1.4rem}
 .guia p{color:var(--crema-2);margin:0 0 1rem}
 .guia strong{color:var(--crema);font-weight:600}
-.regla{border-left:3px solid var(--verde);background:var(--panel);border-radius:0 10px 10px 0;padding:1.1rem 1.3rem;margin:2rem 0 3.5rem}
+.regla{position:relative;overflow:hidden;border:1px solid var(--linea);background:var(--panel);border-radius:14px;padding:1.3rem 1.4rem;margin-top:2rem}
+.regla::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--verde);transform:scaleY(0);transform-origin:top;transition:transform .9s var(--suave) .3s}
+.regla.visto::before{transform:scaleY(1)}
 .regla p{margin:0}
-.regla b{display:block;font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:1.2rem;letter-spacing:.01em;color:var(--crema);margin-bottom:.35rem}
-.seccion{margin:0 0 3.5rem}
-.seccion-cab{display:flex;align-items:baseline;justify-content:space-between;gap:1rem;flex-wrap:wrap;border-bottom:1px solid var(--linea);padding-bottom:.9rem;margin-bottom:.5rem}
-.seccion-cab h3{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:2.4rem;line-height:1;margin:0}
-.seccion-cab span{font-size:.78rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--verde)}
-.seccion-desc{color:var(--crema-3)!important;font-size:.95rem;margin:.8rem 0 1.2rem!important}
-.idea{display:grid;grid-template-columns:3.2rem minmax(0,1fr);gap:0 1rem;padding:1.4rem 0;border-bottom:1px solid var(--linea)}
-.idea:last-child{border-bottom:0}
-.num{font-family:var(--display);font-size:2.2rem;line-height:1;color:var(--verde)}
-.idea h4{font-size:1.12rem;font-weight:700;margin:.15rem 0 .45rem;color:var(--crema)}
-.idea p{font-size:.97rem;margin:0 0 .6rem}
-.idea .dato{font-size:.9rem;margin:0 0 .35rem;color:var(--crema-2)}
-.idea .dato b{color:var(--crema);font-weight:600}
-.semana{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.6rem;margin:1.4rem 0 1rem}
-.dia{border:1px solid var(--linea);border-radius:10px;padding:.9rem 1rem;background:var(--panel)}
-.dia b{display:block;font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:1.3rem;line-height:1}
-.dia span{display:block;font-size:.82rem;color:var(--crema-3);margin-top:.3rem}
-.cierre{margin:4rem 0 1rem;padding:clamp(1.5rem,4vw,2.5rem);border:1px solid var(--linea-2);border-radius:14px;background:linear-gradient(135deg,#0B0B0C 0%,#0B140F 100%)}
-.cierre h2{font-size:clamp(2rem,4.4vw,2.8rem)}
-.cierre .acciones{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:1.5rem}
-.pie{color:var(--crema-3);font-size:.82rem;text-align:center;padding:2.5rem 0 calc(2.5rem + env(safe-area-inset-bottom,0px))}
-@keyframes entra{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.regla b{display:block;font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:1.25rem;letter-spacing:.01em;color:var(--crema);margin-bottom:.35rem}
 
-@media (max-width:900px){
-  .portada{grid-template-columns:1fr;gap:2.2rem;padding-top:1rem}
-  h1{font-size:clamp(2.6rem,11.5vw,4.4rem)}
+/* Fotos con revelado */
+.foto{position:relative;overflow:hidden;border-radius:16px;background:#0A0A0A}
+.foto img{width:100%;height:100%;object-fit:cover;transform:scale(1.18);transition:transform 1.6s var(--suave),filter 1.2s;filter:saturate(.75) brightness(.8)}
+.js .foto{clip-path:inset(100% 0 0 0 round 16px);transition:clip-path 1.1s var(--suave)}
+.js .foto.visto{clip-path:inset(0 0 0 0 round 16px)}
+.foto.visto img{transform:scale(1.02)}
+.foto:hover img{filter:saturate(1) brightness(.92)}
+.foto figcaption{position:absolute;left:1rem;bottom:1rem;right:1rem;font-size:.72rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--crema);text-shadow:0 1px 10px rgba(0,0,0,.8)}
+.foto-antes{aspect-ratio:4/5}
+
+/* Secciones */
+.seccion{position:relative;display:grid;grid-template-columns:minmax(0,22rem) minmax(0,1fr);gap:clamp(2rem,5vw,4.5rem);padding:clamp(3.5rem,9vh,6rem) 0;border-top:1px solid var(--linea)}
+.lado-foto{position:relative}
+.lado-foto-in{position:sticky;top:5.5rem}
+.lado-foto .foto{aspect-ratio:9/13}
+.palabra{position:absolute;z-index:-1;top:clamp(1.5rem,5vh,3rem);right:-2%;font-family:var(--display);text-transform:uppercase;font-size:clamp(6rem,16vw,15rem);line-height:.8;color:transparent;-webkit-text-stroke:1px rgba(242,239,233,.07);pointer-events:none;white-space:nowrap;will-change:transform}
+.seccion-cab{margin-bottom:1.2rem}
+.seccion-cab span{display:inline-flex;align-items:center;gap:.5rem;font-size:.76rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--verde)}
+.seccion-cab span::before{content:"";width:1.6rem;height:1px;background:var(--verde)}
+.seccion-cab h3{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:clamp(2.8rem,6vw,4.2rem);line-height:.92;margin:.5rem 0 .9rem}
+.seccion-desc{color:var(--crema-2)!important;font-size:1.02rem;max-width:36rem}
+
+.idea{position:relative;display:grid;grid-template-columns:4.2rem minmax(0,1fr);gap:0 1.1rem;padding:1.6rem 1.2rem 1.6rem 0;border-top:1px solid var(--linea);transition:background .35s}
+.idea::before{content:"";position:absolute;left:-1.2rem;top:0;bottom:0;width:2px;background:var(--verde);transform:scaleY(0);transform-origin:top;transition:transform .45s var(--suave)}
+.idea:hover{background:linear-gradient(90deg,rgba(57,255,136,.045),transparent 70%)}
+.idea:hover::before{transform:scaleY(1)}
+.num{font-family:var(--display);font-size:3rem;line-height:.9;color:transparent;-webkit-text-stroke:1.5px var(--verde);transition:color .7s var(--suave) .25s}
+.idea.visto .num{color:var(--verde)}
+.idea h4{font-size:1.18rem;font-weight:700;margin:.2rem 0 .5rem;color:var(--crema);line-height:1.3}
+.idea p{font-size:.98rem;margin:0 0 .75rem}
+.datos{display:grid;gap:.45rem}
+.dato{display:grid;grid-template-columns:auto minmax(0,1fr);gap:.6rem;align-items:baseline;font-size:.9rem;color:var(--crema-2);margin:0!important}
+.dato b{font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#000;background:var(--crema-2);border-radius:4px;padding:.12rem .4rem;white-space:nowrap}
+.dato.grabar b{background:var(--verde)}
+
+/* Semana */
+.semana-sec{padding:clamp(3.5rem,9vh,6rem) 0;border-top:1px solid var(--linea)}
+.semana-cab{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:2rem;align-items:end;margin-bottom:2rem}
+.semana{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.8rem}
+.dia{position:relative;overflow:hidden;border-radius:16px;min-height:17rem;display:flex;flex-direction:column;justify-content:flex-end;padding:1.3rem;isolation:isolate;border:1px solid var(--linea);transition:transform .45s var(--suave)}
+.dia img{position:absolute;inset:0;z-index:-2;width:100%;height:100%;object-fit:cover;filter:saturate(.6) brightness(.5);transition:transform 1.2s var(--suave),filter .6s}
+.dia::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(0deg,rgba(0,0,0,.92) 10%,rgba(0,0,0,.15) 70%)}
+.dia:hover{transform:translateY(-6px)}
+.dia:hover img{transform:scale(1.08);filter:saturate(.9) brightness(.62)}
+.dia small{font-size:.72rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--verde)}
+.dia b{display:block;font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:2.4rem;line-height:.95;margin:.35rem 0 .3rem}
+.dia span{font-size:.88rem;color:var(--crema-2)}
+.consejo{margin-top:1.6rem;max-width:44rem}
+
+/* Cierre */
+.cierre{position:relative;margin:2rem 0 1rem;border-radius:20px;padding:2px;background:conic-gradient(from var(--ang),var(--linea) 0deg,var(--verde) 60deg,var(--linea) 140deg,var(--linea) 360deg);animation:gira 6s linear infinite}
+@keyframes gira{to{--ang:360deg}}
+.cierre-in{position:relative;overflow:hidden;isolation:isolate;border-radius:18px;background:#050505;display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr);min-height:22rem}
+.cierre-txt{padding:clamp(1.6rem,4vw,3rem);display:flex;flex-direction:column;justify-content:center}
+.cierre h2{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:clamp(2.2rem,4.6vw,3.4rem);line-height:.92;margin:0 0 1rem}
+.cierre .acciones{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:1.4rem}
+.cierre-foto{position:relative}
+.cierre-foto img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:saturate(.8) brightness(.8)}
+.cierre-foto::before{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(90deg,#050505 0%,rgba(5,5,5,0) 45%)}
+.pie{color:var(--crema-3);font-size:.82rem;text-align:center;padding:2.5rem 0 calc(2.5rem + env(safe-area-inset-bottom,0px))}
+
+/* Revelado al hacer scroll */
+.js .r{opacity:0;transform:translateY(34px);transition:opacity .9s var(--suave),transform .9s var(--suave)}
+.js .r.visto{opacity:1;transform:none}
+.js .r-izq{transform:translateX(-30px)}
+.d1{transition-delay:.08s!important}.d2{transition-delay:.16s!important}.d3{transition-delay:.24s!important}
+
+/* ---------- Teléfono y tableta ---------- */
+@media (max-width:960px){
+  .portada{grid-template-columns:1fr;gap:2.2rem;padding-top:.5rem}
+  .portada-env::before{background:linear-gradient(180deg,rgba(0,0,0,.55) 0%,rgba(0,0,0,.85) 55%,#000 100%)}
+  .fondo{background-position:60% 30%}
+  .bajar{display:none}
+  .antes{grid-template-columns:1fr}
+  .foto-antes{aspect-ratio:16/10}
+  .seccion{grid-template-columns:1fr;gap:1.6rem}
+  .lado-foto-in{position:static}
+  .lado-foto .foto{aspect-ratio:16/10}
+  .semana-cab{grid-template-columns:1fr;gap:.5rem}
+  .cierre-in{grid-template-columns:1fr}
+  .cierre-foto{min-height:13rem;order:-1}
+  .cierre-foto::before{background:linear-gradient(0deg,#050505 0%,rgba(5,5,5,0) 60%)}
+}
+@media (max-width:640px){
+  h1{font-size:clamp(2.5rem,12vw,3.6rem)}
   .bajada{font-size:1rem;margin-bottom:1.5rem}
-}
-@media (max-width:560px){
   .bloques,.semana{grid-template-columns:1fr}
-  .bloque,.dia{display:flex;align-items:baseline;gap:.75rem}
-  .bloque span,.dia span{margin-top:0}
-  .idea{grid-template-columns:2.4rem minmax(0,1fr)}
-  .num{font-size:1.8rem}
-  .seccion-cab h3{font-size:2rem}
+  .bloque{display:flex;align-items:baseline;gap:.75rem}
+  .bloque span{margin-top:0}
+  .dia{min-height:10.5rem}
+  .dia b{font-size:2rem}
+  .idea{grid-template-columns:2.9rem minmax(0,1fr);gap:0 .8rem;padding-right:0}
+  .idea::before{left:-1rem}
+  .num{font-size:2.2rem}
+  .dato{grid-template-columns:1fr;gap:.25rem}
+  .dato b{justify-self:start}
   .logo{width:108px}
+  .cinta-in span{font-size:1.1rem}
+  .brillo{width:30rem;height:30rem}
 }
-@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}html{scroll-behavior:auto}}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .js .r,.js .entra,.js h1 .l>span{opacity:1!important;transform:none!important}
+  .js .foto{clip-path:none}
+  .foto img{transform:none}
+  .num{color:var(--verde)}
+  h1 em::after{transform:scaleX(1)}
+}
 
 @media print{
   :root{--crema:#111;--crema-2:#333;--crema-3:#666;--verde:#0a8f47;--linea:#ddd;--panel:#f6f6f6}
   body{background:#fff;color:#111}
-  .top-link,.tarjeta,.bloques,.cierre .acciones,.no-print{display:none!important}
+  body::after,.fondo,.brillo,.portada-env::before,.top-link,.tarjeta,.bloques,.bajar,.cinta,.indice,.palabra,.lado-foto,.foto-antes,.cierre-foto,.cierre .acciones,.dia img{display:none!important}
+  .portada-env{min-height:0}
   .portada{display:block;padding:0 0 1rem}
-  .guia{display:block!important;border:0;padding-top:0}
+  .guia{display:block!important}
+  .r,.entra,h1 .l>span{opacity:1!important;transform:none!important}
+  .antes,.seccion,.semana-cab,.cierre-in{display:block}
+  .num{color:var(--verde)}
   .idea,.dia,.regla{break-inside:avoid}
-  .seccion{break-inside:auto}
-  .cierre{background:#f6f6f6;border-color:#ddd}
+  .dia{min-height:0;border:1px solid #ddd;color:#111}
+  .dia::before{display:none}
+  .cierre{background:none;padding:0;animation:none}
+  .cierre-in{background:#f6f6f6}
   .logo{filter:invert(1)}
 }
 </style>
 </head>
 <body>
-<div class="envoltura" id="raiz">
-  <header class="top">
-    <a href="https://connectstudios.mx" aria-label="Connect Studios, ir al sitio">
-      <img class="logo" src="https://connectstudios.mx/assets/img/logo-connect.webp" alt="Connect Studios" width="640" height="180"
-        onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'logo-txt',textContent:'Connect Studios'}))">
-    </a>
-    <a class="top-link" href="/empezar/?utm_source=guia">Platiquemos</a>
-  </header>
+<div id="raiz">
+  <div class="portada-env">
+    <div class="fondo" id="fondo" aria-hidden="true"></div>
+    <div class="brillo" aria-hidden="true"></div>
+    <div class="envoltura" style="width:100%;flex:1;display:flex;flex-direction:column">
+      <header class="top entra">
+        <a href="https://connectstudios.mx" aria-label="Connect Studios, ir al sitio">
+          <img class="logo" src="https://connectstudios.mx/assets/img/logo-connect.webp" alt="Connect Studios" width="640" height="180"
+            onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'logo-txt',textContent:'Connect Studios'}))">
+        </a>
+        <a class="top-link" href="/empezar/?utm_source=guia">Platiquemos</a>
+      </header>
 
-  <section class="portada">
-    <div>
-      <p class="ceja">Guía gratis</p>
-      <h1>12 videos que tu negocio puede grabar <em>este mes.</em></h1>
-      <p class="bajada">La misma estructura que uso con mis clientes cada mes: qué grabar, para qué sirve cada video y cómo repartirlos en la semana. Con ejemplos para cualquier giro.</p>
-      <div class="bloques" aria-label="Contenido de la guía">
-        <div class="bloque"><b>Alcance</b><span>4 videos para que te conozcan</span></div>
-        <div class="bloque"><b>Nutrir</b><span>4 videos para que confíen</span></div>
-        <div class="bloque"><b>Historia</b><span>4 videos para que conecten</span></div>
-      </div>
+      <section class="portada">
+        <div>
+          <p class="ceja entra" style="animation-delay:.1s"><i></i>Guía gratis</p>
+          <h1 aria-label="12 videos que tu negocio puede grabar este mes.">
+            <span class="l" aria-hidden="true"><span><span class="cuenta" id="cuenta">12</span> videos</span></span>
+            <span class="l" aria-hidden="true"><span>que tu negocio</span></span>
+            <span class="l" aria-hidden="true"><span>puede grabar</span></span>
+            <span class="l" aria-hidden="true"><span><em>este mes.</em></span></span>
+          </h1>
+          <p class="bajada entra" style="animation-delay:.55s">La misma estructura que uso con mis clientes cada mes: qué grabar, para qué sirve cada video y cómo repartirlos en la semana. Con ejemplos para cualquier giro.</p>
+          <div class="bloques" aria-label="Contenido de la guía">
+            <div class="bloque entra" style="animation-delay:.7s"><b>Alcance</b><span>4 videos para que te conozcan</span></div>
+            <div class="bloque entra" style="animation-delay:.8s"><b>Nutrir</b><span>4 videos para que confíen</span></div>
+            <div class="bloque entra" style="animation-delay:.9s"><b>Historia</b><span>4 videos para que conecten</span></div>
+          </div>
+        </div>
+
+        <div class="tarjeta entra" style="animation-delay:.45s">
+          <form id="form" novalidate>
+            <h2>Recíbela gratis</h2>
+            <p class="intro">Se abre aquí mismo en cuanto envíes tus datos.</p>
+            <div class="campo">
+              <label for="nombre">Nombre</label>
+              <input id="nombre" autocomplete="name" maxlength="120" required placeholder="Tu nombre">
+              <span class="err" id="e-nombre"></span>
+            </div>
+            <div class="campo">
+              <label for="empresa">Negocio</label>
+              <input id="empresa" autocomplete="organization" maxlength="160" required placeholder="Nombre o giro de tu negocio">
+              <span class="err" id="e-empresa"></span>
+            </div>
+            <div class="campo">
+              <label for="correo">Correo</label>
+              <input id="correo" type="email" autocomplete="email" inputmode="email" maxlength="200" required placeholder="tu@empresa.com">
+              <span class="err" id="e-correo"></span>
+            </div>
+            <div class="campo">
+              <label for="whatsapp">WhatsApp <small>(opcional)</small></label>
+              <input id="whatsapp" type="tel" autocomplete="tel" inputmode="tel" maxlength="25" placeholder="33 1234 5678">
+              <span class="err" id="e-whatsapp"></span>
+            </div>
+            <div class="trampa" aria-hidden="true">
+              <label for="web2">No llenes este campo</label>
+              <input id="web2" tabindex="-1" autocomplete="off">
+            </div>
+            <button class="enviar" type="submit" id="btn">
+              <span id="btn-txt">Ver la guía</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"/></svg>
+            </button>
+            <p class="error-gral" id="e-gral" role="alert"></p>
+            <p class="legal">Sin spam. Tus datos solo los vemos nosotros. <a href="/privacidad.html#solicitudes">Aviso de privacidad</a></p>
+          </form>
+
+          <div class="tarjeta-lista">
+            <div class="palomita" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+            <h2>Tu guía está abajo</h2>
+            <p>Guárdala como PDF para tenerla a la mano cuando planees tu mes.</p>
+            <div style="display:flex;flex-wrap:wrap;gap:.6rem">
+              <a class="btn btn-v" href="#antes">Leer ahora</a>
+              <button class="btn" type="button" id="pdf">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>
+                Guardar PDF
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+      <div class="bajar" aria-hidden="true"><span></span></div>
     </div>
+  </div>
 
-    <div class="tarjeta">
-      <form id="form" novalidate>
-        <h2>Recíbela gratis</h2>
-        <p class="intro">Se abre aquí mismo en cuanto envíes tus datos.</p>
-        <div class="campo">
-          <label for="nombre">Nombre</label>
-          <input id="nombre" autocomplete="name" maxlength="120" required placeholder="Tu nombre">
-          <span class="err" id="e-nombre"></span>
-        </div>
-        <div class="campo">
-          <label for="empresa">Negocio</label>
-          <input id="empresa" autocomplete="organization" maxlength="160" required placeholder="Nombre o giro de tu negocio">
-          <span class="err" id="e-empresa"></span>
-        </div>
-        <div class="campo">
-          <label for="correo">Correo</label>
-          <input id="correo" type="email" autocomplete="email" inputmode="email" maxlength="200" required placeholder="tu@empresa.com">
-          <span class="err" id="e-correo"></span>
-        </div>
-        <div class="campo">
-          <label for="whatsapp">WhatsApp <small>(opcional)</small></label>
-          <input id="whatsapp" type="tel" autocomplete="tel" inputmode="tel" maxlength="25" placeholder="33 1234 5678">
-          <span class="err" id="e-whatsapp"></span>
-        </div>
-        <div class="trampa" aria-hidden="true">
-          <label for="web2">No llenes este campo</label>
-          <input id="web2" tabindex="-1" autocomplete="off">
-        </div>
-        <button class="enviar" type="submit" id="btn">
-          <span id="btn-txt">Ver la guía</span>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"/></svg>
-        </button>
-        <p class="error-gral" id="e-gral" role="alert"></p>
-        <p class="legal">Sin spam. Tus datos solo los vemos nosotros. <a href="/privacidad.html#solicitudes">Aviso de privacidad</a></p>
-      </form>
-
-      <div class="tarjeta-lista">
-        <h2>Tu guía está abajo</h2>
-        <p>Guárdala como PDF para tenerla a la mano cuando planees tu mes.</p>
-        <div style="display:flex;flex-wrap:wrap;gap:.6rem">
-          <a class="btn btn-v" href="#guia">Leer ahora</a>
-          <button class="btn" type="button" id="pdf">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>
-            Guardar PDF
-          </button>
-        </div>
-      </div>
+  <div class="cinta" aria-hidden="true">
+    <div class="cinta-in">
+      <span><b>Alcance</b><i>✦</i></span><span><b>Nutrir</b><i>✦</i></span><span><b>Historia</b><i>✦</i></span><span>Lunes · Miércoles · Viernes<i>✦</i></span><span>12 videos al mes<i>✦</i></span><span>El objetivo va antes de la cámara<i>✦</i></span>
+      <span><b>Alcance</b><i>✦</i></span><span><b>Nutrir</b><i>✦</i></span><span><b>Historia</b><i>✦</i></span><span>Lunes · Miércoles · Viernes<i>✦</i></span><span>12 videos al mes<i>✦</i></span><span>El objetivo va antes de la cámara<i>✦</i></span>
     </div>
-  </section>
+  </div>
 
-  <article class="guia" id="guia" tabindex="-1">
-    <div class="lectura">
-      <h2>Antes de grabar</h2>
-      <p>Casi todos los negocios se atoran en lo mismo: saben que tienen que publicar video, pero no saben qué. Terminan grabando lo que se les ocurre esa mañana, y a los dos meses lo dejan.</p>
-      <p>Lo que funciona es repartir el mes en tres funciones. Unos videos traen gente nueva, otros convencen a la que ya llegó y otros hacen que se quede. Si solo haces uno de los tres, se nota: mucho alcance y nadie compra, o mucha confianza y nadie te conoce.</p>
-      <div class="regla">
-        <b>La única regla</b>
-        <p>Cada video necesita un objetivo antes de encender la cámara. Si no sabes qué tiene que lograr, todavía no lo grabes. En edición ya no se corrige.</p>
+  <article class="guia" id="guia" tabindex="-1" aria-label="Guía: 12 videos para tu negocio">
+    <nav class="indice" aria-label="Secciones de la guía">
+      <div class="envoltura indice-in">
+        <a href="#antes">Antes de grabar</a>
+        <a href="#alcance">Alcance</a>
+        <a href="#nutrir">Nutrir</a>
+        <a href="#historia">Historia</a>
+        <a href="#semana">Tu semana</a>
       </div>
+      <div class="progreso" id="progreso"></div>
+    </nav>
 
-      <section class="seccion">
-        <div class="seccion-cab"><h3>Alcance</h3><span>Lunes · que te conozcan</span></div>
-        <p class="seccion-desc">Videos cortos y fáciles de ver. Su trabajo es abrir la puerta: que llegue gente nueva, empezando por tu cliente ideal. Aquí no se vende.</p>
-
-        <div class="idea"><div class="num">01</div><div>
-          <h4>El error que ves todas las semanas</h4>
-          <p>Cuenta el error más común que cometen tus clientes antes de llegar contigo y cómo evitarlo. Funciona porque tu cliente ideal se reconoce en él.</p>
-          <p class="dato"><b>Ejemplo:</b> una arrendadora: «El error que más cuesta al rentar tu primera camioneta para la empresa».</p>
-          <p class="dato"><b>Al grabar:</b> di el error en la primera frase. Nada de «hola, soy…» al inicio.</p>
-        </div></div>
-
-        <div class="idea"><div class="num">02</div><div>
-          <h4>Mito contra realidad</h4>
-          <p>Algo que todos creen de tu industria y que no es cierto. Genera conversación y te posiciona como quien sabe del tema.</p>
-          <p class="dato"><b>Ejemplo:</b> una clínica dental: «No, blanquearte no te daña los dientes. Esto es lo que sí».</p>
-          <p class="dato"><b>Al grabar:</b> pon el mito en texto en pantalla desde el primer segundo.</p>
-        </div></div>
-
-        <div class="idea"><div class="num">03</div><div>
-          <h4>El proceso que nadie ve</h4>
-          <p>Cómo se hace, se prepara o se instala lo que vendes. Lo que para ti es rutina, para tu cliente es fascinante.</p>
-          <p class="dato"><b>Ejemplo:</b> un restaurante preparando la salsa desde las 7 a.m.; una fábrica cortando una pieza.</p>
-          <p class="dato"><b>Al grabar:</b> tomas cerradas, buen sonido ambiente y sin hablar. De 15 a 25 segundos.</p>
-        </div></div>
-
-        <div class="idea"><div class="num">04</div><div>
-          <h4>La pregunta que más te hacen</h4>
-          <p>Respóndela en 30 segundos. Si te la hacen en persona, la están buscando en redes.</p>
-          <p class="dato"><b>Ejemplo:</b> un despacho contable: «¿Me conviene facturar como persona física o moral?».</p>
-          <p class="dato"><b>Al grabar:</b> lee la pregunta tal como te la hacen, con sus palabras, no con las tuyas.</p>
-        </div></div>
+    <div class="envoltura">
+      <section class="antes" id="antes">
+        <div>
+          <h2 class="titulo-g r">Antes de grabar</h2>
+          <p class="r d1">Casi todos los negocios se atoran en lo mismo: saben que tienen que publicar video, pero no saben qué. Terminan grabando lo que se les ocurre esa mañana, y a los dos meses lo dejan.</p>
+          <p class="r d2">Lo que funciona es repartir el mes en tres funciones. Unos videos traen gente nueva, otros convencen a la que ya llegó y otros hacen que se quede. Si solo haces uno de los tres, se nota: mucho alcance y nadie compra, o mucha confianza y nadie te conoce.</p>
+          <div class="regla r d3">
+            <b>La única regla</b>
+            <p>Cada video necesita un objetivo antes de encender la cámara. Si no sabes qué tiene que lograr, todavía no lo grabes. En edición ya no se corrige.</p>
+          </div>
+        </div>
+        <figure class="foto foto-antes" style="margin:0">
+          <img src="../img/guion.webp" alt="Persona revisando un guion con un lápiz" loading="lazy" width="480" height="854">
+          <figcaption>Primero el objetivo, luego el guion</figcaption>
+        </figure>
       </section>
 
-      <section class="seccion">
-        <div class="seccion-cab"><h3>Nutrir</h3><span>Miércoles · que confíen</span></div>
-        <p class="seccion-desc">Para la gente que ya se interesó. Le das algo de valor y con eso se queda, te sigue y, cuando esté lista, te busca a ti.</p>
-
-        <div class="idea"><div class="num">05</div><div>
-          <h4>Cómo elegir bien, aunque no sea conmigo</h4>
-          <p>Tres cosas que tu cliente debería revisar antes de contratar a cualquiera de tu giro. Ayudarle a decidir bien genera más confianza que decirle que eres el mejor.</p>
-          <p class="dato"><b>Ejemplo:</b> una constructora: «3 preguntas que tienes que hacerle a cualquier constructora antes de firmar».</p>
-          <p class="dato"><b>Al grabar:</b> numera en pantalla. La gente se queda para ver el tercer punto.</p>
+      <section class="seccion" id="alcance">
+        <div class="palabra" aria-hidden="true">Alcance</div>
+        <div class="lado-foto"><div class="lado-foto-in">
+          <figure class="foto" style="margin:0">
+            <img src="../img/entregado.webp" alt="Celular grabando un atardecer" loading="lazy" width="480" height="854">
+            <figcaption>Lunes · 01 al 04</figcaption>
+          </figure>
         </div></div>
+        <div>
+          <div class="seccion-cab r">
+            <span>Que te conozcan</span>
+            <h3>Alcance</h3>
+            <p class="seccion-desc">Videos cortos y fáciles de ver. Su trabajo es abrir la puerta: que llegue gente nueva, empezando por tu cliente ideal. Aquí no se vende.</p>
+          </div>
 
-        <div class="idea"><div class="num">06</div><div>
-          <h4>Un caso real, explicado</h4>
-          <p>Un antes y después, o un problema que resolviste: qué pasaba, qué hiciste y cómo quedó. Enseña tu criterio, no solo el resultado.</p>
-          <p class="dato"><b>Ejemplo:</b> un taller: el coche que llegó con tres diagnósticos distintos y qué tenía de verdad.</p>
-          <p class="dato"><b>Al grabar:</b> si puedes, graba el «antes» el día que llega. Después ya no se recupera.</p>
-        </div></div>
+          <div class="idea r"><div class="num">01</div><div>
+            <h4>El error que ves todas las semanas</h4>
+            <p>Cuenta el error más común que cometen tus clientes antes de llegar contigo y cómo evitarlo. Funciona porque tu cliente ideal se reconoce en él.</p>
+            <div class="datos">
+              <p class="dato"><b>Ejemplo</b><span>Una arrendadora: «El error que más cuesta al rentar tu primera camioneta para la empresa».</span></p>
+              <p class="dato grabar"><b>Al grabar</b><span>Di el error en la primera frase. Nada de «hola, soy…» al inicio.</span></p>
+            </div>
+          </div></div>
 
-        <div class="idea"><div class="num">07</div><div>
-          <h4>Qué pasa cuando me contratas</h4>
-          <p>Tu proceso paso a paso, desde el primer mensaje hasta la entrega. Quita el miedo a lo desconocido, que es lo que más frena una compra.</p>
-          <p class="dato"><b>Ejemplo:</b> un despacho de arquitectura: de la primera visita al día que te entregan las llaves, en cuatro pasos.</p>
-          <p class="dato"><b>Al grabar:</b> un paso por toma, en el lugar real donde pasa cada uno.</p>
-        </div></div>
+          <div class="idea r"><div class="num">02</div><div>
+            <h4>Mito contra realidad</h4>
+            <p>Algo que todos creen de tu industria y que no es cierto. Genera conversación y te posiciona como quien sabe del tema.</p>
+            <div class="datos">
+              <p class="dato"><b>Ejemplo</b><span>Una clínica dental: «No, blanquearte no te daña los dientes. Esto es lo que sí».</span></p>
+              <p class="dato grabar"><b>Al grabar</b><span>Pon el mito en texto en pantalla desde el primer segundo.</span></p>
+            </div>
+          </div></div>
 
-        <div class="idea"><div class="num">08</div><div>
-          <h4>Por qué cuesta lo que cuesta</h4>
-          <p>Qué hace que algo de tu giro cueste más o menos. Hablar de precio sin dar tu precio te hace ver transparente y filtra a quien no es tu cliente.</p>
-          <p class="dato"><b>Ejemplo:</b> una mueblería: «Por qué dos sillas que se ven iguales cuestan $900 y $4,000».</p>
-          <p class="dato"><b>Al grabar:</b> muestra físicamente la diferencia. Que se vea, no solo que se diga.</p>
-        </div></div>
+          <div class="idea r"><div class="num">03</div><div>
+            <h4>El proceso que nadie ve</h4>
+            <p>Cómo se hace, se prepara o se instala lo que vendes. Lo que para ti es rutina, para tu cliente es fascinante.</p>
+            <div class="datos">
+              <p class="dato"><b>Ejemplo</b><span>Un restaurante preparando la salsa desde las 7 a.m.; una fábrica cortando una pieza.</span></p>
+              <p class="dato grabar"><b>Al grabar</b><span>Tomas cerradas, buen sonido ambiente y sin hablar. De 15 a 25 segundos.</span></p>
+            </div>
+          </div></div>
+
+          <div class="idea r"><div class="num">04</div><div>
+            <h4>La pregunta que más te hacen</h4>
+            <p>Respóndela en 30 segundos. Si te la hacen en persona, la están buscando en redes.</p>
+            <div class="datos">
+              <p class="dato"><b>Ejemplo</b><span>Un despacho contable: «¿Me conviene facturar como persona física o moral?».</span></p>
+              <p class="dato grabar"><b>Al grabar</b><span>Lee la pregunta tal como te la hacen, con sus palabras, no con las tuyas.</span></p>
+            </div>
+          </div></div>
+        </div>
       </section>
 
-      <section class="seccion">
-        <div class="seccion-cab"><h3>Historia</h3><span>Viernes · que conecten</span></div>
-        <p class="seccion-desc">Aquí dejas de ser una empresa que informa y pasas a ser alguien con quien la gente conecta. Es lo que hace que te elijan a ti y no a la competencia que vende lo mismo.</p>
-
-        <div class="idea"><div class="num">09</div><div>
-          <h4>Por qué empezaste</h4>
-          <p>El momento en que decidiste abrir el negocio. No la historia completa: una escena concreta.</p>
-          <p class="dato"><b>Ejemplo:</b> «Abrí la primera sucursal con un préstamo de mi papá y dos mesas prestadas».</p>
-          <p class="dato"><b>Al grabar:</b> si todavía existe, grábalo en el lugar donde empezó.</p>
+      <section class="seccion" id="nutrir">
+        <div class="palabra" aria-hidden="true">Nutrir</div>
+        <div class="lado-foto"><div class="lado-foto-in">
+          <figure class="foto" style="margin:0">
+            <img src="../img/grabado.webp" alt="Claqueta de cine en las manos de alguien del equipo" loading="lazy" width="480" height="854">
+            <figcaption>Miércoles · 05 al 08</figcaption>
+          </figure>
         </div></div>
+        <div>
+          <div class="seccion-cab r">
+            <span>Que confíen</span>
+            <h3>Nutrir</h3>
+            <p class="seccion-desc">Para la gente que ya se interesó. Le das algo de valor y con eso se queda, te sigue y, cuando esté lista, te busca a ti.</p>
+          </div>
 
-        <div class="idea"><div class="num">10</div><div>
-          <h4>Las personas detrás</h4>
-          <p>Presenta a alguien de tu equipo: qué hace, desde cuándo está y qué es lo que más le gusta de su trabajo. La gente compra a personas.</p>
-          <p class="dato"><b>Ejemplo:</b> el técnico con 15 años en la empresa que conoce a cada cliente por su nombre.</p>
-          <p class="dato"><b>Al grabar:</b> hazle preguntas fuera de cámara y quédate con las respuestas naturales, no con un guion aprendido.</p>
-        </div></div>
+          <div class="idea r"><div class="num">05</div><div>
+            <h4>Cómo elegir bien, aunque no sea conmigo</h4>
+            <p>Tres cosas que tu cliente debería revisar antes de contratar a cualquiera de tu giro. Ayudarle a decidir bien genera más confianza que decirle que eres el mejor.</p>
+            <div class="datos">
+              <p class="dato"><b>Ejemplo</b><span>Una constructora: «3 preguntas que tienes que hacerle a cualquier constructora antes de firmar».</span></p>
+              <p class="dato grabar"><b>Al grabar</b><span>Numera en pantalla. La gente se queda para ver el tercer punto.</span></p>
+            </div>
+          </div></div>
 
-        <div class="idea"><div class="num">11</div><div>
-          <h4>Tu cliente lo cuenta</h4>
-          <p>Un testimonio que no suene a comercial. La clave es la pregunta: no «¿qué opinas de nosotros?», sino «¿cómo era antes de trabajar con nosotros?».</p>
-          <p class="dato"><b>Ejemplo:</b> un cliente contando el problema que tenía y cómo se resolvió, con sus palabras.</p>
-          <p class="dato"><b>Al grabar:</b> en su espacio, no en el tuyo. Se ve más real.</p>
-        </div></div>
+          <div class="idea r"><div class="num">06</div><div>
+            <h4>Un caso real, explicado</h4>
+            <p>Un antes y después, o un problema que resolviste: qué pasaba, qué hiciste y cómo quedó. Enseña tu criterio, no solo el resultado.</p>
+            <div class="datos">
+              <p class="dato"><b>Ejemplo</b><span>Un taller: el coche que llegó con tres diagnósticos distintos y qué tenía de verdad.</span></p>
+              <p class="dato grabar"><b>Al grabar</b><span>Si puedes, graba el «antes» el día que llega. Después ya no se recupera.</span></p>
+            </div>
+          </div></div>
 
-        <div class="idea"><div class="num">12</div><div>
-          <h4>Algo que salió mal</h4>
-          <p>Un error que cometiste y qué cambiaste por eso. Es el video que más confianza genera, porque casi nadie se atreve a hacerlo.</p>
-          <p class="dato"><b>Ejemplo:</b> «Perdimos a nuestro cliente más grande por no contestar a tiempo. Desde entonces hacemos esto».</p>
-          <p class="dato"><b>Al grabar:</b> termina con lo que aprendiste, no con el error.</p>
-        </div></div>
+          <div class="idea r"><div class="num">07</div><div>
+            <h4>Qué pasa cuando me contratas</h4>
+            <p>Tu proceso paso a paso, desde el primer mensaje hasta la entrega. Quita el miedo a lo desconocido, que es lo que más frena una compra.</p>
+            <div class="datos">
+              <p class="dato"><b>Ejemplo</b><span>Un despacho de arquitectura: de la primera visita al día que te entregan las llaves, en cuatro pasos.</span></p>
+              <p class="dato grabar"><b>Al grabar</b><span>Un paso por toma, en el lugar real donde pasa cada uno.</span></p>
+            </div>
+          </div></div>
+
+          <div class="idea r"><div class="num">08</div><div>
+            <h4>Por qué cuesta lo que cuesta</h4>
+            <p>Qué hace que algo de tu giro cueste más o menos. Hablar de precio sin dar tu precio te hace ver transparente y filtra a quien no es tu cliente.</p>
+            <div class="datos">
+              <p class="dato"><b>Ejemplo</b><span>Una mueblería: «Por qué dos sillas que se ven iguales cuestan $900 y $4,000».</span></p>
+              <p class="dato grabar"><b>Al grabar</b><span>Muestra físicamente la diferencia. Que se vea, no solo que se diga.</span></p>
+            </div>
+          </div></div>
+        </div>
       </section>
 
-      <section class="seccion">
-        <div class="seccion-cab"><h3>Cómo repartirlos</h3><span>12 videos · 4 semanas</span></div>
-        <p class="seccion-desc">Tres videos por semana, uno de cada función. Así cada semana traes gente nueva, convences a la que llegó y le das una razón para quedarse.</p>
+      <section class="seccion" id="historia">
+        <div class="palabra" aria-hidden="true">Historia</div>
+        <div class="lado-foto"><div class="lado-foto-in">
+          <figure class="foto" style="margin:0">
+            <img src="../img/sin-guion.webp" alt="Máquina de escribir antigua en blanco y negro" loading="lazy" width="480" height="854">
+            <figcaption>Viernes · 09 al 12</figcaption>
+          </figure>
+        </div></div>
+        <div>
+          <div class="seccion-cab r">
+            <span>Que conecten</span>
+            <h3>Historia</h3>
+            <p class="seccion-desc">Aquí dejas de ser una empresa que informa y pasas a ser alguien con quien la gente conecta. Es lo que hace que te elijan a ti y no a la competencia que vende lo mismo.</p>
+          </div>
+
+          <div class="idea r"><div class="num">09</div><div>
+            <h4>Por qué empezaste</h4>
+            <p>El momento en que decidiste abrir el negocio. No la historia completa: una escena concreta.</p>
+            <div class="datos">
+              <p class="dato"><b>Ejemplo</b><span>«Abrí la primera sucursal con un préstamo de mi papá y dos mesas prestadas».</span></p>
+              <p class="dato grabar"><b>Al grabar</b><span>Si todavía existe, grábalo en el lugar donde empezó.</span></p>
+            </div>
+          </div></div>
+
+          <div class="idea r"><div class="num">10</div><div>
+            <h4>Las personas detrás</h4>
+            <p>Presenta a alguien de tu equipo: qué hace, desde cuándo está y qué es lo que más le gusta de su trabajo. La gente compra a personas.</p>
+            <div class="datos">
+              <p class="dato"><b>Ejemplo</b><span>El técnico con 15 años en la empresa que conoce a cada cliente por su nombre.</span></p>
+              <p class="dato grabar"><b>Al grabar</b><span>Hazle preguntas fuera de cámara y quédate con las respuestas naturales, no con un guion aprendido.</span></p>
+            </div>
+          </div></div>
+
+          <div class="idea r"><div class="num">11</div><div>
+            <h4>Tu cliente lo cuenta</h4>
+            <p>Un testimonio que no suene a comercial. La clave es la pregunta: no «¿qué opinas de nosotros?», sino «¿cómo era antes de trabajar con nosotros?».</p>
+            <div class="datos">
+              <p class="dato"><b>Ejemplo</b><span>Un cliente contando el problema que tenía y cómo se resolvió, con sus palabras.</span></p>
+              <p class="dato grabar"><b>Al grabar</b><span>En su espacio, no en el tuyo. Se ve más real.</span></p>
+            </div>
+          </div></div>
+
+          <div class="idea r"><div class="num">12</div><div>
+            <h4>Algo que salió mal</h4>
+            <p>Un error que cometiste y qué cambiaste por eso. Es el video que más confianza genera, porque casi nadie se atreve a hacerlo.</p>
+            <div class="datos">
+              <p class="dato"><b>Ejemplo</b><span>«Perdimos a nuestro cliente más grande por no contestar a tiempo. Desde entonces hacemos esto».</span></p>
+              <p class="dato grabar"><b>Al grabar</b><span>Termina con lo que aprendiste, no con el error.</span></p>
+            </div>
+          </div></div>
+        </div>
+      </section>
+
+      <section class="semana-sec" id="semana">
+        <div class="semana-cab">
+          <div class="seccion-cab r" style="margin:0">
+            <span>12 videos · 4 semanas</span>
+            <h3>Tu semana</h3>
+          </div>
+          <p class="seccion-desc r d1" style="margin:0">Tres videos por semana, uno de cada función. Así cada semana traes gente nueva, convences a la que llegó y le das una razón para quedarse.</p>
+        </div>
         <div class="semana">
-          <div class="dia"><b>Lunes</b><span>Alcance · 01 al 04</span></div>
-          <div class="dia"><b>Miércoles</b><span>Nutrir · 05 al 08</span></div>
-          <div class="dia"><b>Viernes</b><span>Historia · 09 al 12</span></div>
+          <div class="dia r"><img src="../img/entregado.webp" alt="" loading="lazy"><small>Alcance</small><b>Lunes</b><span>Videos 01 al 04</span></div>
+          <div class="dia r d1"><img src="../img/grabado.webp" alt="" loading="lazy"><small>Nutrir</small><b>Miércoles</b><span>Videos 05 al 08</span></div>
+          <div class="dia r d2"><img src="../img/sin-guion.webp" alt="" loading="lazy"><small>Historia</small><b>Viernes</b><span>Videos 09 al 12</span></div>
         </div>
-        <p><strong>Un consejo:</strong> graba los 12 en uno o dos días. Grabar un video a la vez es la razón número uno por la que los negocios dejan de publicar a la tercera semana.</p>
-      </section>
+        <p class="consejo r"><strong>Un consejo:</strong> graba los 12 en uno o dos días. Grabar un video a la vez es la razón número uno por la que los negocios dejan de publicar a la tercera semana.</p>
 
-      <div class="cierre">
-        <h2>¿Prefieres que lo hagamos nosotros?</h2>
-        <p>Esto es exactamente lo que hacemos cada mes: decidimos qué se graba y por qué, lo grabamos en tu negocio y te entregamos los 12 videos listos para publicar lunes, miércoles y viernes.</p>
-        <div class="acciones">
-          <a class="btn btn-v" href="/empezar/?utm_source=guia">Platiquemos
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-          </a>
-          <a class="btn" href="https://connectstudios.mx">Ver el trabajo</a>
+        <div class="cierre r">
+          <div class="cierre-in">
+            <div class="cierre-txt">
+              <h2>¿Prefieres que lo hagamos nosotros?</h2>
+              <p>Esto es exactamente lo que hacemos cada mes: decidimos qué se graba y por qué, lo grabamos en tu negocio y te entregamos los 12 videos listos para publicar lunes, miércoles y viernes.</p>
+              <div class="acciones">
+                <a class="btn btn-v" href="/empezar/?utm_source=guia">Platiquemos
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                </a>
+                <a class="btn" href="https://connectstudios.mx">Ver el trabajo</a>
+              </div>
+            </div>
+            <div class="cierre-foto">
+              <img src="https://connectstudios.mx/assets/img/bts/bts-3.webp" alt="Rodaje de Connect Studios en las instalaciones de un cliente" loading="lazy" onerror="this.src='../img/edicion.webp'">
+            </div>
+          </div>
         </div>
-      </div>
+      </section>
     </div>
   </article>
 
@@ -365,7 +624,7 @@ h1 em{font-style:normal;color:var(--verde)}
 const CONFIG = {
   SUPABASE_URL: 'https://ypguioklwhyixacfuksu.supabase.co',
   SUPABASE_KEY: 'sb_publishable_qjTIY_M5HJ9R653m_uOmXw_bBbVTibS', // la Publishable key. NUNCA la Secret.
-  META_PIXEL: ''             // opcional: ID del Pixel de Meta (evento Lead al abrir la guía)
+  META_PIXEL: '580716017132096'             // opcional: ID del Pixel de Meta (evento Lead al abrir la guía)
 };
 // =====================================================================
 
@@ -376,10 +635,62 @@ const CONFIG = {
   const btnTxt = document.getElementById('btn-txt');
   const eGral = document.getElementById('e-gral');
   const LLAVE = 'connect.guia.abierta';
+  const quieto = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ---------- Animaciones ----------
+  // El 12 del título cuenta desde 0
+  if (!quieto) {
+    const c = document.getElementById('cuenta');
+    let n = 0;
+    c.textContent = '0';
+    setTimeout(function paso() { n++; c.textContent = n; if (n < 12) setTimeout(paso, 28 + n * 7); }, 350);
+  }
+
+  // Revelado al entrar en pantalla
+  const obs = 'IntersectionObserver' in window ? new IntersectionObserver(es => es.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('visto'); obs.unobserve(e.target); }
+  }), { rootMargin: '0px 0px -12% 0px', threshold: .08 }) : null;
+  const PENDIENTES = '.r:not(.visto), .foto:not(.visto), .regla:not(.visto)';
+  function observar() {
+    document.querySelectorAll(PENDIENTES).forEach(el => obs ? obs.observe(el) : el.classList.add('visto'));
+  }
+  // Respaldo por si el observador no alcanza a disparar: revela lo que ya está en pantalla
+  function revelarVisibles() {
+    document.querySelectorAll(PENDIENTES).forEach(el => {
+      const r = el.getBoundingClientRect();
+      if (r.height && r.top < innerHeight * .92 && r.bottom > 0) el.classList.add('visto');
+    });
+  }
+  observar();
+
+  // Índice activo, barra de progreso, parallax
+  const fondo = document.getElementById('fondo');
+  const progreso = document.getElementById('progreso');
+  const guia = document.getElementById('guia');
+  const links = [...document.querySelectorAll('.indice a')];
+  const secciones = links.map(a => document.querySelector(a.getAttribute('href')));
+  const palabras = [...document.querySelectorAll('.palabra')];
+  let pendiente = false;
+  function alMover() {
+    pendiente = false;
+    const y = scrollY, h = innerHeight;
+    revelarVisibles();
+    if (!quieto && y < h * 1.2) fondo.style.transform = `translate3d(0,${y * .3}px,0) scale(1.08)`;
+    if (!raiz.classList.contains('abierta')) return;
+    const top = guia.offsetTop, alto = guia.offsetHeight - h;
+    progreso.style.transform = `scaleX(${Math.min(1, Math.max(0, (y - top) / alto))})`;
+    let activa = 0;
+    secciones.forEach((s, i) => { if (s && s.getBoundingClientRect().top < h * .35) activa = i; });
+    links.forEach((a, i) => a.classList.toggle('activo', i === activa && y > top - h * .3));
+    if (!quieto) palabras.forEach(p => { const r = p.parentElement.getBoundingClientRect(); p.style.transform = `translate3d(${(r.top - h / 2) * -.12}px,0,0)`; });
+  }
+  addEventListener('scroll', () => { if (!pendiente) { pendiente = true; requestAnimationFrame(alMover); } }, { passive: true });
+  addEventListener('resize', alMover);
 
   // Quien ya la abrió en este navegador la ve directo
-  try { if (localStorage.getItem(LLAVE)) raiz.classList.add('abierta'); } catch (e) { /* sin almacenamiento */ }
+  try { if (localStorage.getItem(LLAVE)) { raiz.classList.add('abierta'); observar(); } } catch (e) { /* sin almacenamiento */ }
 
+  // ---------- Origen ----------
   const params = new URLSearchParams(location.search);
   const origen = { pagina: 'guia' };
   ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'fbclid', 'gclid', 'ref'].forEach(k => {
@@ -394,6 +705,7 @@ const CONFIG = {
     fbq('track', 'PageView');
   }
 
+  // ---------- Formulario ----------
   const val = id => document.getElementById(id).value.trim();
   const REGLAS = {
     nombre: v => v.length >= 2 || 'Escribe tu nombre.',
@@ -422,13 +734,19 @@ const CONFIG = {
   function abrir() {
     raiz.classList.add('abierta');
     try { localStorage.setItem(LLAVE, '1'); } catch (e) { /* sin almacenamiento */ }
-    const guia = document.getElementById('guia');
-    guia.scrollIntoView({ behavior: 'smooth' });
-    guia.focus({ preventScroll: true });
+    observar();
+    setTimeout(revelarVisibles, 100);
+    setTimeout(() => {
+      document.getElementById('antes').scrollIntoView({ behavior: quieto ? 'auto' : 'smooth' });
+      guia.focus({ preventScroll: true });
+    }, 650);
     if (window.fbq) fbq('track', 'Lead', { content_name: 'guia' });
   }
 
-  document.getElementById('pdf').addEventListener('click', () => window.print());
+  document.getElementById('pdf').addEventListener('click', () => {
+    document.querySelectorAll('.r, .foto, .regla').forEach(el => el.classList.add('visto'));
+    window.print();
+  });
 
   form.addEventListener('submit', async e => {
     e.preventDefault();
