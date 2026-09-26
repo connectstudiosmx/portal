@@ -305,6 +305,20 @@ main.app{max-width:var(--ancho);margin:0 auto;padding:1.75rem 1.25rem 5rem}
 .tabla .campo-in{width:100%;min-width:9rem}
 .aviso-linea{border-left:3px solid var(--dorado);padding:.3rem .8rem;color:var(--crema);margin:0 0 1rem}
 
+/* Solicitudes */
+.sol-lista{display:grid;gap:.75rem;max-width:56rem}
+.sol{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:.4rem 1.2rem;background:var(--panel);border:1px solid var(--linea);border-left:3px solid var(--verde);border-radius:var(--r2);padding:1rem 1.1rem}
+.sol.atendida{border-left-color:var(--linea-2);opacity:.62}
+.sol-nombre{font-weight:700;font-size:1.02rem}
+.sol-nombre span{color:var(--crema-2);font-weight:500}
+.sol-meta{display:flex;flex-wrap:wrap;gap:.3rem 1.1rem;font-size:.86rem;color:var(--crema-2);margin-top:.3rem}
+.sol-meta a{color:var(--verde);font-weight:600;text-underline-offset:2px}
+.sol-msg{margin:.6rem 0 0;font-size:.9rem;color:var(--crema);white-space:pre-wrap;overflow-wrap:anywhere}
+.sol-der{display:flex;flex-direction:column;align-items:flex-end;gap:.5rem;text-align:right}
+.sol-der .nota{white-space:nowrap}
+.sol-int{display:inline-block;font-size:.74rem;font-weight:700;padding:.15rem .55rem;border-radius:999px;border:1px solid var(--linea-2);color:var(--crema-2);white-space:nowrap}
+@media (max-width:640px){.sol{grid-template-columns:1fr}.sol-der{flex-direction:row;flex-wrap:wrap;align-items:center;justify-content:space-between;text-align:left}}
+
 /* Ventanas */
 .velo{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.74);display:flex;align-items:flex-start;justify-content:center;padding:max(5vh,env(safe-area-inset-top,0px)) 1rem 2rem;overflow-y:auto}
 .dialogo{width:100%;max-width:640px;background:var(--panel);border:1px solid var(--linea-2);border-radius:12px;padding:1.4rem 1.4rem 1.2rem;animation:entra .16s ease-out}
@@ -373,7 +387,7 @@ const sb = (configLista() && window.supabase)
 const S = {
   sesion: null, perfil: null,
   vista: 'produccion',
-  clientes: [], ciclos: [], videos: [], perfiles: [], asignaciones: [],
+  clientes: [], ciclos: [], videos: [], perfiles: [], asignaciones: [], solicitudes: [], verAtendidas: false,
   portal: null, cicloCliente: null, previa: null,
   filtro: { cliente: 'todos', estado: 'todos', mios: false, entregados: false },
   calInicio: null, verTodos: {}, cargadoEn: 0
@@ -489,6 +503,10 @@ async function cargarEquipo() {
   S.perfiles = perfiles || [];
   S.asignaciones = asignaciones || [];
   S.videos = (videos || []).map(v => { const x = Object.assign({}, v); delete x.cycles; return x; });
+  if (S.perfil.role === 'admin') {
+    try { S.solicitudes = await q(sb.from('solicitudes').select('*').order('created_at', { ascending: false }).limit(300)) || []; }
+    catch (e) { S.solicitudes = []; }
+  }
   S.cargadoEn = Date.now();
 }
 
@@ -551,13 +569,16 @@ function pantallaSimple(titulo, texto, boton, accion) {
 // ---------- Barra superior ------------------------------------------
 function barra() {
   const p = S.perfil, esAdmin = p.role === 'admin';
-  const tabs = esAdmin ? [['produccion', 'Producción'], ['calendario', 'Calendario'], ['clientes', 'Clientes'], ['accesos', 'Accesos']]
+  const tabs = esAdmin ? [['produccion', 'Producción'], ['calendario', 'Calendario'], ['clientes', 'Clientes'], ['solicitudes', 'Solicitudes'], ['accesos', 'Accesos']]
     : p.role === 'editor' ? [['produccion', 'Producción'], ['calendario', 'Calendario']] : [];
   const pendientes = esAdmin ? S.perfiles.filter(x => x.role === 'pendiente').length : 0;
+  const nuevas = esAdmin ? S.solicitudes.filter(x => !x.atendida).length : 0;
+  const punto = id => id === 'accesos' && pendientes ? `<span class="punto" aria-label="${pendientes} pendientes">${pendientes}</span>`
+    : id === 'solicitudes' && nuevas ? `<span class="punto" aria-label="${nuevas} sin atender">${nuevas}</span>` : '';
   const actual = S.vista === 'previa' ? 'clientes' : S.vista;
   return `<header class="barra"><div class="barra-in">
     <div class="marca"><b>Connect Studios</b><span>Portal</span></div>
-    ${tabs.length ? `<nav class="nav" aria-label="Secciones">${tabs.map(([id, txt]) => `<button data-accion="ir" data-id="${id}"${actual === id ? ' aria-current="page"' : ''}>${txt}${id === 'accesos' && pendientes ? `<span class="punto" aria-label="${pendientes} pendientes">${pendientes}</span>` : ''}</button>`).join('')}</nav>` : ''}
+    ${tabs.length ? `<nav class="nav" aria-label="Secciones">${tabs.map(([id, txt]) => `<button data-accion="ir" data-id="${id}"${actual === id ? ' aria-current="page"' : ''}>${txt}${punto(id)}</button>`).join('')}</nav>` : ''}
     <div class="quien">
       <span class="quien-txt"><strong>${esc(nombreDe(p))}</strong><small>${esc(p.role === 'cliente' && S.portal && S.portal.client ? S.portal.client.name : ROL[p.role])}</small></span>
       ${p.role !== 'cliente' ? '<button class="btn btn-s btn-t" data-accion="actualizar">Actualizar</button>' : ''}
@@ -574,6 +595,7 @@ function render() {
   else if (S.vista === 'calendario') cuerpo = vistaCalendario();
   else if (S.vista === 'clientes' && S.perfil.role === 'admin') cuerpo = vistaClientes();
   else if (S.vista === 'accesos' && S.perfil.role === 'admin') cuerpo = vistaAccesos();
+  else if (S.vista === 'solicitudes' && S.perfil.role === 'admin') cuerpo = vistaSolicitudes();
   else cuerpo = vistaProduccion();
   pintar(barra() + `<main class="app">${cuerpo}</main>`);
 }
@@ -936,6 +958,58 @@ function vistaAccesos() {
     </tr>`).join('')}</tbody>
   </table></div>
   <p class="nota" style="margin-top:1rem">Para dar acceso, mándale a la persona el link del portal. Cada editor solo ve los clientes que le asignes. Para quitarle el acceso a alguien, cámbialo a Pendiente. Para borrarlo por completo, elimínalo en Supabase (Authentication, Users).</p>`;
+}
+
+// ---------- Solicitudes (página /empezar) -----------------------------
+const INTERES = { mensual: 'Contenido mensual', proyecto: 'Video o proyecto', no_se: 'Aún no sabe' };
+const fHora = s => { const d = new Date(s); return `${d.getDate()} ${MESES_C[d.getMonth()]} · ${pad(d.getHours())}:${pad(d.getMinutes())}`; };
+const waDe = t => { let d = String(t || '').replace(/\D/g, ''); if (d.length === 10) d = '52' + d; return d; };
+const sitioDe = t => {
+  const v = String(t || '').trim();
+  if (!v) return '';
+  if (/^@?[\w.]+$/.test(v) && !/\.[a-z]{2,}$/i.test(v)) return enlace('https://instagram.com/' + v.replace(/^@/, ''), v.startsWith('@') ? v : '@' + v);
+  return enlace(/^https?:\/\//i.test(v) ? v : 'https://' + v, v.replace(/^https?:\/\//i, '')) || esc(v);
+};
+
+function vistaSolicitudes() {
+  const todas = S.solicitudes, nuevas = todas.filter(x => !x.atendida).length;
+  const lista = S.verAtendidas ? todas : todas.filter(x => !x.atendida);
+  const link = location.origin + '/empezar/';
+  return `<div class="encabezado">
+    <div><h1>Solicitudes</h1><p class="sub">Quien llena el formulario de <a href="${esc(link)}" target="_blank" rel="noopener">${esc(link.replace(/^https?:\/\//, ''))}</a> aparece aquí. Márcala como atendida cuando ya le escribiste.</p></div>
+    <label class="interruptor"><input type="checkbox" data-cambio="sol-ver-atendidas"${S.verAtendidas ? ' checked' : ''}> Ver atendidas</label>
+  </div>
+  ${nuevas ? `<p class="aviso-linea">${nuevas === 1 ? 'Hay 1 solicitud sin atender.' : `Hay ${nuevas} solicitudes sin atender.`}</p>` : ''}
+  ${lista.length ? `<div class="sol-lista">${lista.map(x => {
+    const o = x.origen || {}, wa = waDe(x.whatsapp), pila = String(x.nombre || '').split(/\s+/)[0];
+    const fuente = [o.utm_source, o.utm_campaign, o.utm_content].filter(Boolean).join(' · ');
+    return `<article class="sol${x.atendida ? ' atendida' : ''}">
+      <div>
+        <div class="sol-nombre">${esc(x.nombre)} <span>· ${esc(x.empresa)}</span></div>
+        <div class="sol-meta">
+          ${wa ? `<a href="https://wa.me/${wa}?text=${encodeURIComponent(`Hola ${pila}, soy Manuel de Connect Studios. Vi tu solicitud.`)}" target="_blank" rel="noopener">WhatsApp ${esc(x.whatsapp)}</a>` : ''}
+          <a href="mailto:${esc(x.correo)}">${esc(x.correo)}</a>
+          ${x.sitio ? `<span>${sitioDe(x.sitio)}</span>` : ''}
+        </div>
+        ${x.mensaje ? `<p class="sol-msg">${esc(x.mensaje)}</p>` : ''}
+      </div>
+      <div class="sol-der">
+        <span class="sol-int">${esc(INTERES[x.interes] || x.interes)}</span>
+        <span class="nota">${esc(fHora(x.created_at))}${fuente ? `<br>${esc(fuente)}` : ''}</span>
+        <label class="interruptor"><input type="checkbox" data-cambio="sol-atendida" data-id="${x.id}"${x.atendida ? ' checked' : ''}> Atendida</label>
+      </div>
+    </article>`;
+  }).join('')}</div>`
+    : `<div class="caja-vacia"><p>${todas.length ? 'Todas las solicitudes están atendidas.' : 'Todavía no hay solicitudes. Usa este link en tus anuncios o compártelo directo:'}</p>${todas.length ? '' : `<p><strong>${esc(link)}</strong></p>`}</div>`}`;
+}
+
+async function marcarSolicitud(id, atendida) {
+  try {
+    await q(sb.from('solicitudes').update({ atendida }).eq('id', id));
+    const x = S.solicitudes.find(s => s.id === id);
+    if (x) x.atendida = atendida;
+    render();
+  } catch (e) { aviso(humano(e), true); await recargar(); }
 }
 
 function celdaEditor(p) {
@@ -1610,7 +1684,9 @@ const CAMBIOS = {
   'filtro-entregados'(el) { S.filtro.entregados = el.checked; render(); },
   'perfil-rol'(el) { actualizarPerfil(el.dataset.id, { role: el.value }, true); },
   'perfil-cliente'(el) { actualizarPerfil(el.dataset.id, { client_id: el.value || null }, true); },
-  'perfil-nombre'(el) { actualizarPerfil(el.dataset.id, { full_name: el.value.trim() || null }, false); }
+  'perfil-nombre'(el) { actualizarPerfil(el.dataset.id, { full_name: el.value.trim() || null }, false); },
+  'sol-ver-atendidas'(el) { S.verAtendidas = el.checked; render(); },
+  'sol-atendida'(el) { marcarSolicitud(el.dataset.id, el.checked); }
 };
 
 document.addEventListener('click', ev => {

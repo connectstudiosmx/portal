@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#000000">
+<title>Hablemos · Connect Studios</title>
+<meta name="description" content="Cuéntame de tu negocio y qué quieres lograr con tu contenido. Te contacto para platicarlo.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Hablemos · Connect Studios">
+<meta property="og:description" content="Cuéntame de tu negocio y qué quieres lograr con tu contenido.">
+<meta property="og:image" content="https://connectstudios.mx/assets/img/reel-portada.webp">
+<meta property="og:url" content="https://portal.connectstudios.mx/empezar/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23000'/%3E%3Crect x='14' y='10' width='36' height='44' rx='4' fill='none' stroke='%23F3E7C8' stroke-width='5'/%3E%3Crect x='14' y='44' width='36' height='10' fill='%23E3B23C'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400..700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --negro:#000;
+  --panel:#0B0B0C;
+  --linea:#26262A;
+  --linea-2:#3A3A40;
+  --crema:#F2EFE9;
+  --crema-2:#C9C5BD;
+  --crema-3:#8A867F;
+  --verde:#39FF88;
+  --rojo:#F0705A;
+  --display:'Anton',Impact,'Arial Narrow',sans-serif;
+  --texto:'Archivo',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;min-height:100vh;background:var(--negro);color:var(--crema);font-family:var(--texto);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--verde);outline-offset:3px}
+button,input,textarea{font:inherit;color:inherit}
+
+.pagina{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);min-height:100vh;min-height:100dvh}
+
+/* Lado izquierdo: foto y titular */
+.lado{position:sticky;top:0;height:100vh;height:100dvh;overflow:hidden;background:#050505;display:flex;flex-direction:column;justify-content:space-between;padding:2.25rem clamp(1.25rem,4vw,3.5rem) 2.75rem;isolation:isolate}
+.lado::before{content:"";position:absolute;inset:0;z-index:-2;background:url(https://connectstudios.mx/assets/img/bts/bts-2.webp) center 30%/cover no-repeat;filter:grayscale(.35) brightness(.72)}
+.lado::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(0,0,0,.55) 0%,rgba(0,0,0,.1) 35%,rgba(0,0,0,.35) 60%,rgba(0,0,0,.92) 100%)}
+.logo{display:block;width:150px;height:auto}
+.logo-txt{font-family:var(--display);text-transform:uppercase;font-size:1.3rem;letter-spacing:.02em;text-decoration:none}
+.ceja{font-size:.74rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--crema-2);margin:0 0 1rem}
+.titular{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:clamp(3rem,min(7.4vw,11vh),6.4rem);line-height:.9;letter-spacing:.005em;margin:0}
+.titular em{font-style:normal;color:var(--verde)}
+.bajada{max-width:26rem;color:var(--crema-2);font-size:1.02rem;margin:1.25rem 0 0}
+
+/* Lado derecho: formulario */
+.form-lado{display:flex;align-items:center;justify-content:center;padding:3rem clamp(1.25rem,4vw,4rem)}
+.caja{width:100%;max-width:30rem}
+.caja h2{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:1.9rem;line-height:1;margin:0 0 .4rem;letter-spacing:.01em}
+.caja .intro{color:var(--crema-3);font-size:.93rem;margin:0 0 2rem}
+
+.fila{display:grid;grid-template-columns:1fr 1fr;gap:0 1rem}
+.campo{margin-bottom:1.15rem}
+.campo label,.grupo legend{display:block;font-size:.8rem;font-weight:600;color:var(--crema-2);margin-bottom:.4rem;letter-spacing:.01em}
+.campo label small,.grupo legend small{color:var(--crema-3);font-weight:500}
+.campo input,.campo textarea{display:block;width:100%;background:var(--panel);border:1px solid var(--linea);border-radius:8px;padding:.75rem .85rem;font-size:1rem;transition:border-color .15s,background .15s}
+.campo textarea{resize:vertical;min-height:5.5rem;line-height:1.45}
+.campo input::placeholder,.campo textarea::placeholder{color:#5E5B56}
+.campo input:hover,.campo textarea:hover{border-color:var(--linea-2)}
+.campo input:focus,.campo textarea:focus{outline:none;border-color:var(--verde);background:#0E0E10}
+.campo [aria-invalid="true"]{border-color:var(--rojo)}
+.err{display:block;color:var(--rojo);font-size:.8rem;font-weight:600;margin-top:.35rem}
+.err:empty{display:none}
+
+.grupo{border:0;padding:0;margin:0 0 1.15rem;min-width:0}
+.chips{display:flex;flex-wrap:wrap;gap:.5rem}
+.chip{position:relative}
+.chip input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.chip span{display:inline-flex;align-items:center;min-height:2.4rem;padding:0 1rem;border:1px solid var(--linea-2);border-radius:999px;font-size:.9rem;font-weight:600;color:var(--crema-2);transition:all .15s;cursor:pointer}
+.chip input:hover+span{border-color:var(--crema-3);color:var(--crema)}
+.chip input:checked+span{background:var(--crema);border-color:var(--crema);color:#000}
+.chip input:focus-visible+span{outline:2px solid var(--verde);outline-offset:2px}
+
+.trampa{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+
+.enviar{display:flex;align-items:center;justify-content:center;gap:.6rem;width:100%;min-height:3.25rem;margin-top:.6rem;border:0;border-radius:999px;background:var(--verde);color:#000;font-weight:700;font-size:1rem;letter-spacing:.01em;cursor:pointer;transition:transform .15s,box-shadow .15s,opacity .15s}
+.enviar:hover{transform:translateY(-1px);box-shadow:0 8px 28px rgba(57,255,136,.22)}
+.enviar:active{transform:none}
+.enviar[disabled]{opacity:.6;cursor:progress;transform:none;box-shadow:none}
+.enviar svg{width:18px;height:18px}
+.error-gral{color:var(--rojo);font-weight:600;font-size:.9rem;margin:.9rem 0 0}
+.error-gral:empty{display:none}
+.legal{color:var(--crema-3);font-size:.78rem;margin:1rem 0 0;text-align:center}
+.legal a{text-underline-offset:2px}
+
+/* Confirmación */
+.listo{display:none}
+.hecho .formulario{display:none}
+.hecho .listo{display:block;animation:entra .5s ease both}
+.palomita{width:3.25rem;height:3.25rem;border-radius:50%;border:2px solid var(--verde);display:grid;place-items:center;margin-bottom:1.5rem;color:var(--verde)}
+.palomita svg{width:24px;height:24px}
+.caja .listo h2{font-size:clamp(2.6rem,6vw,3.4rem);margin-bottom:.9rem}
+.listo p{color:var(--crema-2);margin:0 0 1rem}
+.acciones{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:1.75rem}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;min-height:2.75rem;padding:0 1.2rem;border:1px solid var(--linea-2);border-radius:999px;font-weight:600;font-size:.92rem;text-decoration:none;transition:border-color .15s,background .15s}
+.btn:hover{border-color:var(--crema-3);background:#0E0E10}
+.btn-v{border-color:var(--verde);color:var(--verde)}
+.btn svg{width:17px;height:17px}
+@keyframes entra{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+@media (max-width:860px){
+  .pagina{grid-template-columns:1fr;min-height:0}
+  .lado{position:relative;height:auto;min-height:0;padding:1.1rem 1rem 1.6rem;gap:3.25rem}
+  .lado::before{background-position:center 25%}
+  .logo{width:108px}
+  .titular{font-size:clamp(2.7rem,12.5vw,4.2rem)}
+  .ceja{font-size:.66rem;margin-bottom:.7rem}
+  .bajada{font-size:.97rem;margin-top:.9rem}
+  .form-lado{padding:1.75rem 1rem calc(2.5rem + env(safe-area-inset-bottom,0px));align-items:flex-start}
+  .caja h2{font-size:1.6rem}
+  .caja .intro{margin-bottom:1.5rem}
+}
+@media (max-width:440px){.fila{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="pagina">
+  <section class="lado">
+    <a href="https://connectstudios.mx" aria-label="Connect Studios, ir al sitio">
+      <img class="logo" src="https://connectstudios.mx/assets/img/logo-connect.webp" alt="Connect Studios" width="640" height="180"
+        onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'logo-txt',textContent:'Connect Studios'}))">
+    </a>
+    <div>
+      <p class="ceja">Productora audiovisual · Guadalajara</p>
+      <h1 class="titular">Empecemos<br>a trabajar<br><em>juntos.</em></h1>
+      <p class="bajada">Cuéntame de tu negocio y qué quieres lograr. Reviso cada solicitud yo mismo y te contacto para platicarlo.</p>
+    </div>
+  </section>
+
+  <main class="form-lado">
+    <div class="caja" id="caja">
+      <form class="formulario" id="form" novalidate>
+        <h2>Tus datos</h2>
+        <p class="intro">Toma menos de un minuto. Sin compromiso.</p>
+
+        <div class="campo">
+          <label for="nombre">Nombre</label>
+          <input id="nombre" name="nombre" autocomplete="name" maxlength="120" required placeholder="Tu nombre">
+          <span class="err" id="e-nombre"></span>
+        </div>
+        <div class="campo">
+          <label for="empresa">Empresa o marca</label>
+          <input id="empresa" name="empresa" autocomplete="organization" maxlength="160" required placeholder="Nombre del negocio">
+          <span class="err" id="e-empresa"></span>
+        </div>
+        <div class="fila">
+          <div class="campo">
+            <label for="correo">Correo</label>
+            <input id="correo" name="correo" type="email" autocomplete="email" inputmode="email" maxlength="200" required placeholder="tu@empresa.com">
+            <span class="err" id="e-correo"></span>
+          </div>
+          <div class="campo">
+            <label for="whatsapp">WhatsApp</label>
+            <input id="whatsapp" name="whatsapp" type="tel" autocomplete="tel" inputmode="tel" maxlength="25" required placeholder="33 1234 5678">
+            <span class="err" id="e-whatsapp"></span>
+          </div>
+        </div>
+
+        <fieldset class="grupo">
+          <legend>¿Qué te interesa?</legend>
+          <div class="chips">
+            <label class="chip"><input type="radio" name="interes" value="mensual"><span>Contenido mensual</span></label>
+            <label class="chip"><input type="radio" name="interes" value="proyecto"><span>Un video o proyecto</span></label>
+            <label class="chip"><input type="radio" name="interes" value="no_se" checked><span>Aún no lo sé</span></label>
+          </div>
+        </fieldset>
+
+        <div class="campo">
+          <label for="sitio">Instagram o sitio web <small>(opcional)</small></label>
+          <input id="sitio" name="sitio" maxlength="300" autocomplete="url" placeholder="@tumarca o tumarca.com">
+        </div>
+        <div class="campo">
+          <label for="mensaje">¿Qué te gustaría lograr? <small>(opcional)</small></label>
+          <textarea id="mensaje" name="mensaje" maxlength="2000" rows="3" placeholder="Más clientes, mejor imagen, lanzar un producto…"></textarea>
+        </div>
+
+        <div class="trampa" aria-hidden="true">
+          <label for="web2">No llenes este campo</label>
+          <input id="web2" name="web2" tabindex="-1" autocomplete="off">
+        </div>
+
+        <button class="enviar" type="submit" id="btn">
+          <span id="btn-txt">Enviar solicitud</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </button>
+        <p class="error-gral" id="e-gral" role="alert"></p>
+        <p class="legal">Tus datos solo se usan para contactarte. <a href="/privacidad.html#solicitudes">Aviso de privacidad</a></p>
+      </form>
+
+      <div class="listo" id="listo" tabindex="-1">
+        <div class="palomita" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+        <h2>Recibido.</h2>
+        <p id="gracias">Gracias. Ya tengo tus datos.</p>
+        <p>Reviso tu solicitud y te escribo por WhatsApp o correo para agendar una llamada.</p>
+        <div class="acciones">
+          <a class="btn btn-v" id="wa" href="#" target="_blank" rel="noopener" hidden>
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2l-.4-.2z"/></svg>
+            Adelantar por WhatsApp
+          </a>
+          <a class="btn" href="https://connectstudios.mx">Ver el trabajo</a>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+// =====================================================================
+//  CONFIGURACIÓN (la misma base que el portal)
+// =====================================================================
+const CONFIG = {
+  SUPABASE_URL: 'https://ypguioklwhyixacfuksu.supabase.co',
+  SUPABASE_KEY: 'sb_publishable_qjTIY_M5HJ9R653m_uOmXw_bBbVTibS', // la Publishable key. NUNCA la Secret.
+  WHATSAPP: '523323362662',  // botón "Adelantar por WhatsApp" al terminar; vacío lo oculta
+  META_PIXEL: ''             // opcional: ID del Pixel de Meta para medir los anuncios (evento Lead)
+};
+// =====================================================================
+
+(function () {
+  const form = document.getElementById('form');
+  const btn = document.getElementById('btn');
+  const btnTxt = document.getElementById('btn-txt');
+  const eGral = document.getElementById('e-gral');
+
+  // De qué anuncio o link viene (utm_*, fbclid, gclid)
+  const params = new URLSearchParams(location.search);
+  const origen = {};
+  ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'fbclid', 'gclid', 'ref'].forEach(k => {
+    const v = params.get(k);
+    if (v) origen[k] = v.slice(0, 200);
+  });
+  if (document.referrer && !document.referrer.startsWith(location.origin)) origen.referrer = document.referrer.slice(0, 200);
+
+  // Pixel de Meta, solo si está configurado
+  if (CONFIG.META_PIXEL) {
+    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', CONFIG.META_PIXEL);
+    fbq('track', 'PageView');
+  }
+
+  const val = id => document.getElementById(id).value.trim();
+  const REGLAS = {
+    nombre: v => v.length >= 2 || 'Escribe tu nombre.',
+    empresa: v => v.length >= 1 || 'Escribe el nombre de tu empresa o marca.',
+    correo: v => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v) || 'Revisa tu correo.',
+    whatsapp: v => { const d = v.replace(/\D/g, ''); return (d.length >= 10 && d.length <= 15) || 'Escribe tu número a 10 dígitos.'; }
+  };
+
+  function marcar(id, msg) {
+    const el = document.getElementById(id);
+    document.getElementById('e-' + id).textContent = msg || '';
+    if (msg) el.setAttribute('aria-invalid', 'true'); else el.removeAttribute('aria-invalid');
+  }
+  function validar() {
+    let primero = null;
+    for (const id in REGLAS) {
+      const r = REGLAS[id](val(id));
+      marcar(id, r === true ? '' : r);
+      if (r !== true && !primero) primero = id;
+    }
+    return primero;
+  }
+  // Quita el error en cuanto la persona lo corrige
+  Object.keys(REGLAS).forEach(id => document.getElementById(id).addEventListener('input', () => {
+    if (document.getElementById(id).getAttribute('aria-invalid') && REGLAS[id](val(id)) === true) marcar(id, '');
+  }));
+
+  function listo(nombre) {
+    const pila = nombre.split(/\s+/)[0];
+    document.getElementById('gracias').textContent = `Gracias, ${pila}. Ya tengo tus datos.`;
+    if (CONFIG.WHATSAPP) {
+      const wa = document.getElementById('wa');
+      wa.href = `https://wa.me/${CONFIG.WHATSAPP}?text=${encodeURIComponent(`Hola Manuel, soy ${pila}. Acabo de mandar mi solicitud desde la página.`)}`;
+      wa.hidden = false;
+    }
+    document.getElementById('caja').classList.add('hecho');
+    window.scrollTo({ top: document.querySelector('.form-lado').offsetTop - 8, behavior: 'smooth' });
+    document.getElementById('listo').focus({ preventScroll: true });
+    if (window.fbq) fbq('track', 'Lead');
+  }
+
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    eGral.textContent = '';
+    const malo = validar();
+    if (malo) { document.getElementById(malo).focus(); return; }
+
+    const nombre = val('nombre');
+    // Si un bot llenó el campo oculto, fingimos éxito y no guardamos nada
+    if (val('web2')) { listo(nombre); return; }
+
+    const datos = {
+      nombre,
+      empresa: val('empresa'),
+      correo: val('correo').toLowerCase(),
+      whatsapp: val('whatsapp'),
+      interes: (form.querySelector('input[name="interes"]:checked') || {}).value || 'no_se',
+      sitio: val('sitio') || null,
+      mensaje: val('mensaje') || null,
+      origen
+    };
+
+    btn.disabled = true;
+    btnTxt.textContent = 'Enviando…';
+    try {
+      const r = await fetch(`${CONFIG.SUPABASE_URL}/rest/v1/solicitudes`, {
+        method: 'POST',
+        headers: { apikey: CONFIG.SUPABASE_KEY, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+        body: JSON.stringify(datos)
+      });
+      if (!r.ok) {
+        const t = await r.text();
+        throw new Error(/solicitudes_limite/.test(t) ? 'limite' : /correo/.test(t) ? 'correo' : /whatsapp/.test(t) ? 'whatsapp' : 'otro');
+      }
+      listo(nombre);
+    } catch (err) {
+      const m = err && err.message;
+      if (m === 'correo') marcar('correo', 'Revisa tu correo.');
+      else if (m === 'whatsapp') marcar('whatsapp', 'Revisa tu número.');
+      eGral.textContent = m === 'limite'
+        ? 'Estamos recibiendo muchas solicitudes. Intenta en unos minutos o escríbeme por WhatsApp.'
+        : 'No se pudo enviar. Revisa tu conexión e intenta de nuevo.';
+      btn.disabled = false;
+      btnTxt.textContent = 'Enviar solicitud';
+    }
+  });
+})();
+</script>
+</body>
+</html>
