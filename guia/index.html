@@ -1,0 +1,475 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#000000">
+<title>Guía gratis · Connect Studios</title>
+<meta name="description" content="12 videos que tu negocio puede grabar este mes, con ejemplos y cómo grabar cada uno.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="12 videos que tu negocio puede grabar este mes">
+<meta property="og:description" content="Guía gratis de Connect Studios: qué grabar, para qué sirve cada video y cómo repartirlos en la semana.">
+<meta property="og:image" content="https://connectstudios.mx/assets/img/reel-portada.webp">
+<meta property="og:url" content="https://portal.connectstudios.mx/guia/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23000'/%3E%3Crect x='14' y='10' width='36' height='44' rx='4' fill='none' stroke='%23F3E7C8' stroke-width='5'/%3E%3Crect x='14' y='44' width='36' height='10' fill='%23E3B23C'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400..700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --negro:#000;
+  --panel:#0B0B0C;
+  --linea:#26262A;
+  --linea-2:#3A3A40;
+  --crema:#F2EFE9;
+  --crema-2:#C9C5BD;
+  --crema-3:#8A867F;
+  --verde:#39FF88;
+  --rojo:#F0705A;
+  --display:'Anton',Impact,'Arial Narrow',sans-serif;
+  --texto:'Archivo',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{margin:0;background:var(--negro);color:var(--crema);font-family:var(--texto);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--verde);outline-offset:3px}
+button,input{font:inherit;color:inherit}
+
+.envoltura{max-width:72rem;margin:0 auto;padding:0 clamp(1rem,4vw,2.5rem)}
+.top{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1.4rem 0}
+.logo{display:block;width:132px;height:auto}
+.logo-txt{font-family:var(--display);text-transform:uppercase;font-size:1.2rem;text-decoration:none}
+.top-link{font-size:.88rem;font-weight:600;color:var(--crema-2);text-decoration:none;border-bottom:1px solid var(--linea-2);padding-bottom:2px}
+.top-link:hover{color:var(--crema);border-color:var(--crema-3)}
+
+/* Portada */
+.portada{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:3rem clamp(2rem,5vw,5rem);align-items:center;padding:clamp(2rem,6vh,5rem) 0 clamp(3rem,8vh,6rem)}
+.ceja{display:inline-flex;align-items:center;gap:.5rem;font-size:.74rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--verde);margin:0 0 1.2rem}
+.ceja::before{content:"";width:.5rem;height:.5rem;border-radius:50%;background:var(--verde)}
+h1{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:clamp(3rem,6.6vw,5.6rem);line-height:.92;margin:0}
+h1 em{font-style:normal;color:var(--verde)}
+.bajada{color:var(--crema-2);font-size:1.08rem;max-width:34rem;margin:1.4rem 0 2rem}
+.bloques{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.6rem;max-width:34rem}
+.bloque{border:1px solid var(--linea);border-radius:10px;padding:.85rem .9rem;background:var(--panel)}
+.bloque b{display:block;font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:1.25rem;line-height:1;letter-spacing:.01em}
+.bloque span{display:block;font-size:.78rem;color:var(--crema-3);margin-top:.35rem;line-height:1.35}
+
+.tarjeta{background:var(--panel);border:1px solid var(--linea);border-radius:14px;padding:clamp(1.3rem,3vw,2rem)}
+.tarjeta h2{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:1.7rem;line-height:1;margin:0 0 .4rem}
+.tarjeta .intro{color:var(--crema-3);font-size:.9rem;margin:0 0 1.5rem}
+.campo{margin-bottom:1rem}
+.campo label{display:block;font-size:.8rem;font-weight:600;color:var(--crema-2);margin-bottom:.4rem}
+.campo label small{color:var(--crema-3);font-weight:500}
+.campo input{display:block;width:100%;background:#050505;border:1px solid var(--linea);border-radius:8px;padding:.75rem .85rem;font-size:1rem;transition:border-color .15s}
+.campo input::placeholder{color:#5E5B56}
+.campo input:hover{border-color:var(--linea-2)}
+.campo input:focus{outline:none;border-color:var(--verde)}
+.campo [aria-invalid="true"]{border-color:var(--rojo)}
+.err{display:block;color:var(--rojo);font-size:.8rem;font-weight:600;margin-top:.35rem}
+.err:empty{display:none}
+.trampa{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.enviar{display:flex;align-items:center;justify-content:center;gap:.6rem;width:100%;min-height:3.2rem;margin-top:.5rem;border:0;border-radius:999px;background:var(--verde);color:#000;font-weight:700;font-size:1rem;cursor:pointer;transition:transform .15s,box-shadow .15s,opacity .15s}
+.enviar:hover{transform:translateY(-1px);box-shadow:0 8px 28px rgba(57,255,136,.22)}
+.enviar[disabled]{opacity:.6;cursor:progress;transform:none;box-shadow:none}
+.enviar svg{width:18px;height:18px}
+.error-gral{color:var(--rojo);font-weight:600;font-size:.9rem;margin:.9rem 0 0}
+.error-gral:empty{display:none}
+.legal{color:var(--crema-3);font-size:.78rem;margin:1rem 0 0;text-align:center}
+.legal a{text-underline-offset:2px}
+.tarjeta-lista{display:none}
+.abierta .tarjeta form{display:none}
+.abierta .tarjeta-lista{display:block}
+.tarjeta-lista p{color:var(--crema-2);margin:0 0 1.2rem}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;min-height:2.75rem;padding:0 1.2rem;border:1px solid var(--linea-2);border-radius:999px;font-weight:600;font-size:.92rem;text-decoration:none;background:none;cursor:pointer;transition:border-color .15s,background .15s}
+.btn:hover{border-color:var(--crema-3);background:#111}
+.btn-v{background:var(--verde);border-color:var(--verde);color:#000}
+.btn-v:hover{background:var(--verde);box-shadow:0 8px 28px rgba(57,255,136,.22)}
+.btn svg{width:17px;height:17px}
+
+/* Guía */
+.guia{display:none;border-top:1px solid var(--linea);padding:clamp(3rem,8vh,5rem) 0 2rem}
+.abierta .guia{display:block;animation:entra .6s ease both}
+.lectura{max-width:46rem;margin:0 auto}
+.guia h2{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:clamp(2.2rem,5vw,3.2rem);line-height:.95;margin:0 0 1.2rem}
+.guia p{color:var(--crema-2);margin:0 0 1rem}
+.guia strong{color:var(--crema);font-weight:600}
+.regla{border-left:3px solid var(--verde);background:var(--panel);border-radius:0 10px 10px 0;padding:1.1rem 1.3rem;margin:2rem 0 3.5rem}
+.regla p{margin:0}
+.regla b{display:block;font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:1.2rem;letter-spacing:.01em;color:var(--crema);margin-bottom:.35rem}
+.seccion{margin:0 0 3.5rem}
+.seccion-cab{display:flex;align-items:baseline;justify-content:space-between;gap:1rem;flex-wrap:wrap;border-bottom:1px solid var(--linea);padding-bottom:.9rem;margin-bottom:.5rem}
+.seccion-cab h3{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:2.4rem;line-height:1;margin:0}
+.seccion-cab span{font-size:.78rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--verde)}
+.seccion-desc{color:var(--crema-3)!important;font-size:.95rem;margin:.8rem 0 1.2rem!important}
+.idea{display:grid;grid-template-columns:3.2rem minmax(0,1fr);gap:0 1rem;padding:1.4rem 0;border-bottom:1px solid var(--linea)}
+.idea:last-child{border-bottom:0}
+.num{font-family:var(--display);font-size:2.2rem;line-height:1;color:var(--verde)}
+.idea h4{font-size:1.12rem;font-weight:700;margin:.15rem 0 .45rem;color:var(--crema)}
+.idea p{font-size:.97rem;margin:0 0 .6rem}
+.idea .dato{font-size:.9rem;margin:0 0 .35rem;color:var(--crema-2)}
+.idea .dato b{color:var(--crema);font-weight:600}
+.semana{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.6rem;margin:1.4rem 0 1rem}
+.dia{border:1px solid var(--linea);border-radius:10px;padding:.9rem 1rem;background:var(--panel)}
+.dia b{display:block;font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:1.3rem;line-height:1}
+.dia span{display:block;font-size:.82rem;color:var(--crema-3);margin-top:.3rem}
+.cierre{margin:4rem 0 1rem;padding:clamp(1.5rem,4vw,2.5rem);border:1px solid var(--linea-2);border-radius:14px;background:linear-gradient(135deg,#0B0B0C 0%,#0B140F 100%)}
+.cierre h2{font-size:clamp(2rem,4.4vw,2.8rem)}
+.cierre .acciones{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:1.5rem}
+.pie{color:var(--crema-3);font-size:.82rem;text-align:center;padding:2.5rem 0 calc(2.5rem + env(safe-area-inset-bottom,0px))}
+@keyframes entra{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+@media (max-width:900px){
+  .portada{grid-template-columns:1fr;gap:2.2rem;padding-top:1rem}
+  h1{font-size:clamp(2.6rem,11.5vw,4.4rem)}
+  .bajada{font-size:1rem;margin-bottom:1.5rem}
+}
+@media (max-width:560px){
+  .bloques,.semana{grid-template-columns:1fr}
+  .bloque,.dia{display:flex;align-items:baseline;gap:.75rem}
+  .bloque span,.dia span{margin-top:0}
+  .idea{grid-template-columns:2.4rem minmax(0,1fr)}
+  .num{font-size:1.8rem}
+  .seccion-cab h3{font-size:2rem}
+  .logo{width:108px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}html{scroll-behavior:auto}}
+
+@media print{
+  :root{--crema:#111;--crema-2:#333;--crema-3:#666;--verde:#0a8f47;--linea:#ddd;--panel:#f6f6f6}
+  body{background:#fff;color:#111}
+  .top-link,.tarjeta,.bloques,.cierre .acciones,.no-print{display:none!important}
+  .portada{display:block;padding:0 0 1rem}
+  .guia{display:block!important;border:0;padding-top:0}
+  .idea,.dia,.regla{break-inside:avoid}
+  .seccion{break-inside:auto}
+  .cierre{background:#f6f6f6;border-color:#ddd}
+  .logo{filter:invert(1)}
+}
+</style>
+</head>
+<body>
+<div class="envoltura" id="raiz">
+  <header class="top">
+    <a href="https://connectstudios.mx" aria-label="Connect Studios, ir al sitio">
+      <img class="logo" src="https://connectstudios.mx/assets/img/logo-connect.webp" alt="Connect Studios" width="640" height="180"
+        onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'logo-txt',textContent:'Connect Studios'}))">
+    </a>
+    <a class="top-link" href="/empezar/?utm_source=guia">Platiquemos</a>
+  </header>
+
+  <section class="portada">
+    <div>
+      <p class="ceja">Guía gratis</p>
+      <h1>12 videos que tu negocio puede grabar <em>este mes.</em></h1>
+      <p class="bajada">La misma estructura que uso con mis clientes cada mes: qué grabar, para qué sirve cada video y cómo repartirlos en la semana. Con ejemplos para cualquier giro.</p>
+      <div class="bloques" aria-label="Contenido de la guía">
+        <div class="bloque"><b>Alcance</b><span>4 videos para que te conozcan</span></div>
+        <div class="bloque"><b>Nutrir</b><span>4 videos para que confíen</span></div>
+        <div class="bloque"><b>Historia</b><span>4 videos para que conecten</span></div>
+      </div>
+    </div>
+
+    <div class="tarjeta">
+      <form id="form" novalidate>
+        <h2>Recíbela gratis</h2>
+        <p class="intro">Se abre aquí mismo en cuanto envíes tus datos.</p>
+        <div class="campo">
+          <label for="nombre">Nombre</label>
+          <input id="nombre" autocomplete="name" maxlength="120" required placeholder="Tu nombre">
+          <span class="err" id="e-nombre"></span>
+        </div>
+        <div class="campo">
+          <label for="empresa">Negocio</label>
+          <input id="empresa" autocomplete="organization" maxlength="160" required placeholder="Nombre o giro de tu negocio">
+          <span class="err" id="e-empresa"></span>
+        </div>
+        <div class="campo">
+          <label for="correo">Correo</label>
+          <input id="correo" type="email" autocomplete="email" inputmode="email" maxlength="200" required placeholder="tu@empresa.com">
+          <span class="err" id="e-correo"></span>
+        </div>
+        <div class="campo">
+          <label for="whatsapp">WhatsApp <small>(opcional)</small></label>
+          <input id="whatsapp" type="tel" autocomplete="tel" inputmode="tel" maxlength="25" placeholder="33 1234 5678">
+          <span class="err" id="e-whatsapp"></span>
+        </div>
+        <div class="trampa" aria-hidden="true">
+          <label for="web2">No llenes este campo</label>
+          <input id="web2" tabindex="-1" autocomplete="off">
+        </div>
+        <button class="enviar" type="submit" id="btn">
+          <span id="btn-txt">Ver la guía</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"/></svg>
+        </button>
+        <p class="error-gral" id="e-gral" role="alert"></p>
+        <p class="legal">Sin spam. Tus datos solo los vemos nosotros. <a href="/privacidad.html#solicitudes">Aviso de privacidad</a></p>
+      </form>
+
+      <div class="tarjeta-lista">
+        <h2>Tu guía está abajo</h2>
+        <p>Guárdala como PDF para tenerla a la mano cuando planees tu mes.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:.6rem">
+          <a class="btn btn-v" href="#guia">Leer ahora</a>
+          <button class="btn" type="button" id="pdf">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>
+            Guardar PDF
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <article class="guia" id="guia" tabindex="-1">
+    <div class="lectura">
+      <h2>Antes de grabar</h2>
+      <p>Casi todos los negocios se atoran en lo mismo: saben que tienen que publicar video, pero no saben qué. Terminan grabando lo que se les ocurre esa mañana, y a los dos meses lo dejan.</p>
+      <p>Lo que funciona es repartir el mes en tres funciones. Unos videos traen gente nueva, otros convencen a la que ya llegó y otros hacen que se quede. Si solo haces uno de los tres, se nota: mucho alcance y nadie compra, o mucha confianza y nadie te conoce.</p>
+      <div class="regla">
+        <b>La única regla</b>
+        <p>Cada video necesita un objetivo antes de encender la cámara. Si no sabes qué tiene que lograr, todavía no lo grabes. En edición ya no se corrige.</p>
+      </div>
+
+      <section class="seccion">
+        <div class="seccion-cab"><h3>Alcance</h3><span>Lunes · que te conozcan</span></div>
+        <p class="seccion-desc">Videos cortos y fáciles de ver. Su trabajo es abrir la puerta: que llegue gente nueva, empezando por tu cliente ideal. Aquí no se vende.</p>
+
+        <div class="idea"><div class="num">01</div><div>
+          <h4>El error que ves todas las semanas</h4>
+          <p>Cuenta el error más común que cometen tus clientes antes de llegar contigo y cómo evitarlo. Funciona porque tu cliente ideal se reconoce en él.</p>
+          <p class="dato"><b>Ejemplo:</b> una arrendadora: «El error que más cuesta al rentar tu primera camioneta para la empresa».</p>
+          <p class="dato"><b>Al grabar:</b> di el error en la primera frase. Nada de «hola, soy…» al inicio.</p>
+        </div></div>
+
+        <div class="idea"><div class="num">02</div><div>
+          <h4>Mito contra realidad</h4>
+          <p>Algo que todos creen de tu industria y que no es cierto. Genera conversación y te posiciona como quien sabe del tema.</p>
+          <p class="dato"><b>Ejemplo:</b> una clínica dental: «No, blanquearte no te daña los dientes. Esto es lo que sí».</p>
+          <p class="dato"><b>Al grabar:</b> pon el mito en texto en pantalla desde el primer segundo.</p>
+        </div></div>
+
+        <div class="idea"><div class="num">03</div><div>
+          <h4>El proceso que nadie ve</h4>
+          <p>Cómo se hace, se prepara o se instala lo que vendes. Lo que para ti es rutina, para tu cliente es fascinante.</p>
+          <p class="dato"><b>Ejemplo:</b> un restaurante preparando la salsa desde las 7 a.m.; una fábrica cortando una pieza.</p>
+          <p class="dato"><b>Al grabar:</b> tomas cerradas, buen sonido ambiente y sin hablar. De 15 a 25 segundos.</p>
+        </div></div>
+
+        <div class="idea"><div class="num">04</div><div>
+          <h4>La pregunta que más te hacen</h4>
+          <p>Respóndela en 30 segundos. Si te la hacen en persona, la están buscando en redes.</p>
+          <p class="dato"><b>Ejemplo:</b> un despacho contable: «¿Me conviene facturar como persona física o moral?».</p>
+          <p class="dato"><b>Al grabar:</b> lee la pregunta tal como te la hacen, con sus palabras, no con las tuyas.</p>
+        </div></div>
+      </section>
+
+      <section class="seccion">
+        <div class="seccion-cab"><h3>Nutrir</h3><span>Miércoles · que confíen</span></div>
+        <p class="seccion-desc">Para la gente que ya se interesó. Le das algo de valor y con eso se queda, te sigue y, cuando esté lista, te busca a ti.</p>
+
+        <div class="idea"><div class="num">05</div><div>
+          <h4>Cómo elegir bien, aunque no sea conmigo</h4>
+          <p>Tres cosas que tu cliente debería revisar antes de contratar a cualquiera de tu giro. Ayudarle a decidir bien genera más confianza que decirle que eres el mejor.</p>
+          <p class="dato"><b>Ejemplo:</b> una constructora: «3 preguntas que tienes que hacerle a cualquier constructora antes de firmar».</p>
+          <p class="dato"><b>Al grabar:</b> numera en pantalla. La gente se queda para ver el tercer punto.</p>
+        </div></div>
+
+        <div class="idea"><div class="num">06</div><div>
+          <h4>Un caso real, explicado</h4>
+          <p>Un antes y después, o un problema que resolviste: qué pasaba, qué hiciste y cómo quedó. Enseña tu criterio, no solo el resultado.</p>
+          <p class="dato"><b>Ejemplo:</b> un taller: el coche que llegó con tres diagnósticos distintos y qué tenía de verdad.</p>
+          <p class="dato"><b>Al grabar:</b> si puedes, graba el «antes» el día que llega. Después ya no se recupera.</p>
+        </div></div>
+
+        <div class="idea"><div class="num">07</div><div>
+          <h4>Qué pasa cuando me contratas</h4>
+          <p>Tu proceso paso a paso, desde el primer mensaje hasta la entrega. Quita el miedo a lo desconocido, que es lo que más frena una compra.</p>
+          <p class="dato"><b>Ejemplo:</b> un despacho de arquitectura: de la primera visita al día que te entregan las llaves, en cuatro pasos.</p>
+          <p class="dato"><b>Al grabar:</b> un paso por toma, en el lugar real donde pasa cada uno.</p>
+        </div></div>
+
+        <div class="idea"><div class="num">08</div><div>
+          <h4>Por qué cuesta lo que cuesta</h4>
+          <p>Qué hace que algo de tu giro cueste más o menos. Hablar de precio sin dar tu precio te hace ver transparente y filtra a quien no es tu cliente.</p>
+          <p class="dato"><b>Ejemplo:</b> una mueblería: «Por qué dos sillas que se ven iguales cuestan $900 y $4,000».</p>
+          <p class="dato"><b>Al grabar:</b> muestra físicamente la diferencia. Que se vea, no solo que se diga.</p>
+        </div></div>
+      </section>
+
+      <section class="seccion">
+        <div class="seccion-cab"><h3>Historia</h3><span>Viernes · que conecten</span></div>
+        <p class="seccion-desc">Aquí dejas de ser una empresa que informa y pasas a ser alguien con quien la gente conecta. Es lo que hace que te elijan a ti y no a la competencia que vende lo mismo.</p>
+
+        <div class="idea"><div class="num">09</div><div>
+          <h4>Por qué empezaste</h4>
+          <p>El momento en que decidiste abrir el negocio. No la historia completa: una escena concreta.</p>
+          <p class="dato"><b>Ejemplo:</b> «Abrí la primera sucursal con un préstamo de mi papá y dos mesas prestadas».</p>
+          <p class="dato"><b>Al grabar:</b> si todavía existe, grábalo en el lugar donde empezó.</p>
+        </div></div>
+
+        <div class="idea"><div class="num">10</div><div>
+          <h4>Las personas detrás</h4>
+          <p>Presenta a alguien de tu equipo: qué hace, desde cuándo está y qué es lo que más le gusta de su trabajo. La gente compra a personas.</p>
+          <p class="dato"><b>Ejemplo:</b> el técnico con 15 años en la empresa que conoce a cada cliente por su nombre.</p>
+          <p class="dato"><b>Al grabar:</b> hazle preguntas fuera de cámara y quédate con las respuestas naturales, no con un guion aprendido.</p>
+        </div></div>
+
+        <div class="idea"><div class="num">11</div><div>
+          <h4>Tu cliente lo cuenta</h4>
+          <p>Un testimonio que no suene a comercial. La clave es la pregunta: no «¿qué opinas de nosotros?», sino «¿cómo era antes de trabajar con nosotros?».</p>
+          <p class="dato"><b>Ejemplo:</b> un cliente contando el problema que tenía y cómo se resolvió, con sus palabras.</p>
+          <p class="dato"><b>Al grabar:</b> en su espacio, no en el tuyo. Se ve más real.</p>
+        </div></div>
+
+        <div class="idea"><div class="num">12</div><div>
+          <h4>Algo que salió mal</h4>
+          <p>Un error que cometiste y qué cambiaste por eso. Es el video que más confianza genera, porque casi nadie se atreve a hacerlo.</p>
+          <p class="dato"><b>Ejemplo:</b> «Perdimos a nuestro cliente más grande por no contestar a tiempo. Desde entonces hacemos esto».</p>
+          <p class="dato"><b>Al grabar:</b> termina con lo que aprendiste, no con el error.</p>
+        </div></div>
+      </section>
+
+      <section class="seccion">
+        <div class="seccion-cab"><h3>Cómo repartirlos</h3><span>12 videos · 4 semanas</span></div>
+        <p class="seccion-desc">Tres videos por semana, uno de cada función. Así cada semana traes gente nueva, convences a la que llegó y le das una razón para quedarse.</p>
+        <div class="semana">
+          <div class="dia"><b>Lunes</b><span>Alcance · 01 al 04</span></div>
+          <div class="dia"><b>Miércoles</b><span>Nutrir · 05 al 08</span></div>
+          <div class="dia"><b>Viernes</b><span>Historia · 09 al 12</span></div>
+        </div>
+        <p><strong>Un consejo:</strong> graba los 12 en uno o dos días. Grabar un video a la vez es la razón número uno por la que los negocios dejan de publicar a la tercera semana.</p>
+      </section>
+
+      <div class="cierre">
+        <h2>¿Prefieres que lo hagamos nosotros?</h2>
+        <p>Esto es exactamente lo que hacemos cada mes: decidimos qué se graba y por qué, lo grabamos en tu negocio y te entregamos los 12 videos listos para publicar lunes, miércoles y viernes.</p>
+        <div class="acciones">
+          <a class="btn btn-v" href="/empezar/?utm_source=guia">Platiquemos
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </a>
+          <a class="btn" href="https://connectstudios.mx">Ver el trabajo</a>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <footer class="pie">Connect Studios · Guadalajara · connectstudios.mx</footer>
+</div>
+
+<script>
+// =====================================================================
+//  CONFIGURACIÓN (la misma base que el portal)
+// =====================================================================
+const CONFIG = {
+  SUPABASE_URL: 'https://ypguioklwhyixacfuksu.supabase.co',
+  SUPABASE_KEY: 'sb_publishable_qjTIY_M5HJ9R653m_uOmXw_bBbVTibS', // la Publishable key. NUNCA la Secret.
+  META_PIXEL: ''             // opcional: ID del Pixel de Meta (evento Lead al abrir la guía)
+};
+// =====================================================================
+
+(function () {
+  const raiz = document.getElementById('raiz');
+  const form = document.getElementById('form');
+  const btn = document.getElementById('btn');
+  const btnTxt = document.getElementById('btn-txt');
+  const eGral = document.getElementById('e-gral');
+  const LLAVE = 'connect.guia.abierta';
+
+  // Quien ya la abrió en este navegador la ve directo
+  try { if (localStorage.getItem(LLAVE)) raiz.classList.add('abierta'); } catch (e) { /* sin almacenamiento */ }
+
+  const params = new URLSearchParams(location.search);
+  const origen = { pagina: 'guia' };
+  ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'fbclid', 'gclid', 'ref'].forEach(k => {
+    const v = params.get(k);
+    if (v) origen[k] = v.slice(0, 200);
+  });
+  if (document.referrer && !document.referrer.startsWith(location.origin)) origen.referrer = document.referrer.slice(0, 200);
+
+  if (CONFIG.META_PIXEL) {
+    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', CONFIG.META_PIXEL);
+    fbq('track', 'PageView');
+  }
+
+  const val = id => document.getElementById(id).value.trim();
+  const REGLAS = {
+    nombre: v => v.length >= 2 || 'Escribe tu nombre.',
+    empresa: v => v.length >= 1 || 'Escribe el nombre o giro de tu negocio.',
+    correo: v => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v) || 'Revisa tu correo.',
+    whatsapp: v => { if (!v) return true; const d = v.replace(/\D/g, ''); return (d.length >= 10 && d.length <= 15) || 'Escribe tu número a 10 dígitos, o déjalo vacío.'; }
+  };
+  function marcar(id, msg) {
+    const el = document.getElementById(id);
+    document.getElementById('e-' + id).textContent = msg || '';
+    if (msg) el.setAttribute('aria-invalid', 'true'); else el.removeAttribute('aria-invalid');
+  }
+  function validar() {
+    let primero = null;
+    for (const id in REGLAS) {
+      const r = REGLAS[id](val(id));
+      marcar(id, r === true ? '' : r);
+      if (r !== true && !primero) primero = id;
+    }
+    return primero;
+  }
+  Object.keys(REGLAS).forEach(id => document.getElementById(id).addEventListener('input', () => {
+    if (document.getElementById(id).getAttribute('aria-invalid') && REGLAS[id](val(id)) === true) marcar(id, '');
+  }));
+
+  function abrir() {
+    raiz.classList.add('abierta');
+    try { localStorage.setItem(LLAVE, '1'); } catch (e) { /* sin almacenamiento */ }
+    const guia = document.getElementById('guia');
+    guia.scrollIntoView({ behavior: 'smooth' });
+    guia.focus({ preventScroll: true });
+    if (window.fbq) fbq('track', 'Lead', { content_name: 'guia' });
+  }
+
+  document.getElementById('pdf').addEventListener('click', () => window.print());
+
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    eGral.textContent = '';
+    const malo = validar();
+    if (malo) { document.getElementById(malo).focus(); return; }
+    if (val('web2')) { abrir(); return; }
+
+    const datos = {
+      tipo: 'guia',
+      nombre: val('nombre'),
+      empresa: val('empresa'),
+      correo: val('correo').toLowerCase(),
+      whatsapp: val('whatsapp') || null,
+      origen
+    };
+    btn.disabled = true;
+    btnTxt.textContent = 'Abriendo…';
+    try {
+      const r = await fetch(`${CONFIG.SUPABASE_URL}/rest/v1/solicitudes`, {
+        method: 'POST',
+        headers: { apikey: CONFIG.SUPABASE_KEY, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+        body: JSON.stringify(datos)
+      });
+      if (!r.ok) {
+        const t = await r.text();
+        throw new Error(/solicitudes_limite/.test(t) ? 'limite' : /correo/.test(t) ? 'correo' : /whatsapp/.test(t) ? 'whatsapp' : 'otro');
+      }
+      abrir();
+    } catch (err) {
+      const m = err && err.message;
+      if (m === 'correo') marcar('correo', 'Revisa tu correo.');
+      else if (m === 'whatsapp') marcar('whatsapp', 'Revisa tu número.');
+      eGral.textContent = m === 'limite'
+        ? 'Hay mucho tráfico en este momento. Intenta en unos minutos.'
+        : 'No se pudo enviar. Revisa tu conexión e intenta de nuevo.';
+      btn.disabled = false;
+      btnTxt.textContent = 'Ver la guía';
+    }
+  });
+})();
+</script>
+</body>
+</html>

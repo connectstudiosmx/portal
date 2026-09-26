@@ -976,7 +976,7 @@ function vistaSolicitudes() {
   const lista = S.verAtendidas ? todas : todas.filter(x => !x.atendida);
   const link = location.origin + '/empezar/';
   return `<div class="encabezado">
-    <div><h1>Solicitudes</h1><p class="sub">Quien llena el formulario de <a href="${esc(link)}" target="_blank" rel="noopener">${esc(link.replace(/^https?:\/\//, ''))}</a> aparece aquí. Márcala como atendida cuando ya le escribiste.</p></div>
+    <div><h1>Solicitudes</h1><p class="sub">Quien llena el formulario de <a href="${esc(link)}" target="_blank" rel="noopener">${esc(link.replace(/^https?:\/\//, ''))}</a> o descarga la <a href="${esc(location.origin + '/guia/')}" target="_blank" rel="noopener">guía</a> aparece aquí. Márcala como atendida cuando ya le escribiste.</p></div>
     <label class="interruptor"><input type="checkbox" data-cambio="sol-ver-atendidas"${S.verAtendidas ? ' checked' : ''}> Ver atendidas</label>
   </div>
   ${nuevas ? `<p class="aviso-linea">${nuevas === 1 ? 'Hay 1 solicitud sin atender.' : `Hay ${nuevas} solicitudes sin atender.`}</p>` : ''}
@@ -987,14 +987,14 @@ function vistaSolicitudes() {
       <div>
         <div class="sol-nombre">${esc(x.nombre)} <span>· ${esc(x.empresa)}</span></div>
         <div class="sol-meta">
-          ${wa ? `<a href="https://wa.me/${wa}?text=${encodeURIComponent(`Hola ${pila}, soy Manuel de Connect Studios. Vi tu solicitud.`)}" target="_blank" rel="noopener">WhatsApp ${esc(x.whatsapp)}</a>` : ''}
+          ${wa ? `<a href="https://wa.me/${wa}?text=${encodeURIComponent(x.tipo === 'guia' ? `Hola ${pila}, soy Manuel de Connect Studios. Vi que descargaste la guía de videos, ¿te sirvió?` : `Hola ${pila}, soy Manuel de Connect Studios. Vi tu solicitud.`)}" target="_blank" rel="noopener">WhatsApp ${esc(x.whatsapp)}</a>` : ''}
           <a href="mailto:${esc(x.correo)}">${esc(x.correo)}</a>
           ${x.sitio ? `<span>${sitioDe(x.sitio)}</span>` : ''}
         </div>
         ${x.mensaje ? `<p class="sol-msg">${esc(x.mensaje)}</p>` : ''}
       </div>
       <div class="sol-der">
-        <span class="sol-int">${esc(INTERES[x.interes] || x.interes)}</span>
+        <span class="sol-int">${x.tipo === 'guia' ? 'Descargó la guía' : esc(INTERES[x.interes] || x.interes)}</span>
         <span class="nota">${esc(fHora(x.created_at))}${fuente ? `<br>${esc(fuente)}` : ''}</span>
         <label class="interruptor"><input type="checkbox" data-cambio="sol-atendida" data-id="${x.id}"${x.atendida ? ' checked' : ''}> Atendida</label>
       </div>
