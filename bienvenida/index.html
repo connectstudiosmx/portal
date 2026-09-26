@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#000000">
+<title>Bienvenida · Connect Studios</title>
+<meta property="og:title" content="Bienvenido a Connect Studios">
+<meta property="og:description" content="Qué sigue, qué necesito de ti y cómo funciona cada mes.">
+<meta property="og:image" content="https://connectstudios.mx/assets/img/reel-portada.webp">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23000'/%3E%3Crect x='14' y='10' width='36' height='44' rx='4' fill='none' stroke='%23F3E7C8' stroke-width='5'/%3E%3Crect x='14' y='44' width='36' height='10' fill='%23E3B23C'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400..700&display=swap" rel="stylesheet">
+<script>document.documentElement.classList.add('js')</script>
+<style>
+:root{
+  --negro:#000;
+  --panel:#0B0B0C;
+  --linea:#26262A;
+  --linea-2:#3A3A40;
+  --crema:#F2EFE9;
+  --crema-2:#C9C5BD;
+  --crema-3:#8A867F;
+  --verde:#39FF88;
+  --display:'Anton',Impact,'Arial Narrow',sans-serif;
+  --texto:'Archivo',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --suave:cubic-bezier(.2,.7,.2,1);
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--negro);color:var(--crema);font-family:var(--texto);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit}
+img{display:block;max-width:100%}
+:focus-visible{outline:2px solid var(--verde);outline-offset:3px}
+.envoltura{max-width:72rem;margin:0 auto;padding:0 clamp(1rem,4vw,2.5rem)}
+
+/* Portada */
+.portada{position:relative;overflow:hidden;isolation:isolate;min-height:88vh;min-height:88svh;display:flex;flex-direction:column}
+.fondo{position:absolute;inset:0;z-index:-2;background:url(https://connectstudios.mx/assets/img/bts/bts-4.webp) center 35%/cover no-repeat;filter:saturate(.7) brightness(.45);transform:scale(1.06)}
+.js .fondo{animation:acerca 2.2s var(--suave) both}
+@keyframes acerca{from{transform:scale(1.2);filter:saturate(.7) brightness(.08)}}
+.portada::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(0,0,0,.5) 0%,rgba(0,0,0,.2) 40%,#000 100%)}
+.top{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1.4rem 0}
+.logo{width:132px;height:auto}
+.logo-txt{font-family:var(--display);text-transform:uppercase;font-size:1.2rem;text-decoration:none}
+.top a.portal{font-size:.88rem;font-weight:600;color:var(--crema-2);text-decoration:none;border-bottom:1px solid var(--verde);padding-bottom:2px}
+.portada-txt{margin-top:auto;padding:0 0 clamp(3rem,8vh,5rem)}
+.ceja{display:inline-flex;align-items:center;gap:.55rem;font-size:.74rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--verde);margin:0 0 1rem}
+.ceja::before{content:"";width:1.6rem;height:1px;background:var(--verde)}
+h1{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:clamp(3rem,8vw,6.4rem);line-height:.9;margin:0}
+h1 em{font-style:normal;color:var(--verde)}
+.bajada{color:var(--crema-2);font-size:1.08rem;max-width:36rem;margin:1.3rem 0 0}
+
+/* Secciones */
+.seccion{padding:clamp(3.5rem,9vh,6rem) 0;border-top:1px solid var(--linea)}
+.cab{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:1rem 3rem;align-items:end;margin-bottom:2.4rem}
+.cab span{display:inline-flex;align-items:center;gap:.5rem;font-size:.76rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--verde)}
+.cab span::before{content:"";width:1.6rem;height:1px;background:var(--verde)}
+.cab h2{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:clamp(2.4rem,5.4vw,4rem);line-height:.92;margin:.5rem 0 0}
+.cab p{color:var(--crema-2);margin:0;max-width:34rem}
+
+/* Primeros pasos */
+.pasos{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.9rem;counter-reset:p}
+.paso{position:relative;background:var(--panel);border:1px solid var(--linea);border-radius:16px;padding:1.5rem 1.4rem;transition:transform .35s var(--suave),border-color .35s}
+.paso:hover{transform:translateY(-4px);border-color:var(--linea-2)}
+.paso .n{font-family:var(--display);font-size:3rem;line-height:.9;color:transparent;-webkit-text-stroke:1.5px var(--verde);transition:color .7s var(--suave) .2s}
+.paso.visto .n{color:var(--verde)}
+.paso h3{font-size:1.12rem;font-weight:700;margin:1rem 0 .45rem}
+.paso p{color:var(--crema-2);font-size:.95rem;margin:0 0 1rem}
+.paso .cuando{font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--crema-3)}
+
+/* Qué necesito */
+.necesito{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,22rem);gap:clamp(2rem,5vw,4rem);align-items:start}
+.lista{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.7rem}
+.lista li{display:grid;grid-template-columns:1.6rem minmax(0,1fr);gap:.7rem;background:var(--panel);border:1px solid var(--linea);border-radius:12px;padding:1rem 1.05rem}
+.lista svg{width:1.3rem;height:1.3rem;color:var(--verde);margin-top:.1rem}
+.lista b{display:block;font-weight:700;font-size:.98rem}
+.lista small{display:block;color:var(--crema-3);font-size:.86rem;margin-top:.15rem;line-height:1.45}
+.foto{position:relative;overflow:hidden;border-radius:16px;aspect-ratio:4/5;background:#0a0a0a}
+.foto img{width:100%;height:100%;object-fit:cover;filter:saturate(.75) brightness(.8);transform:scale(1.15);transition:transform 1.6s var(--suave)}
+.js .foto{clip-path:inset(100% 0 0 0 round 16px);transition:clip-path 1.1s var(--suave)}
+.js .foto.visto{clip-path:inset(0 0 0 0 round 16px)}
+.foto.visto img{transform:scale(1.02)}
+.foto figcaption{position:absolute;left:1rem;right:1rem;bottom:1rem;font-size:.72rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;text-shadow:0 1px 10px rgba(0,0,0,.8)}
+
+/* El mes */
+.linea-t{position:relative;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:.9rem}
+.linea-t::before{content:"";position:absolute;left:0;right:0;top:1.05rem;height:1px;background:var(--linea-2)}
+.linea-t::after{content:"";position:absolute;left:0;right:0;top:1.05rem;height:1px;background:var(--verde);transform:scaleX(0);transform-origin:left;transition:transform 1.8s var(--suave) .2s}
+.linea-t.visto::after{transform:scaleX(1)}
+.etapa{position:relative;padding-top:2.6rem}
+.etapa::before{content:"";position:absolute;top:.6rem;left:0;width:.95rem;height:.95rem;border-radius:50%;background:#000;border:2px solid var(--verde)}
+.etapa small{font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--verde)}
+.etapa h3{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:1.6rem;line-height:1;margin:.35rem 0 .5rem}
+.etapa p{color:var(--crema-2);font-size:.92rem;margin:0}
+.fechas{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.9rem;margin-top:2.6rem}
+.fecha{background:var(--panel);border:1px solid var(--linea);border-radius:14px;padding:1.2rem 1.3rem;display:grid;grid-template-columns:auto minmax(0,1fr);gap:1.1rem;align-items:center}
+.fecha b{font-family:var(--display);font-weight:400;font-size:2.6rem;line-height:.9;color:var(--verde)}
+.fecha p{margin:0;color:var(--crema-2);font-size:.93rem}
+.fecha strong{color:var(--crema);font-weight:600}
+.nota{color:var(--crema-3);font-size:.88rem;margin:1.2rem 0 0}
+
+/* Portal */
+.portal-caja{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);border:1px solid var(--linea-2);border-radius:20px;overflow:hidden;background:var(--panel)}
+.portal-txt{padding:clamp(1.6rem,4vw,3rem)}
+.portal-txt h2{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:clamp(2.2rem,4.6vw,3.2rem);line-height:.92;margin:.5rem 0 1rem}
+.portal-txt > p{color:var(--crema-2);margin:0 0 1.5rem}
+.portal-txt ol{margin:0 0 1.8rem;padding:0;list-style:none;display:grid;gap:.8rem}
+.portal-txt li{display:grid;grid-template-columns:1.8rem minmax(0,1fr);gap:.6rem;color:var(--crema-2);font-size:.95rem}
+.portal-txt li b{font-family:var(--display);font-weight:400;font-size:1.35rem;line-height:1;color:var(--verde)}
+.portal-txt li strong{color:var(--crema);font-weight:600}
+.portal-foto{position:relative;min-height:18rem}
+.portal-foto img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:saturate(.8) brightness(.75)}
+.portal-foto::before{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(90deg,var(--panel) 0%,rgba(11,11,12,0) 40%)}
+.acciones{display:flex;flex-wrap:wrap;gap:.6rem}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;min-height:2.8rem;padding:0 1.2rem;border:1px solid var(--linea-2);border-radius:999px;font-weight:600;font-size:.92rem;text-decoration:none;transition:border-color .2s,background .2s,transform .2s,box-shadow .2s}
+.btn:hover{border-color:var(--crema-3);background:#111;transform:translateY(-2px)}
+.btn-v{background:var(--verde);border-color:var(--verde);color:#000}
+.btn-v:hover{background:var(--verde);box-shadow:0 10px 30px rgba(57,255,136,.28)}
+.btn svg{width:17px;height:17px}
+
+/* Acuerdos */
+.acuerdos{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.9rem}
+.acuerdo{border-top:2px solid var(--verde);padding-top:1rem}
+.acuerdo h3{font-size:1.05rem;font-weight:700;margin:0 0 .4rem}
+.acuerdo p{color:var(--crema-2);font-size:.94rem;margin:0}
+
+.cierre{text-align:center;padding:clamp(4rem,10vh,6rem) 0 2rem;border-top:1px solid var(--linea)}
+.cierre h2{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:clamp(2.4rem,6vw,4rem);line-height:.92;margin:0 0 1rem}
+.cierre p{color:var(--crema-2);max-width:32rem;margin:0 auto 1.6rem}
+.cierre .acciones{justify-content:center}
+.pie{color:var(--crema-3);font-size:.82rem;text-align:center;padding:2rem 0 calc(2.5rem + env(safe-area-inset-bottom,0px))}
+
+/* Animaciones */
+.js .entra{opacity:0;transform:translateY(18px);animation:aparece .8s var(--suave) forwards}
+@keyframes aparece{to{opacity:1;transform:none}}
+.js .r{opacity:0;transform:translateY(30px);transition:opacity .9s var(--suave),transform .9s var(--suave)}
+.js .r.visto{opacity:1;transform:none}
+.d1{transition-delay:.08s!important}.d2{transition-delay:.16s!important}.d3{transition-delay:.24s!important}.d4{transition-delay:.32s!important}
+
+@media (max-width:900px){
+  .cab{grid-template-columns:1fr}
+  .pasos,.acuerdos{grid-template-columns:1fr}
+  .necesito{grid-template-columns:1fr}
+  .foto{aspect-ratio:16/10;order:-1}
+  .linea-t{grid-template-columns:1fr;gap:0}
+  .linea-t::before,.linea-t::after{left:.45rem;right:auto;top:0;bottom:0;width:1px;height:auto}
+  .linea-t::after{transform:scaleY(0);transform-origin:top}
+  .linea-t.visto::after{transform:scaleY(1)}
+  .etapa{padding:0 0 1.8rem 2.2rem}
+  .etapa::before{top:.15rem}
+  .portal-caja{grid-template-columns:1fr}
+  .portal-foto{min-height:13rem;order:-1}
+  .portal-foto::before{background:linear-gradient(0deg,var(--panel) 0%,rgba(11,11,12,0) 60%)}
+}
+@media (max-width:600px){
+  .lista,.fechas{grid-template-columns:1fr}
+  h1{font-size:clamp(2.7rem,13vw,3.8rem)}
+  .logo{width:108px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .js .r,.js .entra{opacity:1;transform:none}
+  .js .foto{clip-path:none}
+  .foto img{transform:none}
+  .paso .n{color:var(--verde)}
+  .linea-t::after{transform:none!important}
+}
+</style>
+</head>
+<body>
+<header class="portada">
+  <div class="fondo" aria-hidden="true"></div>
+  <div class="envoltura" style="width:100%;flex:1;display:flex;flex-direction:column">
+    <div class="top entra">
+      <a href="https://connectstudios.mx" aria-label="Connect Studios, ir al sitio">
+        <img class="logo" src="https://connectstudios.mx/assets/img/logo-connect.webp" alt="Connect Studios" width="640" height="180"
+          onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'logo-txt',textContent:'Connect Studios'}))">
+      </a>
+      <a class="portal" href="/">Entrar al portal</a>
+    </div>
+    <div class="portada-txt">
+      <p class="ceja entra" style="animation-delay:.1s">Bienvenido</p>
+      <h1 class="entra" style="animation-delay:.18s">Ya somos<br><em>equipo.</em></h1>
+      <p class="bajada entra" style="animation-delay:.3s">Aquí está todo lo que necesitas saber para arrancar: qué sigue, qué necesito de ti y cómo funciona cada mes. Guárdala; la vas a querer tener a la mano.</p>
+    </div>
+  </div>
+</header>
+
+<main class="envoltura">
+  <section class="seccion">
+    <div class="cab r">
+      <div><span>Esta semana</span><h2>Primeros pasos</h2></div>
+      <p>Tres cosas y arrancamos. Ninguna toma más de unos minutos de tu lado.</p>
+    </div>
+    <div class="pasos">
+      <div class="paso r"><div class="n">01</div><h3>Entra al portal</h3><p>Con tu cuenta de Google. Ahí vas a ver tus videos del mes, del guion a la entrega.</p><span class="cuando">Hoy</span></div>
+      <div class="paso r d1"><div class="n">02</div><h3>Mándame lo de la lista</h3><p>Logo, contacto y lo demás que viene abajo. Con eso preparo tu primer mes.</p><span class="cuando">Esta semana</span></div>
+      <div class="paso r d2"><div class="n">03</div><h3>Llamada de arranque</h3><p>Definimos objetivos, a quién le hablamos y qué tiene que lograr el contenido. De ahí salen los guiones.</p><span class="cuando">Antes de grabar</span></div>
+    </div>
+  </section>
+
+  <section class="seccion">
+    <div class="cab r">
+      <div><span>Para arrancar</span><h2>Qué necesito de ti</h2></div>
+      <p>Mándamelo por WhatsApp o compártemelo en una carpeta de Drive. Si algo no lo tienes, no pasa nada: lo resolvemos juntos.</p>
+    </div>
+    <div class="necesito">
+      <ul class="lista">
+        <li class="r"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span><b>Logo y colores</b><small>En la mejor calidad que tengas. Si hay manual de marca, también.</small></span></li>
+        <li class="r d1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span><b>Una persona de contacto</b><small>Quién aprueba guiones y videos, con su WhatsApp.</small></span></li>
+        <li class="r"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span><b>Correo de Google</b><small>El Gmail (o cuenta de Google) con el que vas a entrar al portal.</small></span></li>
+        <li class="r d1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span><b>Lugar de grabación</b><small>Dirección, horarios en que se puede grabar y si hace falta algún permiso.</small></span></li>
+        <li class="r"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span><b>Qué quieres vender más</b><small>Tus productos o servicios prioritarios y a qué cliente quieres atraer.</small></span></li>
+        <li class="r d1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span><b>Tus redes</b><small>Links de tus cuentas y, si quieres, 2 o 3 marcas cuyo contenido te guste.</small></span></li>
+      </ul>
+      <figure class="foto" style="margin:0">
+        <img src="https://connectstudios.mx/assets/img/bts/bts-3.webp" alt="Rodaje de Connect Studios en las instalaciones de un cliente" loading="lazy" onerror="this.src='../img/set.webp'">
+        <figcaption>Grabamos donde de verdad pasa</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="seccion">
+    <div class="cab r">
+      <div><span>Cada mes</span><h2>Cómo funciona</h2></div>
+      <p>El mismo ciclo todos los meses, para que siempre sepas en qué va tu contenido y qué toca después.</p>
+    </div>
+    <div class="linea-t r">
+      <div class="etapa"><small>Paso 1</small><h3>Guiones</h3><p>Definimos qué se graba y por qué. Los guiones quedan en el portal antes del día de grabación.</p></div>
+      <div class="etapa"><small>Paso 2</small><h3>Grabación</h3><p>Vamos a tu negocio y grabamos todo el mes en uno o dos días.</p></div>
+      <div class="etapa"><small>Paso 3</small><h3>Edición</h3><p>Editamos cada video. En el portal lo ves como "En edición".</p></div>
+      <div class="etapa"><small>Paso 4</small><h3>Revisión</h3><p>Reviso cada pieza antes de que llegue a ti. Nada sale sin pasar por mí.</p></div>
+      <div class="etapa"><small>Paso 5</small><h3>Entrega</h3><p>Tus 12 videos listos, para publicar lunes, miércoles y viernes.</p></div>
+    </div>
+    <div class="fechas">
+      <div class="fecha r"><b>1</b><p>Si grabamos <strong>entre el 1 y el 15</strong>, tus videos se entregan <strong>el día 1</strong> del mes siguiente.</p></div>
+      <div class="fecha r d1"><b>15</b><p>Si grabamos <strong>del 16 en adelante</strong>, tus videos se entregan <strong>el día 15</strong> del mes siguiente.</p></div>
+    </div>
+    <p class="nota r">Las fechas exactas de cada mes las ves siempre en el portal.</p>
+  </section>
+
+  <section class="seccion">
+    <div class="portal-caja r">
+      <div class="portal-txt">
+        <div class="cab" style="margin:0;display:block"><span>Tu portal</span></div>
+        <h2>Todo tu contenido en un solo lugar</h2>
+        <p>Ahí subes tus guiones, ves en qué va cada video y los abres cuando se entregan. Sin buscar entre chats y correos.</p>
+        <ol>
+          <li><b>1</b><span><strong>Entra con tu cuenta de Google</strong> en portal.connectstudios.mx</span></li>
+          <li><b>2</b><span><strong>Avísame por WhatsApp</strong> que ya entraste</span></li>
+          <li><b>3</b><span><strong>Te activo tu acceso</strong> y ya ves tu mes</span></li>
+        </ol>
+        <div class="acciones">
+          <a class="btn btn-v" href="/">Entrar al portal
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </a>
+          <a class="btn" href="https://wa.me/523323362662?text=Hola%20Manuel%2C%20ya%20entr%C3%A9%20al%20portal." target="_blank" rel="noopener">Ya entré, avisar</a>
+        </div>
+      </div>
+      <div class="portal-foto"><img src="../img/edicion.webp" alt="Pantalla de edición de video" loading="lazy"></div>
+    </div>
+  </section>
+
+  <section class="seccion">
+    <div class="cab r">
+      <div><span>Para que todo fluya</span><h2>Acuerdos</h2></div>
+      <p>Lo que hace que cada mes salga a tiempo.</p>
+    </div>
+    <div class="acuerdos">
+      <div class="acuerdo r"><h3>Guiones a tiempo</h3><p>Los guiones se cierran antes del día de grabación. Lo que llega después se graba el mes siguiente.</p></div>
+      <div class="acuerdo r d1"><h3>Siempre en contacto</h3><p>Cualquier cambio de fechas o de prioridades, avísame en cuanto lo sepas. Se corrige a tiempo, no al final.</p></div>
+      <div class="acuerdo r d2"><h3>Drive es el almacén</h3><p>Los videos viven en Google Drive. El portal te da el link; guárdalos en tu equipo cuando los recibas.</p></div>
+    </div>
+  </section>
+
+  <section class="cierre r">
+    <h2>¿Dudas?</h2>
+    <p>Escríbeme cuando quieras. Prefiero una pregunta de más que un video que no era lo que esperabas.</p>
+    <div class="acciones">
+      <a class="btn btn-v" href="https://wa.me/523323362662" target="_blank" rel="noopener">Escribir por WhatsApp</a>
+      <a class="btn" href="/">Entrar al portal</a>
+    </div>
+  </section>
+</main>
+<footer class="pie">Connect Studios · Guadalajara · <a href="/privacidad.html">Aviso de privacidad</a></footer>
+
+<script>
+(function () {
+  const PENDIENTES = '.r:not(.visto), .foto:not(.visto), .paso:not(.visto)';
+  const obs = 'IntersectionObserver' in window ? new IntersectionObserver(es => es.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('visto'); obs.unobserve(e.target); }
+  }), { rootMargin: '0px 0px -10% 0px', threshold: .08 }) : null;
+  document.querySelectorAll(PENDIENTES).forEach(el => obs ? obs.observe(el) : el.classList.add('visto'));
+  // Respaldo por si el observador no alcanza a disparar
+  let pendiente = false;
+  addEventListener('scroll', () => {
+    if (pendiente) return;
+    pendiente = true;
+    requestAnimationFrame(() => {
+      pendiente = false;
+      document.querySelectorAll(PENDIENTES).forEach(el => {
+        const r = el.getBoundingClientRect();
+        if (r.height && r.top < innerHeight * .92 && r.bottom > 0) el.classList.add('visto');
+      });
+    });
+  }, { passive: true });
+})();
+</script>
+</body>
+</html>
