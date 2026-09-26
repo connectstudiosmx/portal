@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#000000">
+<title>Agenda tu llamada · Connect Studios</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23000'/%3E%3Crect x='14' y='10' width='36' height='44' rx='4' fill='none' stroke='%23F3E7C8' stroke-width='5'/%3E%3Crect x='14' y='44' width='36' height='10' fill='%23E3B23C'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400..700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://calendly.com">
+<script>document.documentElement.classList.add('js')</script>
+<style>
+:root{
+  --negro:#000;
+  --panel:#0B0B0C;
+  --linea:#26262A;
+  --linea-2:#3A3A40;
+  --crema:#F2EFE9;
+  --crema-2:#C9C5BD;
+  --crema-3:#8A867F;
+  --verde:#39FF88;
+  --display:'Anton',Impact,'Arial Narrow',sans-serif;
+  --texto:'Archivo',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --suave:cubic-bezier(.2,.7,.2,1);
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--negro);color:var(--crema);font-family:var(--texto);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--verde);outline-offset:3px}
+
+.envoltura{max-width:72rem;margin:0 auto;padding:0 clamp(1rem,4vw,2.5rem)}
+.top{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1.4rem 0}
+.logo{display:block;width:132px;height:auto}
+.logo-txt{font-family:var(--display);text-transform:uppercase;font-size:1.2rem;text-decoration:none}
+
+.cuerpo{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:clamp(2rem,5vw,4.5rem);align-items:start;padding:clamp(1rem,4vh,3rem) 0 3rem}
+.palomita{width:3.2rem;height:3.2rem;border-radius:50%;display:grid;place-items:center;background:var(--verde);color:#000;margin-bottom:1.5rem}
+.palomita svg{width:24px;height:24px}
+.ceja{font-size:.74rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--verde);margin:0 0 .9rem}
+h1{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:clamp(2.8rem,6vw,4.8rem);line-height:.92;margin:0}
+h1 em{font-style:normal;color:var(--verde)}
+.bajada{color:var(--crema-2);font-size:1.06rem;margin:1.3rem 0 1.8rem;max-width:30rem}
+.pasos{list-style:none;padding:0;margin:0 0 2rem;display:grid;gap:.9rem;max-width:30rem}
+.pasos li{display:grid;grid-template-columns:2rem minmax(0,1fr);gap:.8rem;align-items:start;color:var(--crema-2);font-size:.95rem}
+.pasos b{font-family:var(--display);font-weight:400;font-size:1.5rem;line-height:1;color:var(--verde)}
+.pasos strong{display:block;color:var(--crema);font-weight:600}
+.alterna{display:flex;flex-wrap:wrap;gap:.6rem}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;min-height:2.75rem;padding:0 1.15rem;border:1px solid var(--linea-2);border-radius:999px;font-weight:600;font-size:.9rem;text-decoration:none;transition:border-color .2s,background .2s,transform .2s}
+.btn:hover{border-color:var(--crema-3);background:#111;transform:translateY(-2px)}
+.btn svg{width:17px;height:17px}
+.btn-wa{border-color:rgba(57,255,136,.45);color:var(--verde)}
+
+.agenda{position:relative;background:var(--panel);border:1px solid var(--linea);border-radius:18px;overflow:hidden;min-height:700px}
+.agenda-cab{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1rem 1.2rem;border-bottom:1px solid var(--linea)}
+.agenda-cab b{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:1.3rem;letter-spacing:.01em}
+.agenda-cab span{font-size:.8rem;color:var(--crema-3);white-space:nowrap}
+.calendly-inline-widget{width:100%;height:700px;min-width:280px}
+.cargando{position:absolute;inset:3.5rem 0 0;display:grid;place-items:center;color:var(--crema-3);font-size:.9rem;pointer-events:none}
+.cargando i{display:block;width:2rem;height:2rem;margin:0 auto .8rem;border-radius:50%;border:2px solid var(--linea-2);border-top-color:var(--verde);animation:gira .9s linear infinite}
+@keyframes gira{to{transform:rotate(360deg)}}
+.agenda.lista .cargando{display:none}
+.agendada{display:none;padding:3rem 1.5rem;text-align:center}
+.agendada h2{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:2.4rem;line-height:.95;margin:1rem 0 .6rem}
+.agendada p{color:var(--crema-2);margin:0 auto;max-width:26rem}
+.agendada .palomita{margin:0 auto}
+.agenda.hecha .calendly-inline-widget,.agenda.hecha .cargando{display:none}
+.agenda.hecha .agendada{display:block}
+.pie{color:var(--crema-3);font-size:.82rem;text-align:center;padding:1rem 0 calc(2.5rem + env(safe-area-inset-bottom,0px))}
+
+.js .entra{opacity:0;transform:translateY(16px);animation:aparece .8s var(--suave) forwards}
+@keyframes aparece{to{opacity:1;transform:none}}
+.palomita.entra{animation:pop .55s var(--suave) forwards}
+@keyframes pop{from{opacity:0;transform:scale(0)}70%{opacity:1;transform:scale(1.12)}to{opacity:1;transform:scale(1)}}
+
+@media (max-width:900px){
+  .cuerpo{grid-template-columns:1fr;gap:2rem;padding-top:.5rem}
+  .pasos{margin-bottom:1.5rem}
+  .calendly-inline-widget{height:1020px}
+  .agenda{min-height:0}
+}
+@media (max-width:560px){
+  h1{font-size:clamp(2.5rem,12vw,3.4rem)}
+  .logo{width:108px}
+  .agenda{margin:0 -1rem;border-radius:0;border-inline:0}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.js .entra{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<div class="envoltura">
+  <header class="top">
+    <a href="https://connectstudios.mx" aria-label="Connect Studios, ir al sitio">
+      <img class="logo" src="https://connectstudios.mx/assets/img/logo-connect.webp" alt="Connect Studios" width="640" height="180"
+        onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'logo-txt',textContent:'Connect Studios'}))">
+    </a>
+  </header>
+
+  <main class="cuerpo">
+    <section>
+      <div class="palomita entra" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+      <p class="ceja entra" style="animation-delay:.15s">Solicitud recibida</p>
+      <h1 class="entra" style="animation-delay:.22s" id="titulo">Gracias.<br><em>Agendemos.</em></h1>
+      <p class="bajada entra" style="animation-delay:.32s">Ahórrate la espera: elige el día y la hora que te acomoden para platicar. Si prefieres, también te escribo yo.</p>
+      <ol class="pasos entra" style="animation-delay:.42s">
+        <li><b>1</b><span><strong>Eliges un horario</strong>La llamada dura hasta 45 minutos, por videollamada.</span></li>
+        <li><b>2</b><span><strong>Platicamos de tu negocio</strong>Qué quieres lograr, a quién quieres llegar y qué has intentado.</span></li>
+        <li><b>3</b><span><strong>Te propongo un plan</strong>Si hacemos equipo, te digo cómo arrancaríamos. Si no, te llevas ideas claras.</span></li>
+      </ol>
+      <div class="alterna entra" style="animation-delay:.52s">
+        <a class="btn btn-wa" id="wa" href="https://wa.me/523323362662" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2l-.4-.2z"/></svg>
+          Prefiero WhatsApp
+        </a>
+        <a class="btn" href="https://connectstudios.mx">Ver el trabajo</a>
+      </div>
+    </section>
+
+    <section class="agenda entra" id="agenda" style="animation-delay:.3s" aria-label="Agenda tu llamada">
+      <div class="agenda-cab"><b>Agenda tu llamada</b><span>Hasta 45 min · videollamada</span></div>
+      <div class="cargando"><div><i></i>Cargando horarios…</div></div>
+      <div class="calendly-inline-widget" id="calendly"></div>
+      <div class="agendada">
+        <div class="palomita" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+        <h2>Nos vemos pronto</h2>
+        <p>Te llegó la confirmación a tu correo con el link de la videollamada. Si necesitas cambiar la hora, ahí mismo viene cómo hacerlo.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="pie">Connect Studios · Guadalajara · <a href="/privacidad.html">Aviso de privacidad</a></footer>
+</div>
+
+<script>
+// =====================================================================
+//  CONFIGURACIÓN
+// =====================================================================
+const CONFIG = {
+  CALENDLY: 'https://calendly.com/elojodemanu/45min',
+  WHATSAPP: '523323362662',
+  META_PIXEL: '580716017132096'  // evento Schedule cuando alguien agenda
+};
+// =====================================================================
+
+(function () {
+  // Nombre y correo que dejó en /empezar (solo en esta pestaña)
+  let lead = {};
+  try { lead = JSON.parse(sessionStorage.getItem('connect.lead') || '{}') || {}; } catch (e) { /* sin almacenamiento */ }
+  const pila = String(lead.nombre || '').trim().split(/\s+/)[0];
+  if (pila) {
+    const t = document.getElementById('titulo');
+    t.textContent = '';
+    t.append(`Gracias, ${pila}.`, document.createElement('br'));
+    const em = document.createElement('em'); em.textContent = 'Agendemos.'; t.append(em);
+  }
+  document.getElementById('wa').href = `https://wa.me/${CONFIG.WHATSAPP}?text=${encodeURIComponent(pila ? `Hola Manuel, soy ${pila}. Acabo de mandar mi solicitud desde la página.` : 'Hola Manuel, acabo de mandar mi solicitud desde la página.')}`;
+
+  if (CONFIG.META_PIXEL) {
+    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', CONFIG.META_PIXEL);
+    fbq('track', 'PageView');
+  }
+
+  // Calendly con los colores de la marca (los colores solo aplican en planes de pago de Calendly)
+  const params = new URLSearchParams(location.search);
+  const url = new URL(CONFIG.CALENDLY);
+  url.searchParams.set('hide_gdpr_banner', '1');
+  url.searchParams.set('background_color', '0b0b0c');
+  url.searchParams.set('text_color', 'f2efe9');
+  url.searchParams.set('primary_color', '39ff88');
+  ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'].forEach(k => { if (params.get(k)) url.searchParams.set(k, params.get(k)); });
+
+  // Calendly vuelve a codificar la URL: con URLSearchParams los espacios saldrían como "+"
+  let dataUrl = url.toString().replace(/\+/g, '%20');
+  if (lead.nombre) dataUrl += '&name=' + encodeURIComponent(lead.nombre) + (lead.correo ? '&email=' + encodeURIComponent(lead.correo) : '');
+  document.getElementById('calendly').dataset.url = dataUrl;
+
+  addEventListener('message', e => {
+    if (e.origin !== 'https://calendly.com' || !e.data || typeof e.data.event !== 'string') return;
+    const agenda = document.getElementById('agenda');
+    if (e.data.event === 'calendly.event_type_viewed') agenda.classList.add('lista');
+    if (e.data.event === 'calendly.event_scheduled') {
+      agenda.classList.add('hecha');
+      agenda.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      if (window.fbq) fbq('track', 'Schedule');
+      try { sessionStorage.removeItem('connect.lead'); } catch (err) { /* sin almacenamiento */ }
+    }
+  });
+  // Si Calendly tarda, quita el aviso de carga de todos modos
+  setTimeout(() => document.getElementById('agenda').classList.add('lista'), 6000);
+})();
+</script>
+<script src="https://assets.calendly.com/assets/external/widget.js" async></script>
+</body>
+</html>

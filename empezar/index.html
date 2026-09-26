@@ -91,20 +91,6 @@ button,input,textarea{font:inherit;color:inherit}
 .legal{color:var(--crema-3);font-size:.78rem;margin:1rem 0 0;text-align:center}
 .legal a{text-underline-offset:2px}
 
-/* Confirmación */
-.listo{display:none}
-.hecho .formulario{display:none}
-.hecho .listo{display:block;animation:entra .5s ease both}
-.palomita{width:3.25rem;height:3.25rem;border-radius:50%;border:2px solid var(--verde);display:grid;place-items:center;margin-bottom:1.5rem;color:var(--verde)}
-.palomita svg{width:24px;height:24px}
-.caja .listo h2{font-size:clamp(2.6rem,6vw,3.4rem);margin-bottom:.9rem}
-.listo p{color:var(--crema-2);margin:0 0 1rem}
-.acciones{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:1.75rem}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;min-height:2.75rem;padding:0 1.2rem;border:1px solid var(--linea-2);border-radius:999px;font-weight:600;font-size:.92rem;text-decoration:none;transition:border-color .15s,background .15s}
-.btn:hover{border-color:var(--crema-3);background:#0E0E10}
-.btn-v{border-color:var(--verde);color:var(--verde)}
-.btn svg{width:17px;height:17px}
-@keyframes entra{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 
 @media (max-width:860px){
   .pagina{grid-template-columns:1fr;min-height:0}
@@ -196,19 +182,6 @@ button,input,textarea{font:inherit;color:inherit}
         <p class="legal">Tus datos solo se usan para contactarte. <a href="/privacidad.html#solicitudes">Aviso de privacidad</a></p>
       </form>
 
-      <div class="listo" id="listo" tabindex="-1">
-        <div class="palomita" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
-        <h2>Recibido.</h2>
-        <p id="gracias">Gracias. Ya tengo tus datos.</p>
-        <p>Reviso tu solicitud y te escribo por WhatsApp o correo para agendar una llamada.</p>
-        <div class="acciones">
-          <a class="btn btn-v" id="wa" href="#" target="_blank" rel="noopener" hidden>
-            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2l-.4-.2z"/></svg>
-            Adelantar por WhatsApp
-          </a>
-          <a class="btn" href="https://connectstudios.mx">Ver el trabajo</a>
-        </div>
-      </div>
     </div>
   </main>
 </div>
@@ -220,7 +193,6 @@ button,input,textarea{font:inherit;color:inherit}
 const CONFIG = {
   SUPABASE_URL: 'https://ypguioklwhyixacfuksu.supabase.co',
   SUPABASE_KEY: 'sb_publishable_qjTIY_M5HJ9R653m_uOmXw_bBbVTibS', // la Publishable key. NUNCA la Secret.
-  WHATSAPP: '523323362662',  // botón "Adelantar por WhatsApp" al terminar; vacío lo oculta
   META_PIXEL: '580716017132096'             // opcional: ID del Pixel de Meta para medir los anuncios (evento Lead)
 };
 // =====================================================================
@@ -274,18 +246,12 @@ const CONFIG = {
     if (document.getElementById(id).getAttribute('aria-invalid') && REGLAS[id](val(id)) === true) marcar(id, '');
   }));
 
-  function listo(nombre) {
-    const pila = nombre.split(/\s+/)[0];
-    document.getElementById('gracias').textContent = `Gracias, ${pila}. Ya tengo tus datos.`;
-    if (CONFIG.WHATSAPP) {
-      const wa = document.getElementById('wa');
-      wa.href = `https://wa.me/${CONFIG.WHATSAPP}?text=${encodeURIComponent(`Hola Manuel, soy ${pila}. Acabo de mandar mi solicitud desde la página.`)}`;
-      wa.hidden = false;
-    }
-    document.getElementById('caja').classList.add('hecho');
-    window.scrollTo({ top: document.querySelector('.form-lado').offsetTop - 8, behavior: 'smooth' });
-    document.getElementById('listo').focus({ preventScroll: true });
+  // Al enviar: se guarda el nombre y correo en esta pestaña y se pasa a /gracias para agendar
+  function listo(nombre, correo) {
+    try { sessionStorage.setItem('connect.lead', JSON.stringify({ nombre, correo: correo || '' })); } catch (e) { /* sin almacenamiento */ }
     if (window.fbq) fbq('track', 'Lead');
+    btnTxt.textContent = 'Listo';
+    setTimeout(() => { location.href = '/gracias/' + (location.search || ''); }, window.fbq ? 400 : 0);
   }
 
   form.addEventListener('submit', async e => {
@@ -296,7 +262,7 @@ const CONFIG = {
 
     const nombre = val('nombre');
     // Si un bot llenó el campo oculto, fingimos éxito y no guardamos nada
-    if (val('web2')) { listo(nombre); return; }
+    if (val('web2')) { listo(nombre, ''); return; }
 
     const datos = {
       nombre,
@@ -321,7 +287,7 @@ const CONFIG = {
         const t = await r.text();
         throw new Error(/solicitudes_limite/.test(t) ? 'limite' : /correo/.test(t) ? 'correo' : /whatsapp/.test(t) ? 'whatsapp' : 'otro');
       }
-      listo(nombre);
+      listo(nombre, datos.correo);
     } catch (err) {
       const m = err && err.message;
       if (m === 'correo') marcar('correo', 'Revisa tu correo.');
