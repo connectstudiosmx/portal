@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#000000">
+<title>Casos · Connect Studios</title>
+<meta name="description" content="Tres negocios, tres problemas distintos y cómo se resolvieron en video.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Casos · Connect Studios">
+<meta property="og:description" content="Tres negocios, tres problemas distintos y cómo se resolvieron en video.">
+<meta property="og:image" content="https://connectstudios.mx/assets/img/cabb/cabb-4-entrega.webp">
+<meta property="og:url" content="https://portal.connectstudios.mx/casos/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23000'/%3E%3Crect x='14' y='10' width='36' height='44' rx='4' fill='none' stroke='%23F3E7C8' stroke-width='5'/%3E%3Crect x='14' y='44' width='36' height='10' fill='%23E3B23C'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400..700&display=swap" rel="stylesheet">
+<script>document.documentElement.classList.add('js')</script>
+<style>
+:root{
+  --negro:#000;
+  --panel:#0B0B0C;
+  --linea:#26262A;
+  --linea-2:#3A3A40;
+  --crema:#F2EFE9;
+  --crema-2:#C9C5BD;
+  --crema-3:#8A867F;
+  --verde:#39FF88;
+  --display:'Anton',Impact,'Arial Narrow',sans-serif;
+  --texto:'Archivo',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --suave:cubic-bezier(.2,.7,.2,1);
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--negro);color:var(--crema);font-family:var(--texto);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit}
+img,video{display:block;max-width:100%}
+:focus-visible{outline:2px solid var(--verde);outline-offset:3px}
+.envoltura{max-width:74rem;margin:0 auto;padding:0 clamp(1rem,4vw,2.5rem)}
+
+/* Barra */
+.top{position:sticky;top:0;z-index:40;background:rgba(0,0,0,.8);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid transparent;transition:border-color .3s}
+.top.con-borde{border-bottom-color:var(--linea)}
+.top-in{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1rem 0}
+.logo{width:124px;height:auto}
+.logo-txt{font-family:var(--display);text-transform:uppercase;font-size:1.2rem;text-decoration:none}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;min-height:2.75rem;padding:0 1.2rem;border:1px solid var(--linea-2);border-radius:999px;font-weight:600;font-size:.92rem;text-decoration:none;background:none;color:inherit;cursor:pointer;transition:border-color .2s,background .2s,transform .2s,box-shadow .2s}
+.btn:hover{border-color:var(--crema-3);background:#111;transform:translateY(-2px)}
+.btn-v{background:var(--verde);border-color:var(--verde);color:#000}
+.btn-v:hover{background:var(--verde);box-shadow:0 10px 30px rgba(57,255,136,.28)}
+.btn-s{min-height:2.35rem;padding:0 1rem;font-size:.85rem}
+.btn svg{width:17px;height:17px;transition:transform .3s var(--suave)}
+.btn:hover svg{transform:translateX(3px)}
+
+/* Portada */
+.portada{padding:clamp(3rem,10vh,6rem) 0 clamp(2rem,5vh,3rem)}
+.ceja{display:inline-flex;align-items:center;gap:.55rem;font-size:.74rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--verde);margin:0 0 1.1rem}
+.ceja::before{content:"";width:1.6rem;height:1px;background:var(--verde)}
+h1{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:clamp(3rem,8.4vw,7rem);line-height:.9;margin:0;max-width:14ch}
+h1 em{font-style:normal;color:var(--verde)}
+.bajada{color:var(--crema-2);font-size:1.1rem;max-width:36rem;margin:1.4rem 0 0}
+
+/* Reel */
+.reel{position:relative;aspect-ratio:16/9;border-radius:18px;overflow:hidden;background:#0a0a0a;border:1px solid var(--linea);cursor:pointer}
+.reel img,.reel iframe{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border:0}
+.reel img{filter:brightness(.7);transition:transform 1.2s var(--suave),filter .5s}
+.reel:hover img{transform:scale(1.03);filter:brightness(.8)}
+.reel-play{position:absolute;inset:0;display:grid;place-items:center;background:none;border:0;color:inherit;cursor:pointer}
+.reel-play span{display:grid;place-items:center;width:5.2rem;height:5.2rem;border-radius:50%;background:var(--verde);color:#000;box-shadow:0 0 0 0 rgba(57,255,136,.5);animation:late 2.2s infinite;transition:transform .3s var(--suave)}
+.reel:hover .reel-play span{transform:scale(1.08)}
+.reel-play svg{width:28px;height:28px;margin-left:4px}
+@keyframes late{0%{box-shadow:0 0 0 0 rgba(57,255,136,.5)}70%{box-shadow:0 0 0 22px rgba(57,255,136,0)}100%{box-shadow:0 0 0 0 rgba(57,255,136,0)}}
+.reel-info{position:absolute;left:1.2rem;bottom:1.1rem;font-size:.74rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;text-shadow:0 1px 8px rgba(0,0,0,.8);pointer-events:none}
+.reel.activo .reel-play,.reel.activo .reel-info,.reel.activo img{display:none}
+
+/* Logos */
+.logos{padding:2.2rem 0 1rem;overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent);mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent)}
+.logos-in{display:flex;align-items:center;gap:.8rem;width:max-content;animation:corre 60s linear infinite}
+.logos:hover .logos-in{animation-play-state:paused}
+.logos img{height:72px;width:auto;border-radius:6px;opacity:.7;filter:grayscale(1);transition:opacity .3s,filter .3s}
+.logos img:hover{opacity:1;filter:none}
+@keyframes corre{to{transform:translateX(-50%)}}
+
+/* Casos */
+.caso{padding:clamp(4rem,10vh,6.5rem) 0;border-top:1px solid var(--linea)}
+.caso-cab{display:flex;align-items:flex-end;justify-content:space-between;gap:1rem 2rem;flex-wrap:wrap;margin-bottom:2.2rem}
+.caso-num{font-family:var(--display);font-size:1rem;letter-spacing:.1em;color:var(--verde)}
+.caso-cab h2{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:clamp(2.6rem,6.4vw,5rem);line-height:.9;margin:.4rem 0 0}
+.caso-tags{display:flex;flex-wrap:wrap;gap:.4rem}
+.tag{font-size:.74rem;font-weight:700;letter-spacing:.06em;padding:.3rem .7rem;border:1px solid var(--linea-2);border-radius:999px;color:var(--crema-2);white-space:nowrap}
+
+.galeria{display:grid;grid-template-columns:2fr 1fr 1fr;grid-template-rows:14rem 14rem;gap:.6rem;margin-bottom:2.6rem}
+.galeria figure{position:relative;margin:0;overflow:hidden;border-radius:14px;background:#0a0a0a}
+.galeria figure:first-child{grid-row:span 2}
+.galeria figure:nth-child(4){grid-column:span 2}
+.galeria img{width:100%;height:100%;object-fit:cover;filter:saturate(.85) brightness(.85);transform:scale(1.12);transition:transform 1.4s var(--suave),filter .6s}
+.js .galeria figure{clip-path:inset(100% 0 0 0 round 14px);transition:clip-path 1s var(--suave)}
+.js .galeria.visto figure{clip-path:inset(0 0 0 0 round 14px)}
+.galeria.visto img{transform:scale(1.02)}
+.galeria figure:hover img{transform:scale(1.07);filter:saturate(1) brightness(.95)}
+.js .galeria figure:nth-child(2){transition-delay:.1s}.js .galeria figure:nth-child(3){transition-delay:.2s}.js .galeria figure:nth-child(4){transition-delay:.3s}
+
+.tres{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(1.2rem,3vw,2.5rem)}
+.tres h3{display:flex;align-items:center;gap:.6rem;font-size:.76rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--verde);margin:0 0 .8rem}
+.tres h3 b{font-family:var(--display);font-weight:400;font-size:1.5rem;letter-spacing:0;color:var(--crema)}
+.tres p{color:var(--crema-2);margin:0 0 .8rem;font-size:.98rem}
+.gancho{display:flex;align-items:center;justify-content:space-between;gap:1rem 2rem;flex-wrap:wrap;margin-top:2.6rem;padding:1.3rem 1.5rem;border:1px dashed var(--linea-2);border-radius:14px}
+.gancho p{margin:0;color:var(--crema);font-weight:600}
+.gancho small{display:block;color:var(--crema-3);font-weight:500;font-size:.88rem;margin-top:.15rem}
+
+/* Casos con testimonio */
+.testimonio{display:grid;grid-template-columns:minmax(0,20rem) minmax(0,1fr);gap:clamp(2rem,5vw,4.5rem);align-items:center}
+.retrato{position:relative;margin:0;border-radius:18px;overflow:hidden;aspect-ratio:4/5;background:#0a0a0a}
+.retrato img{width:100%;height:100%;object-fit:cover;filter:saturate(.8);transform:scale(1.12);transition:transform 1.4s var(--suave)}
+.js .retrato{clip-path:inset(0 0 100% 0 round 18px);transition:clip-path 1.1s var(--suave)}
+.js .retrato.visto{clip-path:inset(0 0 0 0 round 18px)}
+.retrato.visto img{transform:scale(1.02)}
+.retrato figcaption{position:absolute;left:1rem;right:1rem;bottom:1rem;text-shadow:0 1px 10px rgba(0,0,0,.85)}
+.retrato figcaption b{display:block;font-weight:700}
+.retrato figcaption span{font-size:.84rem;color:var(--crema-2)}
+.cita{font-size:clamp(1.25rem,2.4vw,1.7rem);line-height:1.35;font-weight:500;margin:0 0 1.6rem;color:var(--crema);position:relative;padding-top:2.4rem}
+.cita::before{content:"«";position:absolute;top:-.6rem;left:-.1rem;font-family:var(--display);font-size:4.5rem;line-height:1;color:var(--verde)}
+.cita mark{background:linear-gradient(transparent 62%,rgba(57,255,136,.28) 62%);color:inherit;padding:0 .1em}
+.lecciones{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.8rem}
+.leccion{background:var(--panel);border:1px solid var(--linea);border-radius:12px;padding:1rem 1.1rem}
+.leccion b{display:block;font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--verde);margin-bottom:.3rem}
+.leccion p{margin:0;color:var(--crema-2);font-size:.93rem}
+
+/* Detrás de cámara */
+.detras{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(2rem,5vw,4rem);align-items:center;padding:clamp(4rem,10vh,6rem) 0;border-top:1px solid var(--linea)}
+.detras video{width:100%;aspect-ratio:16/10;object-fit:cover;border-radius:18px;border:1px solid var(--linea);background:#0a0a0a}
+.detras h2{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:clamp(2.2rem,5vw,3.6rem);line-height:.92;margin:.4rem 0 1rem}
+.detras p{color:var(--crema-2);margin:0 0 1rem}
+
+/* Cierre */
+.cierre{position:relative;overflow:hidden;isolation:isolate;border-radius:22px;margin:2rem 0 1rem;padding:clamp(2.2rem,6vw,4.5rem) clamp(1.4rem,5vw,4rem);text-align:center}
+.cierre::before{content:"";position:absolute;inset:0;z-index:-2;background:url(https://connectstudios.mx/assets/img/cabb/cabb-3-atencion.webp) center/cover;filter:saturate(.6) brightness(.3)}
+.cierre::after{content:"";position:absolute;inset:0;z-index:-1;background:radial-gradient(ellipse at center,rgba(0,0,0,.2),rgba(0,0,0,.85))}
+.cierre h2{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:clamp(2.6rem,7vw,5rem);line-height:.9;margin:0 0 1rem}
+.cierre h2 em{font-style:normal;color:var(--verde)}
+.cierre p{color:var(--crema-2);max-width:34rem;margin:0 auto 1.8rem;font-size:1.05rem}
+.cierre .acciones{display:flex;flex-wrap:wrap;gap:.6rem;justify-content:center}
+.pie{color:var(--crema-3);font-size:.82rem;text-align:center;padding:2rem 0 calc(2.5rem + env(safe-area-inset-bottom,0px))}
+
+/* Animaciones */
+.js .entra{opacity:0;transform:translateY(18px);animation:aparece .8s var(--suave) forwards}
+@keyframes aparece{to{opacity:1;transform:none}}
+.js .r{opacity:0;transform:translateY(30px);transition:opacity .9s var(--suave),transform .9s var(--suave)}
+.js .r.visto{opacity:1;transform:none}
+.d1{transition-delay:.08s!important}.d2{transition-delay:.16s!important}.d3{transition-delay:.24s!important}
+
+@media (max-width:900px){
+  .tres{grid-template-columns:1fr;gap:1.6rem}
+  .testimonio{grid-template-columns:1fr}
+  .retrato{max-width:22rem;aspect-ratio:1/1}
+  .detras{grid-template-columns:1fr}
+  .galeria{grid-template-columns:1fr 1fr;grid-template-rows:13rem 9rem 9rem}
+  .galeria figure:first-child{grid-column:span 2;grid-row:auto}
+  .galeria figure:nth-child(4){grid-column:span 2}
+}
+@media (max-width:600px){
+  h1{font-size:clamp(2.8rem,13vw,4rem)}
+  .lecciones{grid-template-columns:1fr}
+  .logo{width:104px}
+  .logos img{height:58px}
+  .reel-play span{width:4.2rem;height:4.2rem}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .js .r,.js .entra{opacity:1;transform:none}
+  .js .galeria figure,.js .retrato{clip-path:none}
+  .galeria img,.retrato img{transform:none}
+}
+</style>
+</head>
+<body>
+<header class="top" id="top">
+  <div class="envoltura top-in">
+    <a href="https://connectstudios.mx" aria-label="Connect Studios, ir al sitio">
+      <img class="logo" src="https://connectstudios.mx/assets/img/logo-connect.webp" alt="Connect Studios" width="640" height="180"
+        onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'logo-txt',textContent:'Connect Studios'}))">
+    </a>
+    <a class="btn btn-v btn-s" data-destino="/empezar/" href="/empezar/">Platiquemos</a>
+  </div>
+</header>
+
+<main class="envoltura">
+  <section class="portada">
+    <p class="ceja entra">Casos</p>
+    <h1 class="entra" style="animation-delay:.1s">Lo que se ve <em>por fuera.</em></h1>
+    <p class="bajada entra" style="animation-delay:.2s">Tres negocios que ya funcionaban y necesitaban que su imagen estuviera a la altura. Cada uno pedía algo distinto; en todos, el objetivo se definió antes de encender la cámara.</p>
+  </section>
+
+  <div class="reel r" id="reel" data-video="7-ilQ97QtZQ">
+    <img src="https://connectstudios.mx/assets/img/reel-portada.webp" alt="Demo reel 2026 de Connect Studios" loading="lazy">
+    <button class="reel-play" type="button" aria-label="Reproducir demo reel"><span><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg></span></button>
+    <div class="reel-info">Demo reel 2026 · 2:25</div>
+  </div>
+
+  <div class="logos" aria-label="Clientes y colaboraciones">
+    <div class="logos-in" id="logos"></div>
+  </div>
+
+  <!-- Caso 1 -->
+  <article class="caso">
+    <div class="caso-cab r">
+      <div><span class="caso-num">01 · Video institucional</span><h2>CABB Arrenda</h2></div>
+      <div class="caso-tags"><span class="tag">Arrendadora</span><span class="tag">Guadalajara</span><span class="tag">2024</span></div>
+    </div>
+    <div class="galeria r">
+      <figure><img src="https://connectstudios.mx/assets/img/cabb/cabb-4-entrega.webp" alt="Entrega del vehículo en la distribuidora" loading="lazy"></figure>
+      <figure><img src="https://connectstudios.mx/assets/img/cabb/cabb-1-puerta.webp" alt="Entrada del corporativo de CABB" loading="lazy"></figure>
+      <figure><img src="https://connectstudios.mx/assets/img/cabb/cabb-3-atencion.webp" alt="Atención a un cliente en las oficinas" loading="lazy"></figure>
+      <figure><img src="https://connectstudios.mx/assets/img/cabb/cabb-5-llaves.webp" alt="El vehículo listo para entregarse al cliente" loading="lazy"></figure>
+    </div>
+    <div class="tres">
+      <div class="r"><h3><b>01</b>El reto</h3><p>Un video de aniversario tiende a quedarse en felicitación interna. Un institucional tiene que vender confianza hacia afuera. Esta pieza tenía que hacer las dos cosas.</p></div>
+      <div class="r d1"><h3><b>02</b>La decisión</h3><p>Me pidieron un video de aniversario y propuse no hacer un aniversario: contar la historia de la empresa y, sobre todo, cómo se siente ser su cliente. El aniversario pasó de ser el tema a ser el motivo.</p></div>
+      <div class="r d2"><h3><b>03</b>Cómo se resolvió</h3><p>Se grabó donde de verdad pasa: la recepción, el trato, la firma y el cierre en la distribuidora, cuando el cliente recibe las llaves. Encima, la voz con la trayectoria de la empresa.</p></div>
+    </div>
+    <div class="gancho r">
+      <p>El video completo no se publica.<small>Te lo enseño en la llamada, junto con lo que haría para tu negocio.</small></p>
+      <a class="btn btn-v" data-destino="/empezar/" href="/empezar/">Quiero verlo
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+    </div>
+  </article>
+
+  <!-- Caso 2 -->
+  <article class="caso">
+    <div class="caso-cab r">
+      <div><span class="caso-num">02 · Contenido vertical mensual</span><h2>Dorma</h2></div>
+      <div class="caso-tags"><span class="tag">Marca personal</span><span class="tag">Redes sociales</span></div>
+    </div>
+    <div class="testimonio">
+      <figure class="retrato r">
+        <img src="https://connectstudios.mx/assets/img/testimonios/edgar.webp" alt="Edgar Temores, dueño de Dorma" loading="lazy">
+        <figcaption><b>Edgar Temores</b><span>Dueño · Dorma</span></figcaption>
+      </figure>
+      <div>
+        <p class="cita r">Había trabajado con muchos videógrafos… llegaban, grababan y hacían lo que tú les pedías. Pero acá con Manuel me pasó diferente: <mark>se involucró completamente en el desarrollo del guion</mark>, en la manera de grabar los videos, en los efectos.</p>
+        <div class="lecciones">
+          <div class="leccion r"><b>Lo que pedía</b><p>Contenido para redes, algo sencillo.</p></div>
+          <div class="leccion r d1"><b>Lo que se hizo</b><p>Iterar juntos el guion y la forma de grabar para hacer crecer su marca personal.</p></div>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Caso 3 -->
+  <article class="caso">
+    <div class="caso-cab r">
+      <div><span class="caso-num">03 · Marca personal</span><h2>Seguros Monterrey</h2></div>
+      <div class="caso-tags"><span class="tag">Asesora de ventas</span><span class="tag">New York Life</span></div>
+    </div>
+    <div class="testimonio">
+      <figure class="retrato r">
+        <img src="https://connectstudios.mx/assets/img/testimonios/griselda.webp" alt="Griselda, asesora de ventas en Seguros Monterrey" loading="lazy">
+        <figcaption><b>Griselda</b><span>Asesora de ventas · Seguros Monterrey</span></figcaption>
+      </figure>
+      <div>
+        <p class="cita r">Yo soy una persona a la que le ha costado mucho trabajo el grabar, el memorizar, entonces <mark>buscaste las alternativas en las cuales me sentí muy cómoda.</mark></p>
+        <div class="lecciones">
+          <div class="leccion r"><b>El reto</b><p>Salir a cámara sin memorizar guiones ni sentirse incómoda.</p></div>
+          <div class="leccion r d1"><b>Además</b><p>«No te quedaste con nada más el grabar: me ayudaste a desarrollar ideas para crecer mi negocio.»</p></div>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Detrás de cámara -->
+  <section class="detras">
+    <video id="bts" src="https://connectstudios.mx/assets/video/myskin-bts.mp4" poster="https://connectstudios.mx/assets/img/bts/myskin-poster.webp" muted loop playsinline preload="none" aria-label="Detrás de cámara de una grabación para Activate My Skin"></video>
+    <div class="r">
+      <span class="caso-num">Detrás de cámara</span>
+      <h2>Así se ve un día de grabación</h2>
+      <p>Llegamos a tu negocio con lo que pida el proyecto y grabamos todo en uno o dos días. Tú sigues trabajando; nosotros nos adaptamos a tu operación.</p>
+      <p style="color:var(--crema-3);font-size:.9rem">Grabación para Activate My Skin.</p>
+    </div>
+  </section>
+
+  <section class="cierre r">
+    <h2>¿Tu negocio <em>es el siguiente?</em></h2>
+    <p>Cuéntame qué quieres lograr. Si hay algo que hacer, te propongo cómo; si no, te llevas ideas claras.</p>
+    <div class="acciones">
+      <a class="btn btn-v" data-destino="/empezar/" href="/empezar/">Platiquemos
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+      <a class="btn" data-destino="/guia/" href="/guia/">Ver la guía gratis</a>
+    </div>
+  </section>
+</main>
+<footer class="pie">Connect Studios · Guadalajara · <a href="/privacidad.html">Aviso de privacidad</a></footer>
+
+<script>
+const CONFIG = {
+  META_PIXEL: '580716017132096'
+};
+
+(function () {
+  // Los botones a /empezar y /guia llevan el origen del anuncio
+  const p = new URLSearchParams(location.search);
+  document.querySelectorAll('[data-destino]').forEach(a => {
+    const u = new URL(a.dataset.destino, location.origin);
+    ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'fbclid'].forEach(k => { if (p.get(k)) u.searchParams.set(k, p.get(k)); });
+    if (!u.searchParams.get('utm_source')) u.searchParams.set('utm_source', 'casos');
+    a.href = u.toString();
+  });
+
+  if (CONFIG.META_PIXEL) {
+    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', CONFIG.META_PIXEL);
+    fbq('track', 'PageView');
+    fbq('track', 'ViewContent', { content_name: 'casos' });
+  }
+
+  // Logos (dos veces para que la cinta sea continua)
+  const LOGOS = [['tequila-carrera','Tequila Carrera'],['cabb-arrenda','CABB Arrenda'],['eture-lab','Eture Lab'],['activate-my-skin','Activate My Skin'],['tendencias','Tendencias Alta Costura'],['dorma','Dorma'],['cya','C&A'],['seguros-monterrey','New York Life Seguros Monterrey'],['galeria-ajolote','Galería Ajolote'],['finvivir','Finvivir'],['jugo-comunicacion','Jugo Comunicación'],['confexion-design','Confexion Design']];
+  const cont = document.getElementById('logos');
+  [0, 1].forEach(vuelta => LOGOS.forEach(([f, n]) => {
+    const img = new Image();
+    img.src = `https://connectstudios.mx/assets/img/clientes/${f}.webp`;
+    img.alt = vuelta ? '' : n;
+    img.loading = 'lazy';
+    img.onerror = () => img.remove();
+    cont.appendChild(img);
+  }));
+
+  // Demo reel: YouTube solo se carga al darle play
+  const reel = document.getElementById('reel');
+  reel.addEventListener('click', () => {
+    if (reel.classList.contains('activo')) return;
+    const f = document.createElement('iframe');
+    f.src = `https://www.youtube-nocookie.com/embed/${reel.dataset.video}?autoplay=1&rel=0&modestbranding=1`;
+    f.title = 'Demo reel 2026 de Connect Studios';
+    f.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+    f.allowFullscreen = true;
+    reel.appendChild(f);
+    reel.classList.add('activo');
+    if (window.fbq) fbq('trackCustom', 'VerReel');
+  });
+
+  // Revelado al hacer scroll y video de detrás de cámara que se reproduce al verse
+  const PENDIENTES = '.r:not(.visto)';
+  const bts = document.getElementById('bts');
+  const quieto = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if ('IntersectionObserver' in window) {
+    const obs = new IntersectionObserver(es => es.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('visto'); obs.unobserve(e.target); }
+    }), { rootMargin: '0px 0px -10% 0px', threshold: .08 });
+    document.querySelectorAll(PENDIENTES).forEach(el => obs.observe(el));
+    if (!quieto) new IntersectionObserver(es => es.forEach(e => {
+      if (e.isIntersecting) bts.play().catch(() => {}); else bts.pause();
+    }), { threshold: .35 }).observe(bts);
+  } else {
+    document.querySelectorAll(PENDIENTES).forEach(el => el.classList.add('visto'));
+  }
+  if (quieto) bts.controls = true;
+
+  const top = document.getElementById('top');
+  let pendiente = false;
+  addEventListener('scroll', () => {
+    if (pendiente) return;
+    pendiente = true;
+    requestAnimationFrame(() => {
+      pendiente = false;
+      top.classList.toggle('con-borde', scrollY > 10);
+      // Respaldo por si el observador no alcanza a disparar
+      document.querySelectorAll(PENDIENTES).forEach(el => {
+        const r = el.getBoundingClientRect();
+        if (r.height && r.top < innerHeight * .92 && r.bottom > 0) el.classList.add('visto');
+      });
+    });
+  }, { passive: true });
+})();
+</script>
+</body>
+</html>
