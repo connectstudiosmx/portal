@@ -55,6 +55,17 @@ h1 em{font-style:normal;color:var(--verde)}
 .btn svg{width:17px;height:17px}
 .btn-wa{border-color:rgba(57,255,136,.45);color:var(--verde)}
 
+/* Video de bienvenida (vertical, grabado con el celular) */
+.video-msg{display:grid;grid-template-columns:8.5rem minmax(0,1fr);gap:1.1rem;align-items:center;max-width:30rem;margin:0 0 1.8rem;padding:.8rem;border:1px solid var(--linea);border-radius:16px;background:var(--panel)}
+.video-msg[hidden]{display:none}
+.video-marco{position:relative;aspect-ratio:9/16;border-radius:10px;overflow:hidden;background:#111;cursor:pointer}
+.video-marco video,.video-marco iframe{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border:0}
+.video-marco button{position:absolute;inset:0;display:grid;place-items:center;border:0;background:linear-gradient(0deg,rgba(0,0,0,.55),rgba(0,0,0,0) 60%);color:inherit;cursor:pointer}
+.video-marco button span{display:grid;place-items:center;width:2.8rem;height:2.8rem;border-radius:50%;background:var(--verde);color:#000;transition:transform .3s var(--suave)}
+.video-marco:hover button span{transform:scale(1.1)}
+.video-marco button svg{width:16px;height:16px;margin-left:2px}
+.video-msg b{display:block;font-weight:700;margin-bottom:.25rem}
+.video-msg p{margin:0;color:var(--crema-2);font-size:.9rem}
 .agenda{position:relative;background:var(--panel);border:1px solid var(--linea);border-radius:18px;overflow:hidden;min-height:700px}
 .agenda-cab{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1rem 1.2rem;border-bottom:1px solid var(--linea)}
 .agenda-cab b{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:1.3rem;letter-spacing:.01em}
@@ -106,6 +117,12 @@ h1 em{font-style:normal;color:var(--verde)}
       <p class="ceja entra" style="animation-delay:.15s">Solicitud recibida</p>
       <h1 class="entra" style="animation-delay:.22s" id="titulo">Gracias.<br><em>Agendemos.</em></h1>
       <p class="bajada entra" style="animation-delay:.32s">Ahórrate la espera: elige el día y la hora que te acomoden para platicar. Si prefieres, también te escribo yo.</p>
+      <div class="video-msg entra" id="video-msg" style="animation-delay:.38s" hidden>
+        <div class="video-marco" id="video-marco">
+          <button type="button" aria-label="Reproducir mensaje de Manuel"><span><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg></span></button>
+        </div>
+        <div><b>Un mensaje antes de la llamada</b><p>30 segundos sobre qué sigue y cómo trabajo.</p></div>
+      </div>
       <ol class="pasos entra" style="animation-delay:.42s">
         <li><b>1</b><span><strong>Eliges un horario</strong>La llamada dura hasta 45 minutos, por videollamada.</span></li>
         <li><b>2</b><span><strong>Platicamos de tu negocio</strong>Qué quieres lograr, a quién quieres llegar y qué has intentado.</span></li>
@@ -142,7 +159,9 @@ h1 em{font-style:normal;color:var(--verde)}
 const CONFIG = {
   CALENDLY: 'https://calendly.com/elojodemanu/45min',
   WHATSAPP: '523323362662',
-  META_PIXEL: '580716017132096'  // evento Schedule cuando alguien agenda
+  META_PIXEL: '580716017132096',  // evento Schedule cuando alguien agenda
+  VIDEO: '',         // mensaje de bienvenida: ID de un Short de YouTube (ej. 'abc123XYZ') o link a un .mp4; vacío lo oculta
+  VIDEO_PORTADA: ''  // opcional: imagen de portada del video (.jpg/.webp)
 };
 // =====================================================================
 
@@ -163,6 +182,25 @@ const CONFIG = {
     !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
     fbq('init', CONFIG.META_PIXEL);
     fbq('track', 'PageView');
+  }
+
+  // Video de bienvenida: solo carga cuando le dan play
+  if (CONFIG.VIDEO) {
+    const caja = document.getElementById('video-msg'), marco = document.getElementById('video-marco');
+    const esMp4 = /\.mp4(\?|$)/i.test(CONFIG.VIDEO);
+    const portada = CONFIG.VIDEO_PORTADA || (esMp4 ? '' : `https://i.ytimg.com/vi/${encodeURIComponent(CONFIG.VIDEO)}/oar2.jpg`);
+    if (portada) marco.style.background = `#111 url("${portada}") center/cover`;
+    caja.hidden = false;
+    marco.addEventListener('click', () => {
+      if (marco.dataset.activo) return;
+      marco.dataset.activo = '1';
+      marco.querySelector('button').remove();
+      let el;
+      if (esMp4) { el = document.createElement('video'); el.src = CONFIG.VIDEO; el.controls = true; el.playsInline = true; el.autoplay = true; }
+      else { el = document.createElement('iframe'); el.src = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(CONFIG.VIDEO)}?autoplay=1&rel=0&playsinline=1`; el.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen'; el.title = 'Mensaje de Manuel'; }
+      marco.appendChild(el);
+      if (window.fbq) fbq('trackCustom', 'VerMensaje');
+    });
   }
 
   // Calendly con los colores de la marca (los colores solo aplican en planes de pago de Calendly)
