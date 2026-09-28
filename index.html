@@ -273,7 +273,14 @@ main.app{max-width:var(--ancho);margin:0 auto;padding:1.75rem 1.25rem 5rem}
 .rep-cifras b{color:var(--crema)}
 .rep-txt{margin:0;white-space:pre-wrap;color:var(--crema);font-size:.94rem;overflow-wrap:anywhere}
 .rep-caja .btn{margin-top:.8rem}
-.rep-hay{display:flex;align-items:center;gap:.6rem 1rem;flex-wrap:wrap;border-left:3px solid var(--verde);padding:.35rem .9rem;margin:0 0 1.4rem;color:var(--crema)}
+/* Pestañas del cliente: Mis videos / Resultados */
+.cli-tabs{display:inline-flex;gap:4px;padding:4px;margin:0 0 1.2rem;border:1px solid var(--linea);border-radius:999px;background:var(--panel);max-width:100%}
+.cli-tabs button{display:inline-flex;align-items:center;gap:.45rem;border:0;background:none;border-radius:999px;padding:.55rem 1.15rem;color:var(--crema-2);font-weight:700;font-size:.92rem;cursor:pointer;white-space:nowrap;transition:background .2s,color .2s}
+.cli-tabs button:hover{color:var(--crema)}
+.cli-tabs button[aria-selected="true"]{background:var(--crema);color:#000}
+.cli-nuevo{display:inline-block;padding:.05rem .45rem;border-radius:999px;background:var(--verde);color:#000;font-size:.66rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase}
+.cli-panel{animation:entra .25s ease-out}
+.rep-intro{color:var(--crema-2);margin:-.2rem 0 1.1rem;max-width:60ch}
 .pegar summary{cursor:pointer;font-weight:600;font-size:.88rem;color:var(--verde);margin-bottom:.6rem}
 .pegar textarea{min-height:6rem!important;font-family:ui-monospace,Consolas,monospace;font-size:.8rem!important}
 .aviso-vista{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;border:1px solid var(--dorado);color:var(--dorado);border-radius:var(--r2);padding:.6rem .9rem;margin-bottom:1.6rem;font-weight:600}
@@ -418,7 +425,7 @@ const S = {
   sesion: null, perfil: null,
   vista: 'produccion',
   clientes: [], ciclos: [], videos: [], perfiles: [], asignaciones: [], solicitudes: [], reportes: [], mlLog: [], verAtendidas: false,
-  portal: null, cicloCliente: null, previa: null,
+  portal: null, cicloCliente: null, previa: null, pestanaCli: 'videos',
   filtro: { cliente: 'todos', estado: 'todos', mios: false, entregados: false },
   calInicio: null, verTodos: {}, cargadoEn: 0
 };
@@ -1108,11 +1115,21 @@ function vistaCliente(P, previa) {
   else if (aISO(hoy()) > c.record_end || entregados) { mensaje = `Estamos editando. Van ${entregados} de ${vs.length} entregados.`; cuenta = entregados; que = 'entregados'; }
   else if (conGuion < vs.length) mensaje = `Llevas ${conGuion} de ${vs.length} guiones. Súbelos a más tardar el ${fLarga(c.script_due || c.record_start)}.`;
   else mensaje = `Tus ${vs.length} guiones están listos para grabar.`;
-  // Si el mes que ve no tiene reporte pero el más reciente sí, se lo señalamos
-  const conReporte = ciclos.filter(x => x.report).sort((a, b) => b.delivery_date.localeCompare(a.delivery_date))[0];
-  const hayOtro = !c.report && conReporte && conReporte.id !== c.id;
-  return `${ciclos.length > 1 ? `<div class="mes-tabs" role="group" aria-label="Meses">${ciclos.map(x => `<button data-accion="ver-mes" data-id="${x.id}" aria-pressed="${x.id === c.id}">${esc(x.name)}${x.report ? ' · Resultados' : ''}</button>`).join('')}</div>` : ''}
-    ${hayOtro ? `<p class="rep-hay"><span>Ya están los resultados de <b>${esc(conReporte.name)}</b>.</span><button class="btn btn-s btn-p" data-accion="ver-mes" data-id="${conReporte.id}">Ver resultados</button></p>` : ''}
+  // Resultados: solo el reporte más reciente, en su propia pestaña
+  const ultimo = ultimoReporte(ciclos);
+  const nuevo = !previa && ultimo && reporteVisto() !== claveReporte(ultimo);
+  const enResultados = S.pestanaCli === 'resultados';
+  const pestanas = `<div class="cli-tabs" role="tablist" aria-label="Secciones">
+      <button role="tab" aria-selected="${!enResultados}" data-accion="cli-pestana" data-id="videos">Mis videos</button>
+      <button role="tab" aria-selected="${enResultados}" data-accion="cli-pestana" data-id="resultados">Resultados${nuevo ? ' <span class="cli-nuevo">Nuevo</span>' : ''}</button>
+    </div>`;
+  if (enResultados) {
+    return `${pestanas}<div class="cli-panel" role="tabpanel">${ultimo
+      ? `<p class="rep-intro">Los números de tu mes más reciente de publicaciones. Cada mes que cerramos, aquí aparece el nuevo.</p>${bloqueReporte(ultimo.report, ultimo.name)}`
+      : `<div class="caja-vacia"><p>Aquí vas a ver cómo le fue a tu contenido: cuántas personas lo vieron, el video que mejor funcionó y qué ajustamos. Tus primeros resultados llegan al cerrar tu primer mes de publicaciones.</p><button class="btn" data-accion="cli-pestana" data-id="videos">Ver mis videos</button></div>`}</div>`;
+  }
+  return `${pestanas}<div class="cli-panel" role="tabpanel">
+    ${ciclos.length > 1 ? `<div class="mes-tabs" role="group" aria-label="Meses">${ciclos.map(x => `<button data-accion="ver-mes" data-id="${x.id}" aria-pressed="${x.id === c.id}">${esc(x.name)}</button>`).join('')}</div>` : ''}
     <section class="hero-cli">
       <p class="cli-empresa">${esc(P.client.name)}</p>
       <h1 class="mes-grande">${esc(c.name)}</h1>
@@ -1125,14 +1142,23 @@ function vistaCliente(P, previa) {
       ${urlSegura(c.delivery_url) ? `<div class="hero-cta"><a class="btn btn-p btn-grande" href="${esc(urlSegura(c.delivery_url))}" target="_blank" rel="noopener noreferrer">▶ Ver y descargar tus videos</a>
         <span class="nota">Todos los videos entregados de ${esc(c.name)}, en una carpeta de Drive.</span></div>` : ''}
     </section>
-    ${c.report ? bloqueReporte(c.report, c.name) : ''}
     <div class="avance-cli">
       <b class="avance-num" aria-label="${cuenta} de ${vs.length} ${que}">${pad(cuenta)}<small>/${pad(vs.length)}</small></b>
       <div class="avance-txt"><span>${esc(mensaje)}</span>${tira(vs)}</div>
     </div>
     <div class="hoja">${vs.map(v => cuadro(v, previa)).join('')}</div>
-    <p class="nota" style="margin-top:1.25rem">${previa ? 'En esta vista previa, tocar un video abre su ficha interna.' : 'Toca un video para subir o cambiar su guion. Cuando esté entregado, desde ahí lo abres.'}</p>`;
+    <p class="nota" style="margin-top:1.25rem">${previa ? 'En esta vista previa, tocar un video abre su ficha interna.' : 'Toca un video para subir o cambiar su guion. Cuando esté entregado, desde ahí lo abres.'}</p>
+  </div>`;
 }
+
+// El reporte que ve el cliente: el del mes más reciente que tenga uno
+function ultimoReporte(ciclos) {
+  return (ciclos || []).filter(x => x.report).sort((a, b) => b.delivery_date.localeCompare(a.delivery_date))[0] || null;
+}
+// "Nuevo" en la pestaña hasta que el cliente abre ese reporte (se recuerda en su navegador)
+const claveReporte = c => `${c.id}:${(c.report && (c.report.updated_at || c.report.created_at)) || ''}`;
+function reporteVisto() { try { return localStorage.getItem('portal.reporteVisto'); } catch (e) { return null; } }
+function marcarReporteVisto(c) { try { localStorage.setItem('portal.reporteVisto', claveReporte(c)); } catch (e) { /* sin almacenamiento */ } }
 
 // Reporte mensual: lo que se publicó, cuánto alcanzó, el mejor video y qué se ajusta
 const numero = n => (n === null || n === undefined || n === '') ? null : Number(n).toLocaleString('es-MX');
@@ -1758,8 +1784,16 @@ const ACC = {
   'recargar-pagina'() { location.reload(); },
   async actualizar() { await recargar(); aviso('Actualizado'); },
   ir(el, id) { S.vista = id; S.previa = null; render(); window.scrollTo(0, 0); },
-  previa(el, id) { S.previa = id; S.vista = 'previa'; S.cicloCliente = null; elegirMesCliente(portalLocal(id)); render(); window.scrollTo(0, 0); },
+  previa(el, id) { S.previa = id; S.vista = 'previa'; S.cicloCliente = null; S.pestanaCli = 'videos'; elegirMesCliente(portalLocal(id)); render(); window.scrollTo(0, 0); },
   'ver-mes'(el, id) { S.cicloCliente = id; render(); },
+  'cli-pestana'(el, id) {
+    S.pestanaCli = id === 'resultados' ? 'resultados' : 'videos';
+    if (S.pestanaCli === 'resultados' && S.vista !== 'previa') {
+      const u = ultimoReporte(S.portal && S.portal.cycles);
+      if (u) marcarReporteVisto(u);
+    }
+    render();
+  },
   'ver-todos'(el, id) { S.verTodos[id] = true; render(); },
   'cal-mover'(el, id) {
     const n = Number(id), base = S.calInicio || primerDia(hoy());
