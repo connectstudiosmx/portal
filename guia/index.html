@@ -108,6 +108,13 @@ h1 em::after{content:"";position:absolute;left:0;right:.25em;bottom:.06em;height
 @keyframes tiembla{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
 .err{display:block;color:var(--rojo);font-size:.8rem;font-weight:600;margin-top:.35rem}
 .err:empty{display:none}
+.permiso{display:grid;grid-template-columns:1.15rem minmax(0,1fr);gap:.65rem;align-items:start;margin:.3rem 0 1rem;font-size:.84rem;line-height:1.45;color:var(--crema-2);cursor:pointer}
+.permiso input{appearance:none;-webkit-appearance:none;width:1.15rem;height:1.15rem;margin:.1rem 0 0;border:1.5px solid var(--linea-2);border-radius:4px;background:transparent;display:grid;place-items:center;cursor:pointer;transition:border-color .2s,background .2s}
+.permiso input::after{content:"";width:.55rem;height:.3rem;border-left:2px solid #000;border-bottom:2px solid #000;transform:rotate(-45deg) translate(1px,-1px);opacity:0}
+.permiso input:checked{background:var(--verde);border-color:var(--verde)}
+.permiso input:checked::after{opacity:1}
+.permiso input:focus-visible{outline:2px solid var(--verde);outline-offset:2px}
+.permiso small{display:block;color:var(--crema-3);font-size:.76rem}
 .trampa{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
 .enviar{position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;gap:.6rem;width:100%;min-height:3.2rem;margin-top:.5rem;border:0;border-radius:999px;background:var(--verde);color:#000;font-weight:700;font-size:1rem;cursor:pointer;transition:transform .2s,box-shadow .2s,opacity .2s}
 .enviar::before{content:"";position:absolute;top:0;bottom:0;width:40%;left:-60%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);transform:skewX(-20deg);animation:destello 3.2s ease-in-out 1.6s infinite}
@@ -357,6 +364,7 @@ h1 em::after{content:"";position:absolute;left:0;right:.25em;bottom:.06em;height
               <input id="whatsapp" type="tel" autocomplete="tel" inputmode="tel" maxlength="25" placeholder="33 1234 5678">
               <span class="err" id="e-whatsapp"></span>
             </div>
+            <label class="permiso"><input type="checkbox" id="acepta"><span>Quiero recibir ideas de contenido y novedades por correo.<small>Máximo un par de correos al mes. Te das de baja cuando quieras.</small></span></label>
             <div class="trampa" aria-hidden="true">
               <label for="web2">No llenes este campo</label>
               <input id="web2" tabindex="-1" autocomplete="off">
@@ -691,7 +699,10 @@ const CONFIG = {
   addEventListener('resize', alMover);
 
   // Quien ya la abrió en este navegador la ve directo
-  try { if (localStorage.getItem(LLAVE)) { raiz.classList.add('abierta'); observar(); } } catch (e) { /* sin almacenamiento */ }
+  // Desde los correos (?abrir=1) o si ya la abrió en este navegador, la ve directo
+  let yaAbierta = new URLSearchParams(location.search).get('abrir') === '1';
+  try { yaAbierta = yaAbierta || !!localStorage.getItem(LLAVE); if (yaAbierta) localStorage.setItem(LLAVE, '1'); } catch (e) { /* sin almacenamiento */ }
+  if (yaAbierta) { raiz.classList.add('abierta'); observar(); }
 
   // ---------- Origen ----------
   const params = new URLSearchParams(location.search);
@@ -764,20 +775,27 @@ const CONFIG = {
       empresa: val('empresa'),
       correo: val('correo').toLowerCase(),
       whatsapp: val('whatsapp') || null,
-      origen
+      origen,
+      acepta_correos: document.getElementById('acepta').checked
     };
-    btn.disabled = true;
-    btnTxt.textContent = 'Abriendo…';
-    try {
-      const r = await fetch(`${CONFIG.SUPABASE_URL}/rest/v1/solicitudes`, {
+    // Si la base todavía no tiene la columna del permiso, se reintenta sin ella
+    async function enviar(d) {
+      let r = await fetch(`${CONFIG.SUPABASE_URL}/rest/v1/solicitudes`, {
         method: 'POST',
         headers: { apikey: CONFIG.SUPABASE_KEY, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
-        body: JSON.stringify(datos)
+        body: JSON.stringify(d)
       });
       if (!r.ok) {
         const t = await r.text();
+        if (/acepta_correos/.test(t)) { const s = Object.assign({}, d); delete s.acepta_correos; return enviar(s); }
         throw new Error(/solicitudes_limite/.test(t) ? 'limite' : /correo/.test(t) ? 'correo' : /whatsapp/.test(t) ? 'whatsapp' : 'otro');
       }
+    }
+
+    btn.disabled = true;
+    btnTxt.textContent = 'Abriendo…';
+    try {
+      await enviar(datos);
       abrir();
     } catch (err) {
       const m = err && err.message;

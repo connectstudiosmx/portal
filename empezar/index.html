@@ -79,6 +79,13 @@ button,input,textarea{font:inherit;color:inherit}
 .chip input:checked+span{background:var(--crema);border-color:var(--crema);color:#000}
 .chip input:focus-visible+span{outline:2px solid var(--verde);outline-offset:2px}
 
+.permiso{display:grid;grid-template-columns:1.15rem minmax(0,1fr);gap:.65rem;align-items:start;margin:.3rem 0 1rem;font-size:.84rem;line-height:1.45;color:var(--crema-2);cursor:pointer}
+.permiso input{appearance:none;-webkit-appearance:none;width:1.15rem;height:1.15rem;margin:.1rem 0 0;border:1.5px solid var(--linea-2);border-radius:4px;background:transparent;display:grid;place-items:center;cursor:pointer;transition:border-color .2s,background .2s}
+.permiso input::after{content:"";width:.55rem;height:.3rem;border-left:2px solid #000;border-bottom:2px solid #000;transform:rotate(-45deg) translate(1px,-1px);opacity:0}
+.permiso input:checked{background:var(--verde);border-color:var(--verde)}
+.permiso input:checked::after{opacity:1}
+.permiso input:focus-visible{outline:2px solid var(--verde);outline-offset:2px}
+.permiso small{display:block;color:var(--crema-3);font-size:.76rem}
 .trampa{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
 
 .enviar{display:flex;align-items:center;justify-content:center;gap:.6rem;width:100%;min-height:3.25rem;margin-top:.6rem;border:0;border-radius:999px;background:var(--verde);color:#000;font-weight:700;font-size:1rem;letter-spacing:.01em;cursor:pointer;transition:transform .15s,box-shadow .15s,opacity .15s}
@@ -183,6 +190,7 @@ button,input,textarea{font:inherit;color:inherit}
           <textarea id="mensaje" name="mensaje" maxlength="2000" rows="3" placeholder="Más clientes, mejor imagen, lanzar un producto…"></textarea>
         </div>
 
+        <label class="permiso"><input type="checkbox" id="acepta"><span>Quiero recibir ideas de contenido y novedades por correo.<small>Máximo un par de correos al mes. Te das de baja cuando quieras.</small></span></label>
         <div class="trampa" aria-hidden="true">
           <label for="web2">No llenes este campo</label>
           <input id="web2" name="web2" tabindex="-1" autocomplete="off">
@@ -193,7 +201,7 @@ button,input,textarea{font:inherit;color:inherit}
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
         </button>
         <p class="error-gral" id="e-gral" role="alert"></p>
-        <p class="legal">Tus datos solo se usan para contactarte. <a href="/privacidad.html#solicitudes">Aviso de privacidad</a></p>
+        <p class="legal">Tus datos solo los vemos nosotros. <a href="/privacidad.html#solicitudes">Aviso de privacidad</a></p>
       </form>
       <aside class="confianza" aria-label="Clientes y testimonios">
         <p class="confianza-t">Han confiado en nosotros</p>
@@ -304,21 +312,28 @@ const CONFIG = {
       interes: (form.querySelector('input[name="interes"]:checked') || {}).value || 'no_se',
       sitio: val('sitio') || null,
       mensaje: val('mensaje') || null,
-      origen
+      origen,
+      acepta_correos: document.getElementById('acepta').checked
     };
+
+    // Si la base todavía no tiene la columna del permiso, se reintenta sin ella
+    async function enviar(d) {
+      let r = await fetch(`${CONFIG.SUPABASE_URL}/rest/v1/solicitudes`, {
+        method: 'POST',
+        headers: { apikey: CONFIG.SUPABASE_KEY, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+        body: JSON.stringify(d)
+      });
+      if (!r.ok) {
+        const t = await r.text();
+        if (/acepta_correos/.test(t)) { const s = Object.assign({}, d); delete s.acepta_correos; return enviar(s); }
+        throw new Error(/solicitudes_limite/.test(t) ? 'limite' : /correo/.test(t) ? 'correo' : /whatsapp/.test(t) ? 'whatsapp' : 'otro');
+      }
+    }
 
     btn.disabled = true;
     btnTxt.textContent = 'Enviando…';
     try {
-      const r = await fetch(`${CONFIG.SUPABASE_URL}/rest/v1/solicitudes`, {
-        method: 'POST',
-        headers: { apikey: CONFIG.SUPABASE_KEY, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
-        body: JSON.stringify(datos)
-      });
-      if (!r.ok) {
-        const t = await r.text();
-        throw new Error(/solicitudes_limite/.test(t) ? 'limite' : /correo/.test(t) ? 'correo' : /whatsapp/.test(t) ? 'whatsapp' : 'otro');
-      }
+      await enviar(datos);
       listo(nombre, datos.correo);
     } catch (err) {
       const m = err && err.message;
