@@ -328,6 +328,10 @@ main.app{max-width:var(--ancho);margin:0 auto;padding:1.75rem 1.25rem 5rem}
 .tabla tr.pendiente td{background:rgba(227,178,60,.07)}
 .tabla .campo-in{width:100%;min-width:9rem}
 .aviso-linea{border-left:3px solid var(--dorado);padding:.3rem .8rem;color:var(--crema);margin:0 0 1rem}
+.aviso-error{border-left-color:var(--rojo);display:flex;flex-wrap:wrap;align-items:center;gap:.4rem .8rem}
+.punto-error{background:var(--rojo)}
+.ml-linea{display:flex;flex-wrap:wrap;align-items:center;gap:.2rem .6rem}
+.ml-error{color:var(--rojo);font-weight:700}
 
 /* Solicitudes */
 .sol-lista{display:grid;gap:.75rem;max-width:56rem}
@@ -398,6 +402,7 @@ const CONFIG = {
   SUPABASE_URL: 'https://ypguioklwhyixacfuksu.supabase.co',
   SUPABASE_KEY: 'sb_publishable_qjTIY_M5HJ9R653m_uOmXw_bBbVTibS', // la Publishable key. NUNCA la Secret.
   DIAS_COLCHON: 5,  // días antes de la entrega en que el editor debe terminar
+  DIAS_GUIONES: 5,  // días antes de la grabación para subir guiones (igual que en la base de datos)
   WHATSAPP: '523323362662'      // opcional: tu número con lada, ej. '523312345678'
 };
 // =====================================================================
@@ -412,7 +417,7 @@ const sb = (configLista() && window.supabase)
 const S = {
   sesion: null, perfil: null,
   vista: 'produccion',
-  clientes: [], ciclos: [], videos: [], perfiles: [], asignaciones: [], solicitudes: [], reportes: [], verAtendidas: false,
+  clientes: [], ciclos: [], videos: [], perfiles: [], asignaciones: [], solicitudes: [], reportes: [], mlLog: [], verAtendidas: false,
   portal: null, cicloCliente: null, previa: null,
   filtro: { cliente: 'todos', estado: 'todos', mios: false, entregados: false },
   calInicio: null, verTodos: {}, cargadoEn: 0
@@ -435,6 +440,9 @@ const nombreDe = p => p ? (p.full_name || (p.email || '').split('@')[0] || 'Sin 
 const nombreCorto = p => nombreDe(p).split(' ')[0];
 const clientesDeEditor = id => S.asignaciones.filter(a => a.editor_id === id).map(a => clientePorId(a.client_id)).filter(Boolean);
 const editoresDeCliente = id => S.asignaciones.filter(a => a.client_id === id).map(a => perfilPorId(a.editor_id)).filter(p => p && p.role === 'editor');
+// Último envío a MailerLite de cada cliente (solo admin)
+const mlUltimo = id => S.mlLog.find(l => l.client_id === id);
+const mlConError = () => S.clientes.filter(cl => (mlUltimo(cl.id) || {}).estado === 'error');
 const ROL = { pendiente: 'Pendiente', admin: 'Administrador', editor: 'Editor', cliente: 'Cliente' };
 
 const MESES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
@@ -497,6 +505,8 @@ function humano(e) {
   if (/reportes_periodo/.test(m)) return 'El periodo del reporte no puede terminar antes de empezar.';
   if (/mejor_porque_check|ajustes_check/.test(m)) return 'El texto del reporte es demasiado largo.';
   if (/reportes_\w+_check/.test(m)) return 'Revisa los números del reporte: no pueden ser negativos.';
+  if (/contact_email_check/.test(m)) return 'El correo de contacto no es válido.';
+  if (/contact_name_check/.test(m)) return 'El nombre de contacto es demasiado largo.';
   if (/name_check/.test(m)) return 'Escribe un nombre.';
   if (/duplicate key|_number_key/.test(m)) return 'Ya existe un video con ese número en este mes.';
   if (/JWT|jwt expired|invalid claim/i.test(m)) return 'Tu sesión expiró. Sal y vuelve a entrar.';
@@ -536,6 +546,10 @@ async function cargarEquipo() {
     catch (e) { S.solicitudes = []; }
     try { S.reportes = await q(sb.from('reportes').select('*')) || []; }
     catch (e) { S.reportes = []; }
+    try {
+      await q(sb.rpc('mailerlite_revisar'));
+      S.mlLog = await q(sb.from('mailerlite_sync_log').select('id,created_at,client_id,accion,origen,estado,mensaje,datos').order('id', { ascending: false }).limit(300)) || [];
+    } catch (e) { S.mlLog = []; }
   }
   S.cargadoEn = Date.now();
 }
@@ -603,7 +617,9 @@ function barra() {
     : p.role === 'editor' ? [['produccion', 'Producción'], ['calendario', 'Calendario']] : [];
   const pendientes = esAdmin ? S.perfiles.filter(x => x.role === 'pendiente').length : 0;
   const nuevas = esAdmin ? S.solicitudes.filter(x => !x.atendida).length : 0;
-  const punto = id => id === 'accesos' && pendientes ? `<span class="punto" aria-label="${pendientes} pendientes">${pendientes}</span>`
+  const errML = esAdmin ? mlConError().length : 0;
+  const punto = id => id === 'clientes' && errML ? `<span class="punto punto-error" aria-label="${errML} con error de MailerLite">!</span>`
+    : id === 'accesos' && pendientes ? `<span class="punto" aria-label="${pendientes} pendientes">${pendientes}</span>`
     : id === 'solicitudes' && nuevas ? `<span class="punto" aria-label="${nuevas} sin atender">${nuevas}</span>` : '';
   const actual = S.vista === 'previa' ? 'clientes' : S.vista;
   return `<header class="barra"><div class="barra-in">
@@ -926,6 +942,8 @@ function vistaClientes() {
     <div><h1>Clientes</h1><p class="sub">Cada mes de contenido nace aquí, con sus videos y sus fechas.</p></div>
     <div class="controles"><button class="btn btn-p" data-accion="nuevo-cliente">Nuevo cliente</button></div>
   </div>
+  ${mlConError().map(cl => `<p class="aviso-linea aviso-error"><b>MailerLite no recibió los datos de ${esc(cl.name)}.</b> ${esc(mlUltimo(cl.id).mensaje || '')}
+    <button class="btn btn-s" data-accion="ml-reenviar" data-id="${cl.id}">Reenviar a MailerLite</button></p>`).join('')}
   ${S.clientes.length ? S.clientes.map(bloqueCliente).join('') : `<div class="caja-vacia"><p>Todavía no hay clientes. Tip: crea uno llamado “Demo” con un mes de ejemplo para enseñarle el portal a tus prospectos.</p><button class="btn btn-p" data-accion="nuevo-cliente">Nuevo cliente</button></div>`}`;
 }
 
@@ -942,6 +960,7 @@ function bloqueCliente(cl) {
         <p class="cli-meta"><b>${cs.length ? `${cs.length} ${cs.length === 1 ? 'mes' : 'meses'}` : 'Sin meses'}</b>${cs.length && !abierto ? ` (${esc(cs.slice(0, 3).map(c => c.name).join(', '))}${cs.length > 3 ? '…' : ''})` : ''}.
           ${cl.videos_per_cycle} videos por mes${cl.active ? '' : ', en pausa'}. ${usuarios.length ? `Con acceso: ${usuarios.map(u => esc(nombreDe(u))).join(', ')}.` : 'Nadie de este cliente tiene acceso todavía.'}
           ${editores.length ? `Editores: ${editores.map(u => esc(nombreDe(u))).join(', ')}.` : 'Sin editor asignado (se asigna en Accesos).'}</p>
+        ${lineaMailerlite(cl)}
       </div>
       <div class="controles">
         ${cs.length ? `<button class="btn btn-s btn-t" data-accion="previa" data-id="${cl.id}">Ver como cliente</button>` : ''}
@@ -954,13 +973,29 @@ function bloqueCliente(cl) {
   </section>`;
 }
 
+function lineaMailerlite(cl) {
+  const l = mlUltimo(cl.id);
+  const correo = cl.contact_email || (S.perfiles.find(p => p.role === 'cliente' && p.client_id === cl.id) || {}).email;
+  let txt;
+  if (!l) txt = cl.active ? 'MailerLite: sin enviar todavía.' : 'MailerLite: nunca se envió.';
+  else if (l.estado === 'error') txt = `<span class="ml-error">MailerLite: error.</span> ${esc(l.mensaje || '')}`;
+  else if (l.estado === 'pendiente') txt = 'MailerLite: enviando…';
+  else if (l.accion === 'baja') txt = 'MailerLite: fuera de “Clientes activos” (en pausa).';
+  else {
+    const d = l.datos || {};
+    txt = `MailerLite: al día${d.fecha_limite_texto ? `, guiones hasta el ${esc(d.fecha_limite_texto)}` : ', sin mes próximo'}.`;
+  }
+  return `<p class="cli-meta ml-linea">${txt}${correo ? ` <span class="nota">(${esc(correo)})</span>` : ''}
+    <button class="btn btn-s btn-t" data-accion="ml-reenviar" data-id="${cl.id}">Reenviar a MailerLite</button></p>`;
+}
+
 function filaCiclo(c) {
   const vs = S.videos.filter(v => v.cycle_id === c.id).sort((a, b) => a.number - b.number);
   const ent = vs.filter(v => v.status === 'entregado').length;
   const r = S.reportes.find(x => x.cycle_id === c.id);
   return `<div class="ciclo">
     <b>${esc(c.name)}</b>
-    <span class="nota">Graba ${rango(c.record_start, c.record_end)}. Edición hasta ${fCorta(c.editor_due)}. Entrega ${fCorta(c.delivery_date)}.</span>
+    <span class="nota">${c.script_due ? `Guiones hasta ${fCorta(c.script_due)}. ` : ''}Graba ${rango(c.record_start, c.record_end)}. Edición hasta ${fCorta(c.editor_due)}. Entrega ${fCorta(c.delivery_date)}.</span>
     ${vs.length ? `<div class="ciclo-av">${tira(vs)}<span class="nota">${ent} de ${vs.length} entregados</span></div>` : `<button class="btn btn-s btn-t" data-accion="historial" data-id="${c.id}">Ver videos</button>`}
     <span class="controles">
       <button class="btn btn-s${r ? '' : ' btn-t'}" data-accion="reporte" data-id="${c.id}">${r ? (r.publicado ? 'Reporte publicado' : 'Reporte en borrador') : 'Hacer reporte'}</button>
@@ -1071,7 +1106,7 @@ function vistaCliente(P, previa) {
   let mensaje, cuenta = conGuion, que = 'guiones';
   if (vs.length && entregados === vs.length) { mensaje = `Tus ${vs.length} videos están entregados.`; cuenta = entregados; que = 'entregados'; }
   else if (aISO(hoy()) > c.record_end || entregados) { mensaje = `Estamos editando. Van ${entregados} de ${vs.length} entregados.`; cuenta = entregados; que = 'entregados'; }
-  else if (conGuion < vs.length) mensaje = `Llevas ${conGuion} de ${vs.length} guiones. Súbelos antes de la grabación.`;
+  else if (conGuion < vs.length) mensaje = `Llevas ${conGuion} de ${vs.length} guiones. Súbelos a más tardar el ${fLarga(c.script_due || c.record_start)}.`;
   else mensaje = `Tus ${vs.length} guiones están listos para grabar.`;
   // Si el mes que ve no tiene reporte pero el más reciente sí, se lo señalamos
   const conReporte = ciclos.filter(x => x.report).sort((a, b) => b.delivery_date.localeCompare(a.delivery_date))[0];
@@ -1082,6 +1117,7 @@ function vistaCliente(P, previa) {
       <p class="cli-empresa">${esc(P.client.name)}</p>
       <h1 class="mes-grande">${esc(c.name)}</h1>
       <div class="mes-info">
+        ${c.script_due && aISO(hoy()) <= c.record_start && conGuion < vs.length ? `<div class="clave">Tus guiones, a más tardar<b>el ${esc(fLarga(c.script_due))}</b></div>` : ''}
         <div>Grabamos<b>${esc(rangoLargo(c.record_start, c.record_end))}</b></div>
         <div class="clave">Recibes tus videos<b>el ${esc(fLarga(c.delivery_date))}</b></div>
         ${urlSegura(P.client.shared_url) ? `<div>Carpeta compartida<b>${enlace(P.client.shared_url, 'Abrir en Drive')}</b></div>` : ''}
@@ -1142,7 +1178,7 @@ function portalLocal(idCliente) {
   const cycles = S.ciclos.filter(c => c.client_id === idCliente)
     .sort((a, b) => b.delivery_date.localeCompare(a.delivery_date))
     .map(c => ({
-      id: c.id, name: c.name, record_start: c.record_start, record_end: c.record_end, delivery_date: c.delivery_date,
+      id: c.id, name: c.name, record_start: c.record_start, record_end: c.record_end, script_due: c.script_due, delivery_date: c.delivery_date,
       // Igual que client_portal: la carpeta aparece cuando ya hay algún video entregado
       delivery_url: S.videos.some(v => v.cycle_id === c.id && v.status === 'entregado') ? c.delivery_url : null,
       videos: S.videos.filter(v => v.cycle_id === c.id).sort((a, b) => a.number - b.number).map(v => ({
@@ -1324,12 +1360,15 @@ function modalCiclo(idCiclo, idCliente) {
     if (previo) { const p = aFecha(previo.record_start); ini = new Date(p.getFullYear(), p.getMonth() + 1, Math.min(p.getDate(), 28)); }
     const entrega = sugerirEntrega(aISO(ini));
     d = { name: nombreMes(entrega), record_start: aISO(ini), record_end: aISO(sumarDias(ini, 1)),
-          editor_due: aISO(sumarDias(entrega, -CONFIG.DIAS_COLCHON)), delivery_date: aISO(entrega), raw_url: '' };
+          editor_due: aISO(sumarDias(entrega, -CONFIG.DIAS_COLCHON)), delivery_date: aISO(entrega), raw_url: '',
+          script_due: aISO(sumarDias(ini, -CONFIG.DIAS_GUIONES)) };
   }
   abrirModal(`<form data-form="ciclo" data-id="${c ? c.id : ''}" data-cliente="${cl.id}" novalidate>
     <div class="d-cab"><div><h2 class="d-titulo">${c ? 'Editar mes' : 'Nuevo mes'}</h2><p class="d-sub">${esc(cl.name)}</p></div></div>
     <div class="campo"><label for="c-nombre">Nombre del mes</label><input id="c-nombre" name="name" required maxlength="80" value="${esc(d.name)}">
       <p class="ayuda">Es lo que ve el cliente en grande. Normalmente, el mes en que se publica el contenido.</p></div>
+    <div class="campo"><label for="c-gui">Límite para subir guiones</label><input id="c-gui" name="script_due" type="date" required value="${d.script_due || ''}" style="max-width:12rem">
+      <p class="ayuda">Se calcula solo: ${CONFIG.DIAS_GUIONES} días antes de la grabación. Cámbialo si hace falta; el cliente lo ve y MailerLite le avisa 3 días antes.</p></div>
     <div class="fila-campos">
       <div class="campo"><label for="c-ini">Grabación: primer día</label><input id="c-ini" name="record_start" type="date" required value="${d.record_start}"></div>
       <div class="campo"><label for="c-fin">Grabación: último día</label><input id="c-fin" name="record_end" type="date" required value="${d.record_end}"></div>
@@ -1356,6 +1395,11 @@ function montarCiclo(f, nuevo) {
   const $ = n => f.elements[n];
   let nombreTocado = !nuevo;
   $('name').addEventListener('input', () => { nombreTocado = true; });
+  // El límite de guiones sigue a la grabación mientras nadie lo cambie a mano
+  const guionAuto = () => $('record_start').value ? aISO(sumarDias(aFecha($('record_start').value), -CONFIG.DIAS_GUIONES)) : '';
+  let guionTocado = !!$('script_due').value && $('script_due').value !== guionAuto();
+  $('script_due').addEventListener('input', () => { guionTocado = true; });
+  $('script_due').addEventListener('change', () => resumen());
   const resumen = () => {
     const [a, b, e, g] = ['record_start', 'record_end', 'editor_due', 'delivery_date'].map(n => $(n).value);
     const caja = f.querySelector('#c-resumen');
@@ -1363,7 +1407,9 @@ function montarCiclo(f, nuevo) {
     const edicion = diasEntre(aFecha(b), aFecha(e)), revision = diasEntre(aFecha(e), aFecha(g));
     const n = Number(($('count') && $('count').value) || S.videos.filter(v => v.cycle_id === f.dataset.id).length || 12);
     let ojo = '';
-    if (b < a) ojo = 'La grabación termina antes de empezar.';
+    const gui = $('script_due').value;
+    if (gui && gui > a) ojo = 'Ojo: el límite de guiones queda después de que empieza la grabación.';
+    else if (b < a) ojo = 'La grabación termina antes de empezar.';
     else if (g < b) ojo = 'La entrega queda antes de que termine la grabación.';
     else if (e < a || e > g) ojo = 'El límite del editor tiene que quedar entre la grabación y la entrega.';
     else if (edicion < 7) ojo = `Ojo: menos de una semana para editar ${n} videos.`;
@@ -1373,6 +1419,7 @@ function montarCiclo(f, nuevo) {
   $('record_start').addEventListener('change', () => {
     if (!$('record_start').value) return;
     if (!$('record_end').value || $('record_end').value < $('record_start').value) $('record_end').value = $('record_start').value;
+    if (!guionTocado) $('script_due').value = guionAuto();
     if (nuevo) {
       const ent = sugerirEntrega($('record_start').value);
       $('delivery_date').value = aISO(ent);
@@ -1495,6 +1542,12 @@ function modalCliente(id) {
     <div class="d-cab"><div><h2 class="d-titulo">${cl ? 'Editar cliente' : 'Nuevo cliente'}</h2></div></div>
     <div class="campo"><label for="k-nombre">Nombre</label><input id="k-nombre" name="name" required maxlength="80" value="${esc(cl ? cl.name : '')}" placeholder="Nombre de la marca o negocio"></div>
     <div class="campo"><label for="k-n">Videos por mes</label><input id="k-n" name="videos_per_cycle" type="number" min="1" max="40" value="${cl ? cl.videos_per_cycle : 12}" style="max-width:8rem"></div>
+    <div class="fila-campos">
+      <div class="campo"><label for="k-cnom">Nombre de contacto</label><input id="k-cnom" name="contact_name" maxlength="120" placeholder="Con quien hablas" value="${esc(cl ? cl.contact_name || '' : '')}"></div>
+      <div class="campo"><label for="k-cmail">Correo de contacto</label><input id="k-cmail" name="contact_email" type="email" inputmode="email" maxlength="200" placeholder="nombre@empresa.com" value="${esc(cl ? cl.contact_email || '' : '')}"></div>
+    </div>
+    <div class="campo"><label for="k-onb">Fecha de onboarding</label><input id="k-onb" name="onboarding_date" type="date" value="${esc(cl ? cl.onboarding_date || '' : aISO(hoy()))}" style="max-width:12rem">
+      <p class="ayuda">A este correo le llegan los recordatorios de MailerLite (4 días después del onboarding y 3 días antes del límite de guiones). Si lo dejas vacío, se usa el correo con el que el cliente entra al portal.</p></div>
     <div class="campo"><label for="k-url">Carpeta compartida con el cliente (opcional)</label><input id="k-url" name="shared_url" type="url" inputmode="url" placeholder="https://drive.google.com/..." value="${esc(cl ? cl.shared_url || '' : '')}">
       <p class="ayuda">El cliente la ve en su portal. No pongas aquí la carpeta de crudos.</p></div>
     ${cl ? `<div class="campo"><label class="interruptor"><input type="checkbox" name="active"${cl.active ? ' checked' : ''}> Cliente activo</label><p class="ayuda">Si lo pausas, deja de aparecer en el calendario, pero su historial se conserva.</p></div>` : ''}
@@ -1575,7 +1628,8 @@ const FORMS = {
   },
   async ciclo(f) {
     const d = {};
-    ['name', 'record_start', 'record_end', 'editor_due', 'delivery_date', 'raw_url', 'delivery_url', 'count'].forEach(n => { d[n] = valor(f, n); });
+    ['name', 'record_start', 'record_end', 'editor_due', 'delivery_date', 'raw_url', 'delivery_url', 'count', 'script_due'].forEach(n => { d[n] = valor(f, n); });
+    if (!d.script_due) { aviso('Pon la fecha límite de guiones.', true); return f.elements.script_due.focus(); }
     if (!d.name) { aviso('Escribe el nombre del mes.', true); return f.elements.name.focus(); }
     if (!d.record_start || !d.record_end || !d.editor_due || !d.delivery_date) return aviso('Completa las cuatro fechas.', true);
     if (d.record_end < d.record_start) return aviso('La grabación no puede terminar antes de empezar.', true);
@@ -1584,14 +1638,18 @@ const FORMS = {
     if (!revisarLinks(f, ['raw_url', 'delivery_url'])) return;
     try {
       if (f.dataset.id) {
-        await q(sb.from('cycles').update({ name: d.name, record_start: d.record_start, record_end: d.record_end, editor_due: d.editor_due, delivery_date: d.delivery_date, raw_url: d.raw_url || null, delivery_url: d.delivery_url || null }).eq('id', f.dataset.id));
+        await q(sb.from('cycles').update({ name: d.name, record_start: d.record_start, record_end: d.record_end, editor_due: d.editor_due, delivery_date: d.delivery_date, script_due: d.script_due, raw_url: d.raw_url || null, delivery_url: d.delivery_url || null }).eq('id', f.dataset.id));
       } else {
         const n = Math.round(Number(d.count));
         if (!(n >= 1 && n <= 40)) return aviso('El número de videos tiene que estar entre 1 y 40.', true);
         const nuevo = await q(sb.rpc('create_cycle', { p_client: f.dataset.cliente, p_name: d.name, p_record_start: d.record_start, p_record_end: d.record_end, p_editor_due: d.editor_due, p_delivery: d.delivery_date, p_raw_url: d.raw_url || null, p_count: n }));
         if (nuevo) {
           S.abiertos.add(nuevo); S.abiertos.add('pc:' + f.dataset.cliente); S.abiertos.add('cc:' + f.dataset.cliente); guardarAbiertos();
-          if (d.delivery_url) await q(sb.from('cycles').update({ delivery_url: d.delivery_url }).eq('id', nuevo));
+          // La base pone el límite automático; solo se toca si lo cambiaste o si agregaste carpeta
+          const extra = {};
+          if (d.delivery_url) extra.delivery_url = d.delivery_url;
+          if (d.script_due !== aISO(sumarDias(aFecha(d.record_start), -CONFIG.DIAS_GUIONES))) extra.script_due = d.script_due;
+          if (Object.keys(extra).length) await q(sb.from('cycles').update(extra).eq('id', nuevo));
         }
       }
       cerrarModal();
@@ -1664,7 +1722,10 @@ const FORMS = {
     if (!nombre) { aviso('Escribe el nombre del cliente.', true); return f.elements.name.focus(); }
     if (!(n >= 1 && n <= 40)) return aviso('Los videos por mes tienen que estar entre 1 y 40.', true);
     if (!revisarLinks(f, ['shared_url'])) return;
-    const datos = { name: nombre, videos_per_cycle: n, shared_url: valor(f, 'shared_url') || null };
+    const correo = valor(f, 'contact_email');
+    if (correo && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(correo)) { aviso('El correo de contacto no es válido.', true); return f.elements.contact_email.focus(); }
+    const datos = { name: nombre, videos_per_cycle: n, shared_url: valor(f, 'shared_url') || null,
+      contact_name: valor(f, 'contact_name') || null, contact_email: correo || null, onboarding_date: valor(f, 'onboarding_date') || null };
     if (f.elements.active) datos.active = f.elements.active.checked;
     try {
       if (f.dataset.id) await q(sb.from('clients').update(datos).eq('id', f.dataset.id));
@@ -1779,6 +1840,13 @@ const ACC = {
     catch (e) { aviso(humano(e), true); }
   },
   reporte(el, id) { modalReporte(id); },
+  async 'ml-reenviar'(el, id) {
+    try {
+      await q(sb.rpc('mailerlite_reenviar', { p_client: id }));
+      aviso('Enviado a MailerLite. Revisando la respuesta…');
+      setTimeout(() => recargar(), 6000);
+    } catch (e) { aviso(humano(e), true); }
+  },
   'reporte-llenar'(el) {
     const f = el.closest('form'); if (!f) return;
     let d;
