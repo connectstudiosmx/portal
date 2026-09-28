@@ -1394,7 +1394,7 @@ function modalCiclo(idCiclo, idCliente) {
     <div class="campo"><label for="c-nombre">Nombre del mes</label><input id="c-nombre" name="name" required maxlength="80" value="${esc(d.name)}">
       <p class="ayuda">Es lo que ve el cliente en grande. Normalmente, el mes en que se publica el contenido.</p></div>
     <div class="campo"><label for="c-gui">Límite para subir guiones</label><input id="c-gui" name="script_due" type="date" required value="${d.script_due || ''}" style="max-width:12rem">
-      <p class="ayuda">Se calcula solo: ${CONFIG.DIAS_GUIONES} días antes de la grabación. Cámbialo si hace falta; el cliente lo ve y MailerLite le avisa 3 días antes.</p></div>
+      <p class="ayuda">Se calcula solo: ${CONFIG.DIAS_GUIONES} días antes de la grabación. Cámbialo si hace falta; el cliente lo ve y MailerLite le recuerda apartar su día una semana antes.</p></div>
     <div class="fila-campos">
       <div class="campo"><label for="c-ini">Grabación: primer día</label><input id="c-ini" name="record_start" type="date" required value="${d.record_start}"></div>
       <div class="campo"><label for="c-fin">Grabación: último día</label><input id="c-fin" name="record_end" type="date" required value="${d.record_end}"></div>
@@ -1573,7 +1573,7 @@ function modalCliente(id) {
       <div class="campo"><label for="k-cmail">Correo de contacto</label><input id="k-cmail" name="contact_email" type="email" inputmode="email" maxlength="200" placeholder="nombre@empresa.com" value="${esc(cl ? cl.contact_email || '' : '')}"></div>
     </div>
     <div class="campo"><label for="k-onb">Fecha de onboarding</label><input id="k-onb" name="onboarding_date" type="date" value="${esc(cl ? cl.onboarding_date || '' : aISO(hoy()))}" style="max-width:12rem">
-      <p class="ayuda">A este correo le llegan los recordatorios de MailerLite (4 días después del onboarding y 3 días antes del límite de guiones). Si lo dejas vacío, se usa el correo con el que el cliente entra al portal.</p></div>
+      <p class="ayuda">A este correo le llegan los recordatorios de MailerLite: “Aparta tu día” (en su primer mes, 4 días después del onboarding; después, una semana antes del límite de guiones) y, solo si le faltan guiones, uno 2 días antes del límite. Si lo dejas vacío, se usa el correo con el que el cliente entra al portal.</p></div>
     <div class="campo"><label for="k-url">Carpeta compartida con el cliente (opcional)</label><input id="k-url" name="shared_url" type="url" inputmode="url" placeholder="https://drive.google.com/..." value="${esc(cl ? cl.shared_url || '' : '')}">
       <p class="ayuda">El cliente la ve en su portal. No pongas aquí la carpeta de crudos.</p></div>
     ${cl ? `<div class="campo"><label class="interruptor"><input type="checkbox" name="active"${cl.active ? ' checked' : ''}> Cliente activo</label><p class="ayuda">Si lo pausas, deja de aparecer en el calendario, pero su historial se conserva.</p></div>` : ''}
