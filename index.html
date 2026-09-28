@@ -252,6 +252,30 @@ main.app{max-width:var(--ancho);margin:0 auto;padding:1.75rem 1.25rem 5rem}
 .d-foto{position:relative;height:150px;margin:-1.4rem -1.4rem 1.1rem;border-radius:12px 12px 0 0;overflow:hidden;background:var(--foto,none) center 40%/cover}
 .d-foto::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,var(--panel),rgba(15,15,16,.15) 75%)}
 @media (prefers-reduced-motion:reduce){.cuadro,.cuadro::before{transition:none}.cuadro:hover,.cuadro:hover::before{transform:none}}
+/* Reporte mensual de resultados */
+.rep{background:var(--panel);border:1px solid var(--linea);border-radius:14px;padding:clamp(1.1rem,3vw,1.8rem);margin:0 0 1.6rem}
+.rep-cab{display:flex;align-items:baseline;justify-content:space-between;gap:.3rem 1rem;flex-wrap:wrap;margin-bottom:1.1rem}
+.rep-cab h2{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:clamp(1.8rem,4.5vw,2.6rem);line-height:.95;margin:0}
+.rep-cab h2 span{color:var(--verde)}
+.rep-borrador{border:1px dashed var(--dorado);color:var(--dorado);border-radius:999px;padding:.15rem .6rem;font-size:.74rem;font-weight:700}
+.rep-datos{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:1rem}
+.rep-dato{background:#0A0A0B;border:1px solid var(--linea);border-radius:10px;padding:.85rem 1rem;display:grid;gap:.3rem;align-content:end;min-height:96px}
+.rep-dato b{font-family:var(--display);font-weight:400;font-size:clamp(2rem,5vw,2.7rem);line-height:.9;color:var(--verde);font-variant-numeric:tabular-nums}
+.rep-dato span{font-size:.82rem;color:var(--crema-2);font-weight:600}
+.rep-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:10px}
+@media (max-width:720px){.rep-grid{grid-template-columns:1fr}}
+.rep-caja{background:#0A0A0B;border:1px solid var(--linea);border-radius:10px;padding:1rem 1.1rem}
+.rep-caja.mejor{border-color:rgba(57,255,136,.5);box-shadow:0 12px 32px -18px rgba(57,255,136,.55)}
+.rep-et{margin:0 0 .45rem;color:var(--verde);font-weight:700;font-size:.74rem;letter-spacing:.14em;text-transform:uppercase}
+.rep-caja.ajuste .rep-et{color:var(--dorado)}
+.rep-tit{font-weight:700;font-size:1.05rem;margin:0 0 .35rem;overflow-wrap:anywhere}
+.rep-cifras{display:flex;flex-wrap:wrap;gap:.2rem 1rem;font-size:.86rem;color:var(--crema-2);margin:0 0 .6rem}
+.rep-cifras b{color:var(--crema)}
+.rep-txt{margin:0;white-space:pre-wrap;color:var(--crema);font-size:.94rem;overflow-wrap:anywhere}
+.rep-caja .btn{margin-top:.8rem}
+.rep-hay{display:flex;align-items:center;gap:.6rem 1rem;flex-wrap:wrap;border-left:3px solid var(--verde);padding:.35rem .9rem;margin:0 0 1.4rem;color:var(--crema)}
+.pegar summary{cursor:pointer;font-weight:600;font-size:.88rem;color:var(--verde);margin-bottom:.6rem}
+.pegar textarea{min-height:6rem!important;font-family:ui-monospace,Consolas,monospace;font-size:.8rem!important}
 .aviso-vista{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;border:1px solid var(--dorado);color:var(--dorado);border-radius:var(--r2);padding:.6rem .9rem;margin-bottom:1.6rem;font-weight:600}
 
 /* Calendario: línea de tiempo tipo editor de video */
@@ -388,7 +412,7 @@ const sb = (configLista() && window.supabase)
 const S = {
   sesion: null, perfil: null,
   vista: 'produccion',
-  clientes: [], ciclos: [], videos: [], perfiles: [], asignaciones: [], solicitudes: [], verAtendidas: false,
+  clientes: [], ciclos: [], videos: [], perfiles: [], asignaciones: [], solicitudes: [], reportes: [], verAtendidas: false,
   portal: null, cicloCliente: null, previa: null,
   filtro: { cliente: 'todos', estado: 'todos', mios: false, entregados: false },
   calInicio: null, verTodos: {}, cargadoEn: 0
@@ -470,6 +494,9 @@ function humano(e) {
   if (/team_notes_check/.test(m)) return 'Las notas son demasiado largas.';
   if (/change_request_check/.test(m)) return 'El comentario de cambios es demasiado largo (máximo 2,000 caracteres).';
   if (/videos_per_cycle_check/.test(m)) return 'El número de videos por mes tiene que estar entre 1 y 40.';
+  if (/reportes_periodo/.test(m)) return 'El periodo del reporte no puede terminar antes de empezar.';
+  if (/mejor_porque_check|ajustes_check/.test(m)) return 'El texto del reporte es demasiado largo.';
+  if (/reportes_\w+_check/.test(m)) return 'Revisa los números del reporte: no pueden ser negativos.';
   if (/name_check/.test(m)) return 'Escribe un nombre.';
   if (/duplicate key|_number_key/.test(m)) return 'Ya existe un video con ese número en este mes.';
   if (/JWT|jwt expired|invalid claim/i.test(m)) return 'Tu sesión expiró. Sal y vuelve a entrar.';
@@ -507,6 +534,8 @@ async function cargarEquipo() {
   if (S.perfil.role === 'admin') {
     try { S.solicitudes = await q(sb.from('solicitudes').select('*').order('created_at', { ascending: false }).limit(300)) || []; }
     catch (e) { S.solicitudes = []; }
+    try { S.reportes = await q(sb.from('reportes').select('*')) || []; }
+    catch (e) { S.reportes = []; }
   }
   S.cargadoEn = Date.now();
 }
@@ -928,11 +957,15 @@ function bloqueCliente(cl) {
 function filaCiclo(c) {
   const vs = S.videos.filter(v => v.cycle_id === c.id).sort((a, b) => a.number - b.number);
   const ent = vs.filter(v => v.status === 'entregado').length;
+  const r = S.reportes.find(x => x.cycle_id === c.id);
   return `<div class="ciclo">
     <b>${esc(c.name)}</b>
     <span class="nota">Graba ${rango(c.record_start, c.record_end)}. Edición hasta ${fCorta(c.editor_due)}. Entrega ${fCorta(c.delivery_date)}.</span>
     ${vs.length ? `<div class="ciclo-av">${tira(vs)}<span class="nota">${ent} de ${vs.length} entregados</span></div>` : `<button class="btn btn-s btn-t" data-accion="historial" data-id="${c.id}">Ver videos</button>`}
-    <button class="btn btn-s btn-t" data-accion="editar-ciclo" data-id="${c.id}">Editar</button>
+    <span class="controles">
+      <button class="btn btn-s${r ? '' : ' btn-t'}" data-accion="reporte" data-id="${c.id}">${r ? (r.publicado ? 'Reporte publicado' : 'Reporte en borrador') : 'Hacer reporte'}</button>
+      <button class="btn btn-s btn-t" data-accion="editar-ciclo" data-id="${c.id}">Editar</button>
+    </span>
   </div>`;
 }
 
@@ -1040,7 +1073,11 @@ function vistaCliente(P, previa) {
   else if (aISO(hoy()) > c.record_end || entregados) { mensaje = `Estamos editando. Van ${entregados} de ${vs.length} entregados.`; cuenta = entregados; que = 'entregados'; }
   else if (conGuion < vs.length) mensaje = `Llevas ${conGuion} de ${vs.length} guiones. Súbelos antes de la grabación.`;
   else mensaje = `Tus ${vs.length} guiones están listos para grabar.`;
-  return `${ciclos.length > 1 ? `<div class="mes-tabs" role="group" aria-label="Meses">${ciclos.map(x => `<button data-accion="ver-mes" data-id="${x.id}" aria-pressed="${x.id === c.id}">${esc(x.name)}</button>`).join('')}</div>` : ''}
+  // Si el mes que ve no tiene reporte pero el más reciente sí, se lo señalamos
+  const conReporte = ciclos.filter(x => x.report).sort((a, b) => b.delivery_date.localeCompare(a.delivery_date))[0];
+  const hayOtro = !c.report && conReporte && conReporte.id !== c.id;
+  return `${ciclos.length > 1 ? `<div class="mes-tabs" role="group" aria-label="Meses">${ciclos.map(x => `<button data-accion="ver-mes" data-id="${x.id}" aria-pressed="${x.id === c.id}">${esc(x.name)}${x.report ? ' · Resultados' : ''}</button>`).join('')}</div>` : ''}
+    ${hayOtro ? `<p class="rep-hay"><span>Ya están los resultados de <b>${esc(conReporte.name)}</b>.</span><button class="btn btn-s btn-p" data-accion="ver-mes" data-id="${conReporte.id}">Ver resultados</button></p>` : ''}
     <section class="hero-cli">
       <p class="cli-empresa">${esc(P.client.name)}</p>
       <h1 class="mes-grande">${esc(c.name)}</h1>
@@ -1052,12 +1089,39 @@ function vistaCliente(P, previa) {
       ${urlSegura(c.delivery_url) ? `<div class="hero-cta"><a class="btn btn-p btn-grande" href="${esc(urlSegura(c.delivery_url))}" target="_blank" rel="noopener noreferrer">▶ Ver y descargar tus videos</a>
         <span class="nota">Todos los videos entregados de ${esc(c.name)}, en una carpeta de Drive.</span></div>` : ''}
     </section>
+    ${c.report ? bloqueReporte(c.report, c.name) : ''}
     <div class="avance-cli">
       <b class="avance-num" aria-label="${cuenta} de ${vs.length} ${que}">${pad(cuenta)}<small>/${pad(vs.length)}</small></b>
       <div class="avance-txt"><span>${esc(mensaje)}</span>${tira(vs)}</div>
     </div>
     <div class="hoja">${vs.map(v => cuadro(v, previa)).join('')}</div>
     <p class="nota" style="margin-top:1.25rem">${previa ? 'En esta vista previa, tocar un video abre su ficha interna.' : 'Toca un video para subir o cambiar su guion. Cuando esté entregado, desde ahí lo abres.'}</p>`;
+}
+
+// Reporte mensual: lo que se publicó, cuánto alcanzó, el mejor video y qué se ajusta
+const numero = n => (n === null || n === undefined || n === '') ? null : Number(n).toLocaleString('es-MX');
+function bloqueReporte(r, mes) {
+  const datos = [[r.publicados, r.publicados === 1 ? 'Video publicado' : 'Videos publicados'], [r.alcance, 'Personas alcanzadas'],
+    [r.vistas, 'Reproducciones'], [r.interacciones, 'Interacciones']].filter(([n]) => numero(n) !== null);
+  const periodo = r.periodo_inicio && r.periodo_fin ? rango(r.periodo_inicio, r.periodo_fin) : '';
+  const mejorUrl = urlSegura(r.mejor_url);
+  const hayMejor = r.mejor_titulo || mejorUrl || r.mejor_porque;
+  return `<section class="rep" aria-label="Resultados de ${esc(mes)}">
+    <div class="rep-cab"><h2>Resultados <span>${esc(mes)}</span></h2>
+      ${r.borrador ? '<span class="rep-borrador">Borrador: el cliente todavía no lo ve</span>' : periodo ? `<span class="nota">Publicaciones del ${esc(periodo)}</span>` : ''}</div>
+    ${datos.length ? `<div class="rep-datos">${datos.map(([n, txt]) => `<div class="rep-dato"><b>${esc(numero(n))}</b><span>${txt}</span></div>`).join('')}</div>` : ''}
+    ${hayMejor || r.ajustes ? `<div class="rep-grid">
+      ${hayMejor ? `<div class="rep-caja mejor"><p class="rep-et">El video que mejor funcionó</p>
+        ${r.mejor_titulo ? `<p class="rep-tit">${esc(r.mejor_titulo)}</p>` : ''}
+        ${numero(r.mejor_alcance) !== null || numero(r.mejor_vistas) !== null ? `<p class="rep-cifras">
+          ${numero(r.mejor_alcance) !== null ? `<span><b>${esc(numero(r.mejor_alcance))}</b> personas</span>` : ''}
+          ${numero(r.mejor_vistas) !== null ? `<span><b>${esc(numero(r.mejor_vistas))}</b> reproducciones</span>` : ''}</p>` : ''}
+        ${r.mejor_porque ? `<p class="rep-txt">${esc(r.mejor_porque)}</p>` : ''}
+        ${mejorUrl ? `<a class="btn btn-s" href="${esc(mejorUrl)}" target="_blank" rel="noopener noreferrer">▶ Ver el video</a>` : ''}
+      </div>` : ''}
+      ${r.ajustes ? `<div class="rep-caja ajuste"><p class="rep-et">Lo que ajustamos el próximo mes</p><p class="rep-txt">${esc(r.ajustes)}</p></div>` : ''}
+    </div>` : ''}
+  </section>`;
 }
 
 const ACCION_CUADRO = { sin_guion: '+ Agregar guion', guion: 'Ver o cambiar guion', entregado: '▶ Ver video' };
@@ -1085,7 +1149,9 @@ function portalLocal(idCliente) {
         id: v.id, number: v.number, title: v.title, script_url: v.script_url, script_text: v.script_text,
         status: ['edicion', 'revision', 'listo'].includes(v.status) ? 'produccion' : v.status,
         final_url: v.status === 'entregado' ? v.final_url : null
-      }))
+      })),
+      // A diferencia de client_portal, aquí se ve también el borrador para revisarlo antes de publicarlo
+      report: (r => r ? Object.assign({}, r, { borrador: !r.publicado }) : null)(S.reportes.find(r => r.cycle_id === c.id))
     })).filter(c => c.videos.length);
   return { client: cl ? { id: cl.id, name: cl.name, shared_url: cl.shared_url } : null, cycles };
 }
@@ -1384,6 +1450,44 @@ function modalEditorClientes(id) {
   </form>`);
 }
 
+// Reporte mensual de un mes (admin). Claude prepara los datos desde Metricool y aquí se pegan.
+const CAMPOS_REPORTE = ['periodo_inicio', 'periodo_fin', 'publicados', 'alcance', 'vistas', 'interacciones',
+  'mejor_titulo', 'mejor_url', 'mejor_alcance', 'mejor_vistas', 'mejor_porque', 'ajustes'];
+const NUMEROS_REPORTE = ['publicados', 'alcance', 'vistas', 'interacciones', 'mejor_alcance', 'mejor_vistas'];
+function modalReporte(idCiclo) {
+  const c = S.ciclos.find(x => x.id === idCiclo); if (!c) return;
+  const cl = clientePorId(c.client_id);
+  const r = S.reportes.find(x => x.cycle_id === c.id) || {};
+  const val = k => esc(r[k] ?? '');
+  const num = (k, txt) => `<div class="campo"><label for="r-${k}">${txt}</label><input id="r-${k}" name="${k}" type="number" min="0" step="1" inputmode="numeric" value="${val(k)}"></div>`;
+  abrirModal(`<form data-form="reporte" data-id="${c.id}" novalidate>
+    <div class="d-cab"><div><h2 class="d-titulo">Reporte de resultados</h2><p class="d-sub">${esc(cl ? cl.name : '')}, ${esc(c.name)}</p></div></div>
+    <details class="pegar"${r.cycle_id ? '' : ' open'}><summary>Pegar los datos que preparó Claude</summary>
+      <div class="campo"><textarea name="pegado" aria-label="Datos del reporte" placeholder='{"publicados": 12, "alcance": 18450, ...}'></textarea>
+        <p class="ayuda">Pega el bloque completo y toca “Llenar”. Revisa los campos antes de guardar.</p>
+        <div><button type="button" class="btn btn-s" data-accion="reporte-llenar">Llenar</button></div></div>
+    </details>
+    <div class="fila-campos">
+      <div class="campo"><label for="r-periodo_inicio">Publicaciones desde</label><input id="r-periodo_inicio" name="periodo_inicio" type="date" value="${val('periodo_inicio')}"></div>
+      <div class="campo"><label for="r-periodo_fin">Hasta</label><input id="r-periodo_fin" name="periodo_fin" type="date" value="${val('periodo_fin')}"></div>
+      ${num('publicados', 'Videos publicados')}${num('alcance', 'Personas alcanzadas')}
+      ${num('vistas', 'Reproducciones')}${num('interacciones', 'Interacciones')}
+    </div>
+    <div class="campo"><label for="r-mejor_titulo">El video que mejor funcionó</label><input id="r-mejor_titulo" name="mejor_titulo" maxlength="200" placeholder="Título o de qué trata" value="${val('mejor_titulo')}"></div>
+    <div class="campo"><label for="r-mejor_url">Link de ese video</label><input id="r-mejor_url" name="mejor_url" type="url" inputmode="url" placeholder="https://www.instagram.com/reel/..." value="${val('mejor_url')}"></div>
+    <div class="fila-campos">${num('mejor_alcance', 'Sus personas alcanzadas')}${num('mejor_vistas', 'Sus reproducciones')}</div>
+    <div class="campo"><label for="r-mejor_porque">Por qué funcionó</label><textarea id="r-mejor_porque" name="mejor_porque" maxlength="1500" placeholder="Ej. El gancho nombra un error concreto que el cliente ideal comete">${val('mejor_porque')}</textarea></div>
+    <div class="campo"><label for="r-ajustes">Lo que ajustamos el próximo mes</label><textarea id="r-ajustes" name="ajustes" maxlength="3000">${val('ajustes')}</textarea></div>
+    <div class="campo"><label class="interruptor"><input type="checkbox" name="publicado"${r.publicado ? ' checked' : ''}> Publicarlo para el cliente</label>
+      <p class="ayuda">Mientras no lo publiques, solo tú lo ves (en “Ver como cliente” aparece como borrador).</p></div>
+    <div class="d-pie">
+      ${r.cycle_id ? `<button type="button" class="btn btn-t btn-peligro izq" data-accion="borrar-reporte" data-id="${c.id}">Borrar reporte</button>` : ''}
+      <button type="button" class="btn" data-accion="cerrar">Cancelar</button>
+      <button type="submit" class="btn btn-p">Guardar reporte</button>
+    </div>
+  </form>`);
+}
+
 // Cliente (crear o editar)
 function modalCliente(id) {
   const cl = id ? clientePorId(id) : null;
@@ -1536,6 +1640,25 @@ const FORMS = {
       await recargar();
     } catch (e) { aviso(humano(e), true); await recargar(); }
   },
+  async reporte(f) {
+    if (!revisarLinks(f, ['mejor_url'])) return;
+    const datos = { cycle_id: f.dataset.id, publicado: f.elements.publicado.checked };
+    for (const k of CAMPOS_REPORTE) {
+      const x = valor(f, k);
+      if (NUMEROS_REPORTE.includes(k)) {
+        const n = x === '' ? null : Number(x);
+        if (n !== null && !(Number.isInteger(n) && n >= 0)) { aviso('Los números del reporte tienen que ser enteros y sin signo.', true); return f.elements[k].focus(); }
+        datos[k] = n;
+      } else datos[k] = x || null;
+    }
+    if (datos.periodo_inicio && datos.periodo_fin && datos.periodo_fin < datos.periodo_inicio) return aviso('El periodo del reporte no puede terminar antes de empezar.', true);
+    try {
+      await q(sb.from('reportes').upsert(datos));
+      cerrarModal();
+      aviso(datos.publicado ? 'Reporte publicado: el cliente ya lo ve' : 'Reporte guardado como borrador');
+      await recargar();
+    } catch (e) { aviso(humano(e), true); }
+  },
   async cliente(f) {
     const nombre = valor(f, 'name'), n = Math.round(Number(valor(f, 'videos_per_cycle')));
     if (!nombre) { aviso('Escribe el nombre del cliente.', true); return f.elements.name.focus(); }
@@ -1653,6 +1776,27 @@ const ACC = {
     const n = S.ciclos.filter(c => c.client_id === id).length;
     if (!await confirmar(`¿Borrar a ${cl.name}?`, `Se borran también sus ${n} meses y todos sus videos. Si solo dejó de trabajar contigo, mejor ponlo en pausa.`, 'Borrar cliente', true)) return;
     try { await q(sb.from('clients').delete().eq('id', id)); aviso('Cliente borrado'); await recargar(); }
+    catch (e) { aviso(humano(e), true); }
+  },
+  reporte(el, id) { modalReporte(id); },
+  'reporte-llenar'(el) {
+    const f = el.closest('form'); if (!f) return;
+    let d;
+    try {
+      const t = f.elements.pegado.value.trim();
+      d = JSON.parse(t.slice(t.indexOf('{'), t.lastIndexOf('}') + 1));
+    } catch (e) { return aviso('No reconocí los datos. Pega el bloque completo, desde { hasta }.', true); }
+    let n = 0;
+    CAMPOS_REPORTE.forEach(k => { if (d[k] !== undefined && d[k] !== null && f.elements[k]) { f.elements[k].value = d[k]; n++; } });
+    if (typeof d.publicado === 'boolean') f.elements.publicado.checked = d.publicado;
+    if (!n) return aviso('Esos datos no traen ningún campo del reporte.', true);
+    f.querySelector('.pegar').open = false;
+    aviso(`${n} campos llenados. Revísalos y guarda.`);
+  },
+  async 'borrar-reporte'(el, id) {
+    const c = S.ciclos.find(x => x.id === id);
+    if (!await confirmar(`¿Borrar el reporte de ${c ? c.name : 'este mes'}?`, 'Si está publicado, el cliente deja de verlo. No se puede deshacer.', 'Borrar reporte', true)) return;
+    try { await q(sb.from('reportes').delete().eq('cycle_id', id)); aviso('Reporte borrado'); await recargar(); }
     catch (e) { aviso(humano(e), true); }
   },
   'nuevo-ciclo'(el, id) { modalCiclo(null, id); },
