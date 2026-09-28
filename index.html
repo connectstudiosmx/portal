@@ -513,6 +513,7 @@ function humano(e) {
   if (/mejor_porque_check|ajustes_check/.test(m)) return 'El texto del reporte es demasiado largo.';
   if (/reportes_\w+_check/.test(m)) return 'Revisa los números del reporte: no pueden ser negativos.';
   if (/contact_email_check/.test(m)) return 'El correo de contacto no es válido.';
+  if (/contact_phone_check/.test(m)) return 'El WhatsApp debe tener de 10 a 15 dígitos.';
   if (/contact_name_check/.test(m)) return 'El nombre de contacto es demasiado largo.';
   if (/name_check/.test(m)) return 'Escribe un nombre.';
   if (/duplicate key|_number_key/.test(m)) return 'Ya existe un video con ese número en este mes.';
@@ -1005,6 +1006,7 @@ function filaCiclo(c) {
     <span class="nota">${c.script_due ? `Guiones hasta ${fCorta(c.script_due)}. ` : ''}Graba ${rango(c.record_start, c.record_end)}. Edición hasta ${fCorta(c.editor_due)}. Entrega ${fCorta(c.delivery_date)}.</span>
     ${vs.length ? `<div class="ciclo-av">${tira(vs)}<span class="nota">${ent} de ${vs.length} entregados</span></div>` : `<button class="btn btn-s btn-t" data-accion="historial" data-id="${c.id}">Ver videos</button>`}
     <span class="controles">
+      ${ent || (r && r.publicado) ? `<button class="btn btn-s btn-t" data-accion="wa-aviso" data-id="${c.id}" title="Avisar al cliente por WhatsApp">WhatsApp</button>` : ''}
       <button class="btn btn-s${r ? '' : ' btn-t'}" data-accion="reporte" data-id="${c.id}">${r ? (r.publicado ? 'Reporte publicado' : 'Reporte en borrador') : 'Hacer reporte'}</button>
       <button class="btn btn-s btn-t" data-accion="editar-ciclo" data-id="${c.id}">Editar</button>
     </span>
@@ -1561,6 +1563,29 @@ function modalReporte(idCiclo) {
   </form>`);
 }
 
+// Avisar al cliente por WhatsApp (entrega de videos o reporte publicado). El mensaje se puede editar.
+const PORTAL_URL = 'https://portal.connectstudios.mx';
+function pilaCliente(cl) {
+  const perfil = S.perfiles.find(p => p.role === 'cliente' && p.client_id === cl.id);
+  return String(cl.contact_name || (perfil && perfil.full_name) || '').trim().split(/\s+/)[0] || '';
+}
+function modalAvisoWA(tipo, idCiclo) {
+  const c = S.ciclos.find(x => x.id === idCiclo); if (!c) return;
+  const cl = clientePorId(c.client_id); if (!cl) return;
+  const hola = `Hola${pilaCliente(cl) ? ' ' + pilaCliente(cl) : ''}`;
+  const n = S.videos.filter(v => v.cycle_id === c.id && v.status === 'entregado').length;
+  const texto = tipo === 'reporte'
+    ? `${hola}, ya está tu reporte de resultados de ${c.name} en tu portal: ${PORTAL_URL}\n\nAhí ves cuántas personas alcanzaron tus videos, cuál funcionó mejor y qué vamos a ajustar el próximo mes.`
+    : `${hola}, ya están tus ${n === 1 ? 'video' : n + ' videos'} de ${c.name} en tu portal: ${PORTAL_URL}\n\nTienes 3 días hábiles para revisarlos. Si algo hay que ajustar, me dices por aquí.`;
+  const num = waDe(cl.contact_phone);
+  abrirModal(`<div class="d-cab"><div><h2 class="d-titulo">Avisar a ${esc(cl.name)} por WhatsApp</h2>
+      <p class="d-sub">${tipo === 'reporte' ? 'Reporte de ' : 'Entrega de '}${esc(c.name)}${num ? ` · ${esc(cl.contact_phone)}` : ''}</p></div></div>
+    <div class="campo"><label for="wa-texto">Mensaje</label><textarea id="wa-texto" maxlength="1500">${esc(texto)}</textarea>
+      <p class="ayuda">${num ? 'Puedes cambiarlo antes de abrir WhatsApp.' : 'Este cliente no tiene WhatsApp guardado: WhatsApp te pedirá elegir el contacto. Guárdalo en Clientes > Editar.'}</p></div>
+    <div class="d-pie"><button class="btn" data-accion="cerrar">Ahora no</button>
+      <button class="btn btn-p" data-accion="wa-abrir" data-id="${esc(num)}">Abrir WhatsApp</button></div>`);
+}
+
 // Cliente (crear o editar)
 function modalCliente(id) {
   const cl = id ? clientePorId(id) : null;
@@ -1572,6 +1597,8 @@ function modalCliente(id) {
       <div class="campo"><label for="k-cnom">Nombre de contacto</label><input id="k-cnom" name="contact_name" maxlength="120" placeholder="Con quien hablas" value="${esc(cl ? cl.contact_name || '' : '')}"></div>
       <div class="campo"><label for="k-cmail">Correo de contacto</label><input id="k-cmail" name="contact_email" type="email" inputmode="email" maxlength="200" placeholder="nombre@empresa.com" value="${esc(cl ? cl.contact_email || '' : '')}"></div>
     </div>
+    <div class="campo"><label for="k-cwa">WhatsApp del contacto</label><input id="k-cwa" name="contact_phone" type="tel" inputmode="tel" maxlength="25" placeholder="33 1234 5678" value="${esc(cl ? cl.contact_phone || '' : '')}" style="max-width:14rem">
+      <p class="ayuda">Para avisarle con un clic cuando le entregas videos o publicas su reporte.</p></div>
     <div class="campo"><label for="k-onb">Fecha de onboarding</label><input id="k-onb" name="onboarding_date" type="date" value="${esc(cl ? cl.onboarding_date || '' : aISO(hoy()))}" style="max-width:12rem">
       <p class="ayuda">A este correo le llegan los recordatorios de MailerLite: “Aparta tu día” (en su primer mes, 4 días después del onboarding; después, una semana antes del límite de guiones) y, solo si le faltan guiones, uno 2 días antes del límite. Si lo dejas vacío, se usa el correo con el que el cliente entra al portal.</p></div>
     <div class="campo"><label for="k-url">Carpeta compartida con el cliente (opcional)</label><input id="k-url" name="shared_url" type="url" inputmode="url" placeholder="https://drive.google.com/..." value="${esc(cl ? cl.shared_url || '' : '')}">
@@ -1736,11 +1763,13 @@ const FORMS = {
       } else datos[k] = x || null;
     }
     if (datos.periodo_inicio && datos.periodo_fin && datos.periodo_fin < datos.periodo_inicio) return aviso('El periodo del reporte no puede terminar antes de empezar.', true);
+    const antes = S.reportes.find(x => x.cycle_id === datos.cycle_id);
     try {
       await q(sb.from('reportes').upsert(datos));
       cerrarModal();
       aviso(datos.publicado ? 'Reporte publicado: el cliente ya lo ve' : 'Reporte guardado como borrador');
       await recargar();
+      if (datos.publicado && !(antes && antes.publicado)) modalAvisoWA('reporte', datos.cycle_id);
     } catch (e) { aviso(humano(e), true); }
   },
   async cliente(f) {
@@ -1751,7 +1780,9 @@ const FORMS = {
     const correo = valor(f, 'contact_email');
     if (correo && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(correo)) { aviso('El correo de contacto no es válido.', true); return f.elements.contact_email.focus(); }
     const datos = { name: nombre, videos_per_cycle: n, shared_url: valor(f, 'shared_url') || null,
-      contact_name: valor(f, 'contact_name') || null, contact_email: correo || null, onboarding_date: valor(f, 'onboarding_date') || null };
+      contact_name: valor(f, 'contact_name') || null, contact_email: correo || null, onboarding_date: valor(f, 'onboarding_date') || null,
+      contact_phone: valor(f, 'contact_phone') || null };
+    if (datos.contact_phone && !/^\d{10,15}$/.test(datos.contact_phone.replace(/\D/g, ''))) { aviso('El WhatsApp debe tener de 10 a 15 dígitos.', true); return f.elements.contact_phone.focus(); }
     if (f.elements.active) datos.active = f.elements.active.checked;
     try {
       if (f.dataset.id) await q(sb.from('clients').update(datos).eq('id', f.dataset.id));
@@ -1849,8 +1880,11 @@ const ACC = {
   async 'entregar-ciclo'(el, id) {
     const n = S.videos.filter(v => v.cycle_id === id && v.status === 'listo').length;
     if (!await confirmar(`¿Entregar ${n} videos al cliente?`, 'El cliente verá el link de cada video aprobado. Los que no estén aprobados se quedan como están.', 'Entregar')) return;
-    try { await q(sb.from('videos').update({ status: 'entregado' }).eq('cycle_id', id).eq('status', 'listo')); aviso('Videos entregados'); await recargar(); }
-    catch (e) { aviso(humano(e), true); }
+    try {
+      await q(sb.from('videos').update({ status: 'entregado' }).eq('cycle_id', id).eq('status', 'listo'));
+      aviso('Videos entregados'); await recargar();
+      modalAvisoWA('entrega', id);
+    } catch (e) { aviso(humano(e), true); }
   },
   async 'agregar-video'(el, id) {
     const max = S.videos.filter(v => v.cycle_id === id).reduce((m, v) => Math.max(m, v.number), 0);
@@ -1874,6 +1908,17 @@ const ACC = {
     catch (e) { aviso(humano(e), true); }
   },
   reporte(el, id) { modalReporte(id); },
+  'wa-aviso'(el, id) {
+    const r = S.reportes.find(x => x.cycle_id === id);
+    const hayEntrega = S.videos.some(v => v.cycle_id === id && v.status === 'entregado');
+    // Si el mes ya tiene reporte publicado, el aviso es del reporte; si no, de la entrega
+    modalAvisoWA(r && r.publicado ? 'reporte' : (hayEntrega ? 'entrega' : 'reporte'), id);
+  },
+  'wa-abrir'(el, num) {
+    const t = (document.getElementById('wa-texto') || {}).value || '';
+    window.open(`https://wa.me/${num || ''}?text=${encodeURIComponent(t)}`, '_blank', 'noopener');
+    cerrarModal();
+  },
   async 'ml-reenviar'(el, id) {
     try {
       await q(sb.rpc('mailerlite_reenviar', { p_client: id }));
