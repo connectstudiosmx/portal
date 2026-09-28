@@ -996,6 +996,7 @@ function vistaSolicitudes() {
       </div>
       <div class="sol-der">
         <span class="sol-int">${x.tipo === 'guia' ? 'Descargó la guía' : esc(INTERES[x.interes] || x.interes)}</span>
+        ${x.confirmacion ? `<span class="sol-int sol-ok">${x.tipo === 'guia' ? 'Negocio operando' : 'Conoce la inversión'}</span>` : ''}
         ${x.acepta_correos ? '<span class="sol-int sol-ok">Acepta correos</span>' : ''}
         <span class="nota">${esc(fHora(x.created_at))}${fuente ? `<br>${esc(fuente)}` : ''}</span>
         <label class="interruptor"><input type="checkbox" data-cambio="sol-atendida" data-id="${x.id}"${x.atendida ? ' checked' : ''}> Atendida</label>

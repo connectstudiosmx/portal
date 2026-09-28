@@ -190,6 +190,8 @@ button,input,textarea{font:inherit;color:inherit}
           <textarea id="mensaje" name="mensaje" maxlength="2000" rows="3" placeholder="Más clientes, mejor imagen, lanzar un producto…"></textarea>
         </div>
 
+        <label class="permiso"><input type="checkbox" id="confirma" required aria-describedby="e-confirma"><span>Sé que el servicio mensual es desde <strong style="color:var(--crema);font-weight:600">$14,499 MXN más IVA</strong>.<small>El precio final depende del alcance; lo vemos en la llamada.</small></span></label>
+        <span class="err" id="e-confirma" style="margin:-.6rem 0 .8rem"></span>
         <label class="permiso"><input type="checkbox" id="acepta"><span>Quiero recibir ideas de contenido y novedades por correo.<small>Máximo un par de correos al mes. Te das de baja cuando quieras.</small></span></label>
         <div class="trampa" aria-hidden="true">
           <label for="web2">No llenes este campo</label>
@@ -294,11 +296,15 @@ const CONFIG = {
     setTimeout(() => { location.href = '/gracias/' + (location.search || ''); }, window.fbq ? 400 : 0);
   }
 
+  document.getElementById('confirma').addEventListener('change', () => { document.getElementById('e-confirma').textContent = ''; });
+
   form.addEventListener('submit', async e => {
     e.preventDefault();
     eGral.textContent = '';
     const malo = validar();
     if (malo) { document.getElementById(malo).focus(); return; }
+    const confirma = document.getElementById('confirma');
+    if (!confirma.checked) { document.getElementById('e-confirma').textContent = 'Marca esta casilla para continuar.'; confirma.focus(); return; }
 
     const nombre = val('nombre');
     // Si un bot llenó el campo oculto, fingimos éxito y no guardamos nada
@@ -313,10 +319,11 @@ const CONFIG = {
       sitio: val('sitio') || null,
       mensaje: val('mensaje') || null,
       origen,
-      acepta_correos: document.getElementById('acepta').checked
+      acepta_correos: document.getElementById('acepta').checked,
+      confirmacion: true
     };
 
-    // Si la base todavía no tiene la columna del permiso, se reintenta sin ella
+    // Si la base todavía no tiene las columnas de las casillas, se reintenta sin ellas
     async function enviar(d) {
       let r = await fetch(`${CONFIG.SUPABASE_URL}/rest/v1/solicitudes`, {
         method: 'POST',
@@ -325,7 +332,7 @@ const CONFIG = {
       });
       if (!r.ok) {
         const t = await r.text();
-        if (/acepta_correos/.test(t)) { const s = Object.assign({}, d); delete s.acepta_correos; return enviar(s); }
+        if (/acepta_correos|confirmacion/.test(t) && ('acepta_correos' in d || 'confirmacion' in d)) { const s = Object.assign({}, d); delete s.acepta_correos; delete s.confirmacion; return enviar(s); }
         throw new Error(/solicitudes_limite/.test(t) ? 'limite' : /correo/.test(t) ? 'correo' : /whatsapp/.test(t) ? 'whatsapp' : 'otro');
       }
     }

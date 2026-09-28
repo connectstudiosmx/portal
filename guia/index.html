@@ -364,6 +364,7 @@ h1 em::after{content:"";position:absolute;left:0;right:.25em;bottom:.06em;height
               <input id="whatsapp" type="tel" autocomplete="tel" inputmode="tel" maxlength="25" placeholder="33 1234 5678">
               <span class="err" id="e-whatsapp"></span>
             </div>
+            <label class="permiso"><input type="checkbox" id="confirma"><span>Mi negocio ya está operando y quiero que se vea a la altura.</span></label>
             <label class="permiso"><input type="checkbox" id="acepta"><span>Quiero recibir ideas de contenido y novedades por correo.<small>Máximo un par de correos al mes. Te das de baja cuando quieras.</small></span></label>
             <div class="trampa" aria-hidden="true">
               <label for="web2">No llenes este campo</label>
@@ -776,9 +777,10 @@ const CONFIG = {
       correo: val('correo').toLowerCase(),
       whatsapp: val('whatsapp') || null,
       origen,
-      acepta_correos: document.getElementById('acepta').checked
+      acepta_correos: document.getElementById('acepta').checked,
+      confirmacion: document.getElementById('confirma').checked
     };
-    // Si la base todavía no tiene la columna del permiso, se reintenta sin ella
+    // Si la base todavía no tiene las columnas de las casillas, se reintenta sin ellas
     async function enviar(d) {
       let r = await fetch(`${CONFIG.SUPABASE_URL}/rest/v1/solicitudes`, {
         method: 'POST',
@@ -787,7 +789,7 @@ const CONFIG = {
       });
       if (!r.ok) {
         const t = await r.text();
-        if (/acepta_correos/.test(t)) { const s = Object.assign({}, d); delete s.acepta_correos; return enviar(s); }
+        if (/acepta_correos|confirmacion/.test(t) && ('acepta_correos' in d || 'confirmacion' in d)) { const s = Object.assign({}, d); delete s.acepta_correos; delete s.confirmacion; return enviar(s); }
         throw new Error(/solicitudes_limite/.test(t) ? 'limite' : /correo/.test(t) ? 'correo' : /whatsapp/.test(t) ? 'whatsapp' : 'otro');
       }
     }
