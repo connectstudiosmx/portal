@@ -1,0 +1,795 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#000000">
+<title>Solicitud de proyecto · Connect Studios</title>
+<meta name="description" content="Cuéntame de tu proyecto y veamos si soy la persona adecuada. Toma 3 minutos.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Solicitud de proyecto · Connect Studios">
+<meta property="og:description" content="Cuéntame de tu proyecto y veamos si soy la persona adecuada. Toma 3 minutos.">
+<meta property="og:image" content="https://connectstudios.mx/assets/img/reel-portada.webp">
+<meta property="og:url" content="https://portal.connectstudios.mx/solicitud/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23000'/%3E%3Crect x='14' y='10' width='36' height='44' rx='4' fill='none' stroke='%23F3E7C8' stroke-width='5'/%3E%3Crect x='14' y='44' width='36' height='10' fill='%23E3B23C'/%3E%3C/svg%3E">
+<link rel="preload" href="/img/solicitud-bg.webp" as="image" type="image/webp">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400..700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --negro:#000;
+  --panel:#0B0B0C;
+  --linea:#26262A;
+  --linea-2:#3A3A40;
+  --crema:#F2EFE9;
+  --crema-2:#C9C5BD;
+  --crema-3:#8A867F;
+  --verde:#39FF88;
+  --rojo:#F0705A;
+  --display:'Anton',Impact,'Arial Narrow',sans-serif;
+  --texto:'Archivo',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --suave:cubic-bezier(.2,.7,.2,1);
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;min-height:100vh;min-height:100dvh;background:var(--negro);color:var(--crema);font-family:var(--texto);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body.preguntando{overflow:hidden}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--verde);outline-offset:3px}
+button,input,textarea{font:inherit;color:inherit}
+button{-webkit-tap-highlight-color:transparent}
+
+/* Fondo: foto de rodaje con capa oscura para que el texto siempre se lea */
+.fondo{position:fixed;inset:0;z-index:-1;background:#050505 url(/img/solicitud-bg.webp) center 30%/cover no-repeat}
+.fondo::after{content:"";position:absolute;inset:0;background-color:rgba(0,0,0,.8);transition:background-color .6s}
+body.en-pregunta .fondo::after{background-color:rgba(0,0,0,.88)}
+body.final .fondo::after{background-color:rgba(0,0,0,.93)}
+
+.logo{position:fixed;top:1.1rem;left:clamp(1rem,4vw,2.5rem);z-index:5;display:block;width:112px;height:auto}
+.logo-txt{font-family:var(--display);text-transform:uppercase;font-size:1.1rem;letter-spacing:.02em}
+.progreso{position:fixed;top:0;left:0;right:0;height:4px;background:rgba(255,255,255,.08);z-index:6;opacity:0;transition:opacity .3s}
+.progreso i{display:block;height:100%;width:0;background:var(--verde);transition:width .5s var(--suave)}
+body.en-pregunta .progreso{opacity:1}
+
+/* Escena: una pregunta a la vez */
+.escena{position:fixed;inset:0}
+.pantalla{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:5rem clamp(1.25rem,6vw,4rem) 6rem;overflow-y:auto;-webkit-overflow-scrolling:touch;transition:transform .5s var(--suave),opacity .45s var(--suave)}
+.pantalla.desde-abajo{transform:translateY(70px);opacity:0}
+.pantalla.desde-arriba{transform:translateY(-70px);opacity:0}
+.pantalla.hacia-arriba{transform:translateY(-70px);opacity:0;pointer-events:none}
+.pantalla.hacia-abajo{transform:translateY(70px);opacity:0;pointer-events:none}
+.pantalla:focus{outline:none}
+.p-cuerpo{width:100%;max-width:40rem;margin:auto 0}
+
+/* Bienvenida */
+.bienvenida .p-cuerpo{max-width:38rem}
+.ceja{font-size:.74rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--verde);margin:0 0 1rem}
+.b-titulo{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:clamp(2.8rem,9vw,5.2rem);line-height:.92;letter-spacing:.005em;margin:0}
+.b-texto{color:var(--crema-2);font-size:clamp(1.05rem,2.6vw,1.2rem);max-width:32rem;margin:1.3rem 0 2rem}
+.b-tiempo{display:inline-flex;align-items:center;gap:.4rem;color:var(--crema-3);font-size:.85rem;margin-left:1rem}
+.b-tiempo svg{width:15px;height:15px}
+.legal{color:var(--crema-3);font-size:.8rem;margin:1.6rem 0 0;max-width:30rem}
+.legal a{text-underline-offset:2px}
+
+/* Pregunta */
+.p-num{display:flex;align-items:center;gap:.35rem;color:var(--verde);font-size:.9rem;font-weight:700;margin:0 0 .6rem}
+.p-num svg{width:14px;height:14px}
+.p-titulo{font-size:clamp(1.35rem,4.2vw,1.9rem);font-weight:600;line-height:1.25;margin:0;letter-spacing:-.005em;overflow-wrap:anywhere}
+.p-titulo .req{color:var(--verde);margin-left:.15rem}
+.p-ayuda{color:var(--crema-3);font-size:clamp(.95rem,2.4vw,1.05rem);margin:.6rem 0 0}
+.p-control{margin-top:1.8rem}
+
+.p-input{display:block;width:100%;background:transparent;border:0;border-bottom:2px solid rgba(242,239,233,.28);border-radius:0;padding:.45rem 0 .55rem;font-size:clamp(1.25rem,3.8vw,1.6rem);color:var(--crema);transition:border-color .2s;resize:none;overflow:hidden;line-height:1.35}
+.p-input::placeholder{color:rgba(242,239,233,.32)}
+.p-input:focus{outline:none;border-bottom-color:var(--verde)}
+.p-input[aria-invalid="true"]{border-bottom-color:var(--rojo)}
+.p-input[type="date"]{font-size:1.2rem;min-height:2.6rem}
+.p-nota{color:var(--crema-3);font-size:.78rem;margin:.55rem 0 0}
+.tel{display:flex;align-items:flex-end;gap:.75rem}
+.tel b{font-size:clamp(1.25rem,3.8vw,1.6rem);font-weight:500;color:var(--crema-2);padding-bottom:.6rem;border-bottom:2px solid rgba(242,239,233,.28);white-space:nowrap}
+.tel .p-input{flex:1;min-width:0}
+
+.opciones{display:grid;gap:.55rem;max-width:34rem}
+.op{display:grid;grid-template-columns:1.75rem minmax(0,1fr) 1.2rem;align-items:center;gap:.8rem;width:100%;min-height:3.1rem;padding:.6rem .8rem;border:1px solid rgba(242,239,233,.24);border-radius:8px;background:rgba(242,239,233,.06);text-align:left;font-size:1.02rem;line-height:1.3;cursor:pointer;transition:background .15s,border-color .15s}
+.op:hover{background:rgba(242,239,233,.12);border-color:rgba(242,239,233,.42)}
+.op kbd{display:grid;place-items:center;width:1.75rem;height:1.75rem;border:1px solid rgba(242,239,233,.38);border-radius:4px;background:rgba(0,0,0,.35);font:700 .78rem var(--texto);color:var(--crema-2)}
+.op svg{width:18px;height:18px;color:var(--verde);opacity:0;transition:opacity .15s}
+.op.sel{border-color:var(--verde);background:rgba(57,255,136,.14)}
+.op.sel kbd{background:var(--verde);border-color:var(--verde);color:#000}
+.op.sel svg{opacity:1}
+.op.parpadea{animation:parpadea .38s steps(1) 1}
+@keyframes parpadea{0%,50%{background:rgba(57,255,136,.14)}25%,75%{background:rgba(57,255,136,.32)}}
+.op-detalle{margin-top:1.1rem;max-width:34rem}
+.op-detalle[hidden]{display:none}
+
+.p-error{display:flex;align-items:center;gap:.45rem;margin:.9rem 0 0;color:var(--rojo);font-weight:600;font-size:.92rem}
+.p-error:empty{display:none}
+.p-accion{display:flex;align-items:center;gap:1rem;margin-top:1.6rem}
+.p-accion[hidden]{display:none}
+.ok{display:inline-flex;align-items:center;gap:.5rem;min-height:3rem;padding:0 1.35rem;border:0;border-radius:999px;background:var(--verde);color:#000;font-weight:700;font-size:1.02rem;cursor:pointer;transition:transform .15s,box-shadow .15s,opacity .15s}
+.ok:hover{transform:translateY(-1px);box-shadow:0 8px 28px rgba(57,255,136,.22)}
+.ok:active{transform:none}
+.ok[disabled]{opacity:.6;cursor:progress;transform:none;box-shadow:none}
+.ok svg{width:17px;height:17px}
+.p-tip{color:var(--crema-3);font-size:.8rem}
+.p-tip b{color:var(--crema-2);font-weight:600}
+@media (hover:none){.p-tip{display:none}}
+
+/* Navegación: atrás y adelante */
+.nav{position:fixed;right:clamp(1rem,4vw,2.5rem);bottom:calc(1rem + env(safe-area-inset-bottom,0px));z-index:5;display:none;gap:2px}
+body.en-pregunta .nav{display:flex}
+.nav button{display:grid;place-items:center;width:2.9rem;height:2.9rem;border:0;background:rgba(242,239,233,.12);cursor:pointer;transition:background .15s}
+.nav button:first-child{border-radius:8px 0 0 8px}
+.nav button:last-child{border-radius:0 8px 8px 0}
+.nav button:hover{background:rgba(242,239,233,.22)}
+.nav button[disabled]{opacity:.35;cursor:default}
+.nav svg{width:20px;height:20px}
+
+.trampa{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+
+/* Pantallas finales */
+.final-caja{display:none;max-width:60rem;margin:0 auto;padding:5.5rem clamp(1rem,4vw,2.5rem) calc(3rem + env(safe-area-inset-bottom,0px))}
+body.final .final-caja{display:block}
+body.final .escena,body.final .nav{display:none}
+.f-intro{max-width:40rem}
+.palomita{width:3.2rem;height:3.2rem;border-radius:50%;display:grid;place-items:center;background:var(--verde);color:#000;margin-bottom:1.4rem}
+.palomita svg{width:24px;height:24px}
+.f-titulo{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:clamp(2.1rem,6vw,3.6rem);line-height:.95;margin:0;letter-spacing:.005em}
+.f-titulo em{font-style:normal;color:var(--verde)}
+.f-texto{color:var(--crema-2);font-size:1.08rem;margin:1.1rem 0 0;max-width:34rem}
+.decide{display:flex;gap:.75rem;align-items:flex-start;margin:1.4rem 0 0;padding:.9rem 1rem;border:1px solid rgba(57,255,136,.45);border-radius:12px;background:rgba(57,255,136,.08);max-width:34rem}
+.decide svg{flex:none;width:22px;height:22px;color:var(--verde);margin-top:.1rem}
+.decide b{display:block}
+.decide span{color:var(--crema-2);font-size:.92rem}
+.agenda{position:relative;margin-top:2rem;background:var(--panel);border:1px solid var(--linea);border-radius:18px;overflow:hidden;min-height:640px}
+.agenda-cab{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1rem 1.2rem;border-bottom:1px solid var(--linea)}
+.agenda-cab b{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:1.3rem;letter-spacing:.01em}
+.agenda-cab span{font-size:.8rem;color:var(--crema-3);white-space:nowrap}
+#cal{width:100%;min-height:600px}
+.calendly-inline-widget{width:100%;height:700px;min-width:280px}
+.cargando{position:absolute;inset:3.5rem 0 0;display:grid;place-items:center;color:var(--crema-3);font-size:.9rem;pointer-events:none}
+.cargando i{display:block;width:2rem;height:2rem;margin:0 auto .8rem;border-radius:50%;border:2px solid var(--linea-2);border-top-color:var(--verde);animation:gira .9s linear infinite}
+@keyframes gira{to{transform:rotate(360deg)}}
+.agenda.lista .cargando{display:none}
+.listo-cita{display:none;align-items:center;gap:.8rem;margin-top:2rem;padding:1rem 1.2rem;border-radius:12px;background:var(--verde);color:#000;font-weight:600;max-width:40rem}
+.listo-cita svg{flex:none;width:22px;height:22px}
+.listo-cita.ver{display:flex}
+.alterna{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:1.4rem}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;min-height:2.75rem;padding:0 1.15rem;border:1px solid var(--linea-2);border-radius:999px;background:transparent;font-weight:600;font-size:.9rem;text-decoration:none;cursor:pointer;transition:border-color .2s,background .2s}
+.btn:hover{border-color:var(--crema-3);background:#111}
+.btn svg{width:17px;height:17px}
+.btn-wa{border-color:rgba(57,255,136,.45);color:var(--verde)}
+.reiniciar{margin-top:2.5rem;font-size:.82rem;color:var(--crema-3)}
+.reiniciar button{background:none;border:0;padding:0;color:inherit;text-decoration:underline;text-underline-offset:2px;cursor:pointer}
+
+/* Video (pantalla de no califica) */
+.video-msg{display:grid;grid-template-columns:8.5rem minmax(0,1fr);gap:1.1rem;align-items:center;max-width:30rem;margin:1.8rem 0 0;padding:.8rem;border:1px solid var(--linea);border-radius:16px;background:var(--panel)}
+.video-marco{position:relative;aspect-ratio:9/16;border-radius:10px;overflow:hidden;background:#111;cursor:pointer}
+.video-marco video,.video-marco iframe{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border:0}
+.video-marco button{position:absolute;inset:0;display:grid;place-items:center;border:0;background:linear-gradient(0deg,rgba(0,0,0,.55),rgba(0,0,0,0) 60%);cursor:pointer}
+.video-marco button span{display:grid;place-items:center;width:2.8rem;height:2.8rem;border-radius:50%;background:var(--verde);color:#000}
+.video-marco button svg{width:16px;height:16px;margin-left:2px}
+.video-msg b{display:block;font-weight:700;margin-bottom:.25rem}
+.video-msg p{margin:0;color:var(--crema-2);font-size:.9rem}
+
+.entra{animation:aparece .7s var(--suave) both}
+@keyframes aparece{from{opacity:0;transform:translateY(16px)}}
+
+@media (max-width:640px){
+  .logo{width:96px;top:.95rem;left:1rem}
+  .pantalla{align-items:flex-start;padding:max(5rem,13vh) 1rem 6.5rem}
+  .pantalla:not(.bienvenida) .p-cuerpo{margin:0}   /* arriba, para que el teclado no tape el campo */
+  .bienvenida{align-items:center}
+  .p-control{margin-top:1.4rem}
+  .op{font-size:.98rem}
+  .b-tiempo{display:flex;margin:1rem 0 0}
+  .final-caja{padding-top:4.5rem}
+  .agenda{margin-left:-1rem;margin-right:-1rem;border-radius:0;border-inline:0}
+  .calendly-inline-widget{height:1020px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="fondo" aria-hidden="true"></div>
+<div class="progreso" aria-hidden="true"><i id="barra"></i></div>
+<img class="logo" src="https://connectstudios.mx/assets/img/logo-connect.webp" alt="Connect Studios" width="640" height="180"
+  onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'logo logo-txt',textContent:'Connect Studios'}))">
+
+<main class="escena" id="escena"></main>
+
+<nav class="nav" aria-label="Navegación del formulario">
+  <button type="button" id="atras" aria-label="Pregunta anterior"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 15l6-6 6 6"/></svg></button>
+  <button type="button" id="adelante" aria-label="Siguiente pregunta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+</nav>
+
+<div class="final-caja" id="final" aria-live="polite"></div>
+
+<div class="trampa" aria-hidden="true">
+  <label for="web2">No llenes este campo</label>
+  <input id="web2" name="web2" tabindex="-1" autocomplete="off">
+</div>
+
+<script src="/solicitud/config.js"></script>
+<script>
+(function () {
+  'use strict';
+  const C = window.SOLICITUD_CONFIG || {};
+  const escena = document.getElementById('escena');
+  const finalCaja = document.getElementById('final');
+
+  // ---------- Utilidades ----------------------------------------------
+  function h(tag, props) {
+    const el = document.createElement(tag);
+    for (const k in props || {}) {
+      const v = props[k];
+      if (v == null || v === false) continue;
+      if (k === 'class') el.className = v;
+      else if (k === 'html') el.innerHTML = v;            // solo para íconos fijos, nunca datos de la persona
+      else if (k.slice(0, 2) === 'on') el.addEventListener(k.slice(2), v);
+      else el.setAttribute(k, v === true ? '' : v);
+    }
+    for (let i = 2; i < arguments.length; i++) {
+      [].concat(arguments[i]).forEach(c => { if (c != null && c !== false) el.append(c.nodeType ? c : String(c)); });
+    }
+    return el;
+  }
+  const ICONO = {
+    check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+    flecha: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
+    reloj: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+    alerta: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.01"/></svg>',
+    gente: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5"/><path d="M16 4.8a3.5 3.5 0 0 1 0 6.4M18.5 14.8c1.6.8 2.6 2.5 3 5.2"/></svg>',
+    wa: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2l-.4-.2z"/></svg>',
+    play: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>'
+  };
+  const uuid = () => (crypto.randomUUID ? crypto.randomUUID()
+    : ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c => (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)));
+  const pila = () => String(E.R.nombre || '').trim().split(/\s+/)[0];
+  const tocar = matchMedia('(hover:none)').matches;
+
+  // ---------- De qué anuncio o link viene ------------------------------
+  const params = new URLSearchParams(location.search);
+  const ORIGEN = {};
+  ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'fbclid', 'gclid', 'ref'].forEach(k => {
+    const v = params.get(k);
+    if (v) ORIGEN[k] = v.slice(0, 200);
+  });
+  if (document.referrer && !document.referrer.startsWith(location.origin)) ORIGEN.referrer = document.referrer.slice(0, 200);
+
+  // ---------- Avance guardado en este navegador ------------------------
+  // Si Instagram recarga la página (por ejemplo, al ir a copiar su link), sigue donde iba.
+  const CLAVE = 'connect.solicitud';
+  let E = cargar() || nuevo();
+  function nuevo() { return { token: uuid(), R: {}, paso: null, t0: Date.now(), origen: ORIGEN, fin: null, agendado: false, pixel: {} }; }
+  function cargar() {
+    try {
+      if (params.has('nueva')) { localStorage.removeItem(CLAVE); return null; }
+      const e = JSON.parse(localStorage.getItem(CLAVE) || 'null');
+      if (e && e.token && e.R && Date.now() - e.t0 < 30 * 864e5) { e.pixel = e.pixel || {}; return e; }
+    } catch (x) { /* sin almacenamiento */ }
+    return null;
+  }
+  function recordar() { try { localStorage.setItem(CLAVE, JSON.stringify(E)); } catch (x) { /* sin almacenamiento */ } }
+
+  // ---------- Meta Pixel -----------------------------------------------
+  // Conversions API (para después): manda los mismos eventos desde el servidor con el
+  // mismo event_id que usamos aquí (lead-, nolead-, agenda- + token) para que Meta no
+  // los cuente doble. El lugar natural es un trigger en solicitudes, como el de MailerLite.
+  if (C.PIXEL_ID) {
+    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', C.PIXEL_ID);
+    fbq('track', 'PageView');
+  }
+  function pixel(clave, tipo, evento, datos) {
+    if (!window.fbq || E.pixel[clave]) return;
+    E.pixel[clave] = 1; recordar();
+    fbq(tipo, evento, datos || {}, { eventID: clave + '-' + E.token });
+  }
+
+  // ---------- Preguntas ------------------------------------------------
+  const A = R => R.busca === 'mensual';
+  const B = R => !!R.busca && R.busca !== 'mensual';
+  const PREGUNTAS = [
+    { id: 'nombre', tipo: 'texto', t: '¿Cuál es tu nombre y apellido?', ph: 'Tu nombre', ac: 'name', max: 120 },
+    { id: 'correo', tipo: 'email', t: R => `Mucho gusto, ${pila()}. ¿Cuál es tu correo electrónico?`, tq: '¿Cuál es tu correo electrónico?', ph: 'nombre@empresa.com', ac: 'email', max: 200 },
+    { id: 'whatsapp', tipo: 'tel', t: '¿Cuál es tu WhatsApp?', ayuda: 'Por aquí te escribo para platicar tu proyecto.', ph: '33 1234 5678' },
+    { id: 'negocio', tipo: 'largo', t: '¿Cómo se llama tu negocio o marca y a qué se dedica?', ph: 'Ej. Café Aurora, cafetería de especialidad en Providencia', max: 300 },
+    { id: 'sitio', tipo: 'texto', req: false, t: '¿Tienes Instagram o sitio web? Pega el link.', ayuda: 'También puedes escribir tu @. Si no tienes, sigue.', ph: '@tumarca o tumarca.com', ac: 'url', max: 300 },
+    { id: 'busca', t: '¿Qué estás buscando?', ops: [
+      ['mensual', 'Contenido mensual para redes (marca personal o de empresa)'],
+      ['corporativo', 'Video corporativo o institucional'],
+      ['comercial', 'Comercial o video promocional'],
+      ['evento', 'Cobertura de evento corporativo'],
+      ['otro', 'Otro', { detalle: 'Cuéntame qué necesitas' }]] },
+    // Ruta A: contenido mensual
+    { id: 'a_para', si: A, t: '¿Para quién sería el contenido?', ops: [['personal', 'Mi marca personal'], ['empresa', 'Mi empresa'], ['ambas', 'Ambas']] },
+    { id: 'a_clientes', si: A, t: '¿Cómo te llegan hoy la mayoría de tus clientes?', ops: [['recomendacion', 'Recomendación'], ['redes', 'Redes sociales'], ['publicidad', 'Publicidad'], ['otro', 'Otro']] },
+    { id: 'a_camara', si: A, t: '¿Quién saldría a cámara?', ops: [['yo', 'Yo'], ['equipo', 'Personas de mi equipo'], ['no_se', 'Todavía no lo sé'], ['nadie', 'Nadie quiere salir']] },
+    { id: 'a_exito', si: A, tipo: 'largo', t: '¿Qué tendría que pasar en los próximos 6 meses para considerar esto un éxito?', max: 1000 },
+    { id: 'a_inversion', si: A, t: 'Nuestros planes mensuales empiezan en $14,499 + IVA. ¿Es una inversión que puedes considerar?', ops: [['si', 'Sí'], ['que_incluye', 'Quiero saber qué incluye'], ['no', 'No por ahora']] },
+    // Ruta B: proyecto puntual
+    { id: 'b_exito', si: B, tipo: 'largo', t: '¿Qué tendría que lograr este video para considerarlo un éxito?', max: 1000 },
+    { id: 'b_uso', si: B, multi: true, t: '¿Dónde se va a usar?', ayuda: 'Puedes elegir varias.', ops: [['redes', 'Redes sociales'], ['web', 'Sitio web'], ['evento', 'Evento o presentación'], ['publicidad', 'Publicidad'], ['otro', 'Otro']] },
+    { id: 'b_presupuesto', si: B, t: '¿Cuál es tu presupuesto aproximado para este proyecto?', ops: [['menos10', 'Menos de $10,000'], ['10a25', '$10,000 – $25,000'], ['25a50', '$25,000 – $50,000'], ['50a100', '$50,000 – $100,000'], ['mas100', 'Más de $100,000']] },
+    { id: 'b_fecha', si: B, t: '¿Para cuándo necesitas el proyecto terminado?', ops: [['fecha', 'Tengo una fecha exacta', { fecha: true }], ['mes', 'En el próximo mes'], ['1a3', 'En 1 a 3 meses'], ['sin', 'Todavía no tengo fecha']] },
+    // Cierre
+    { id: 'referencias', t: '¿Tienes referencias o ejemplos del estilo que te gustaría?', ops: [['si', 'Sí, tengo ejemplos', { detalle: 'Pega aquí los links' }], ['no', 'No, necesito ayuda para definirlo']] },
+    { id: 'decide', t: '¿Eres quien toma la decisión de esta inversión?', ops: [['si', 'Sí'], ['socio', 'La tomo con un socio'], ['otro', 'No, se lo presento a alguien más']] },
+    // Si el link ya trae de dónde viene (anuncio, bio, guía), no se pregunta
+    { id: 'conocio', si: () => !(E.origen || {}).utm_source, t: '¿Cómo nos conociste?', ops: [['anuncio', 'Anuncio'], ['instagram', 'Instagram'], ['recomendacion', 'Recomendación'], ['otro', 'Otro']] },
+    { id: 'mas', tipo: 'largo', req: false, fin: true, t: '¿Algo más que deba saber sobre ti o tu proyecto?', ayuda: 'Opcional.', max: 2000 }
+  ];
+  const visibles = () => PREGUNTAS.filter(p => !p.si || p.si(E.R));
+  const porId = id => PREGUNTAS.find(p => p.id === id);
+  const titulo = p => typeof p.t === 'function' ? p.t(E.R) : p.t;
+  const tituloPlano = p => p.tq || (typeof p.t === 'string' ? p.t : '');
+  const opcion = (p, v) => (p.ops || []).find(o => o[0] === v);
+  const digitos = v => {
+    let d = String(v || '').replace(/\D/g, '');
+    if (d.length === 12 && d.startsWith('52')) d = d.slice(2);
+    if (d.length === 13 && d.startsWith('521')) d = d.slice(3);
+    return d;
+  };
+  const vacio = v => v == null || (Array.isArray(v) ? !v.length : !String(v).trim());
+
+  function validar(p) {
+    const v = E.R[p.id];
+    if (p.id === 'nombre') return String(v || '').trim().length >= 2 || 'Escribe tu nombre para continuar.';
+    if (p.id === 'correo') return /^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(String(v || '').trim()) || 'Revisa tu correo, parece que le falta algo.';
+    if (p.id === 'whatsapp') return digitos(v).length === 10 || 'Escribe tu número a 10 dígitos, sin el 52.';
+    if (p.req === false) return true;
+    if (p.ops) {
+      if (vacio(v)) return p.multi ? 'Elige al menos una opción.' : 'Elige una opción para continuar.';
+      const o = opcion(p, v);
+      if (o && o[2] && vacio(E.R[p.id + '_detalle'])) return o[2].fecha ? 'Elige la fecha para continuar.' : 'Escribe un poco más para continuar.';
+      return true;
+    }
+    return !vacio(v) || 'Escribe tu respuesta para continuar.';
+  }
+
+  // Lo que se manda a la base: respuestas del camino actual + _qa legible para el portal
+  function datos() {
+    const R = E.R, d = { origen: E.origen || {} }, qa = [];
+    visibles().forEach(p => {
+      let v = R[p.id];
+      if (vacio(v)) return;
+      if (p.id === 'whatsapp') v = digitos(v);
+      if (typeof v === 'string') v = v.trim();
+      d[p.id] = v;
+      let txt = p.ops ? [].concat(v).map(x => (opcion(p, x) || [x, x])[1]).join(', ') : String(v);
+      const o = p.ops && !p.multi && opcion(p, v);
+      if (o && o[2] && !vacio(R[p.id + '_detalle'])) {
+        const det = String(R[p.id + '_detalle']).trim();
+        d[p.id + '_detalle'] = det;
+        txt += ': ' + (o[2].fecha ? det.split('-').reverse().join('/') : det);
+      }
+      qa.push([p.id, tituloPlano(p), txt]);
+    });
+    const u = (E.origen || {}).utm_source;
+    if (u && !d.conocio) { d.conocio = 'link'; qa.push(['conocio', '¿Cómo nos conociste?', 'Llegó por un link: ' + u]); }
+    d._qa = qa;
+    return d;
+  }
+
+  // ---------- Base de datos --------------------------------------------
+  async function rpc(fn, args) {
+    const r = await fetch(`${C.SUPABASE_URL}/rest/v1/rpc/${fn}`, {
+      method: 'POST', keepalive: true,
+      headers: { apikey: C.SUPABASE_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify(args)
+    });
+    const t = await r.text();
+    if (!r.ok) throw new Error(t || String(r.status));
+    return t ? JSON.parse(t) : null;
+  }
+  // Guardado parcial: desde el WhatsApp en adelante, en orden y sin frenar a la persona
+  let cola = Promise.resolve();
+  function guardarParcial(paso) {
+    if (validar(porId('nombre')) !== true || validar(porId('correo')) !== true || validar(porId('whatsapp')) !== true) return;
+    const d = datos();
+    cola = cola.then(() => rpc('guardar_solicitud', { p_token: E.token, p_datos: d, p_paso: paso, p_final: false })).catch(() => { /* se reintenta con el siguiente paso */ });
+  }
+
+  // ---------- Pantallas ------------------------------------------------
+  let actual = null;      // id de la pregunta en pantalla (null = bienvenida)
+  let pantalla = null;
+  let ocupado = false;
+
+  function cambiar(nueva, dir) {
+    nueva.classList.add(dir < 0 ? 'desde-arriba' : 'desde-abajo');
+    escena.append(nueva);
+    const vieja = pantalla;
+    pantalla = nueva;
+    nueva.getBoundingClientRect();   // fija la posición inicial para que la transición corra
+    nueva.classList.remove('desde-arriba', 'desde-abajo');
+    if (vieja) {
+      vieja.classList.add(dir < 0 ? 'hacia-abajo' : 'hacia-arriba');
+      vieja.setAttribute('aria-hidden', 'true');
+      vieja.querySelectorAll('input,textarea,button').forEach(el => { el.tabIndex = -1; });
+      setTimeout(() => vieja.remove(), 520);
+    }
+  }
+
+  function bienvenida() {
+    actual = null;
+    document.body.classList.remove('en-pregunta');
+    const sigue = E.paso && porId(E.paso);
+    const s = h('section', { class: 'pantalla bienvenida', 'aria-labelledby': 'b-titulo' },
+      h('div', { class: 'p-cuerpo entra' },
+        h('p', { class: 'ceja' }, 'Connect Studios'),
+        h('h1', { class: 'b-titulo', id: 'b-titulo' }, 'Solicitud de proyecto'),
+        h('p', { class: 'b-texto' }, 'Este formulario me ayuda a entender tu proyecto y saber si soy la persona adecuada.'),
+        h('div', null,
+          h('button', { type: 'button', class: 'ok', id: 'empezar', onclick: empezar }, sigue ? 'Continuar' : 'Empezar', h('span', { html: ICONO.flecha, style: 'display:contents' })),
+          h('span', { class: 'b-tiempo', html: ICONO.reloj + '<span>Toma 3 minutos</span>' })),
+        h('p', { class: 'legal' }, 'Al empezar aceptas el ', h('a', { href: C.LINK_AVISO_PRIVACIDAD || '/privacidad.html', target: '_blank', rel: 'noopener' }, 'aviso de privacidad'), '. Tus datos solo los vemos nosotros.')));
+    cambiar(s, -1);
+    if (!tocar) setTimeout(() => { const b = document.getElementById('empezar'); if (b) b.focus({ preventScroll: true }); }, 60);
+  }
+
+  function empezar() {
+    const id = E.paso && porId(E.paso) && visibles().some(p => p.id === E.paso) ? E.paso : PREGUNTAS[0].id;
+    mostrar(id, 1);
+  }
+
+  function mostrar(id, dir) {
+    const p = porId(id);
+    actual = id;
+    E.paso = id; recordar();
+    document.body.classList.add('en-pregunta');
+    cambiar(pantallaPregunta(p), dir);
+    progreso();
+    document.getElementById('atras').disabled = false;
+    setTimeout(() => enfocar(p), 380);
+  }
+
+  function progreso() {
+    const vis = visibles();
+    const total = E.R.busca ? vis.length : vis.length + 5;   // antes de elegir ruta, se estima
+    const i = vis.findIndex(p => p.id === actual);
+    document.getElementById('barra').style.width = Math.max(4, Math.round(i / total * 100)) + '%';
+  }
+
+  function enfocar(p) {
+    if (!pantalla || actual !== p.id) return;
+    const campo = pantalla.querySelector('.p-input:not([hidden])');
+    const det = pantalla.querySelector('.op-detalle:not([hidden]) .p-input');
+    if (p.ops) { (det || pantalla).focus({ preventScroll: true }); return; }
+    if (campo) campo.focus({ preventScroll: true });
+  }
+
+  function pantallaPregunta(p) {
+    const vis = visibles(), n = vis.findIndex(x => x.id === p.id) + 1;
+    const cuerpo = h('div', { class: 'p-cuerpo' },
+      h('p', { class: 'p-num' }, String(n), h('span', { html: ICONO.flecha, style: 'display:contents' })),
+      h('h2', { class: 'p-titulo', id: 't-' + p.id }, titulo(p), p.req !== false ? h('span', { class: 'req', 'aria-hidden': 'true' }, '*') : null),
+      p.ayuda ? h('p', { class: 'p-ayuda' }, p.ayuda) : null,
+      h('div', { class: 'p-control' }, p.ops ? opciones(p) : campo(p)),
+      h('p', { class: 'p-error', id: 'e-' + p.id, role: 'alert' }));
+    const conRespuesta = !p.ops || p.multi || !vacio(E.R[p.id]);
+    cuerpo.append(h('div', { class: 'p-accion', hidden: !conRespuesta },
+      h('button', { type: 'button', class: 'ok', onclick: avanzar }, p.fin ? 'Enviar' : 'OK', h('span', { html: p.fin ? ICONO.flecha : ICONO.check, style: 'display:contents' })),
+      h('span', { class: 'p-tip' }, 'pulsa ', h('b', null, 'Enter ↵'))));
+    return h('section', { class: 'pantalla', tabindex: '-1', 'aria-labelledby': 't-' + p.id }, cuerpo);
+  }
+
+  function alEscribir(p, el, clave) {
+    el.addEventListener('input', () => {
+      E.R[clave] = el.value;
+      if (el.tagName === 'TEXTAREA') crecer(el);
+      const e = document.getElementById('e-' + p.id);
+      if (e && e.textContent) { e.textContent = ''; el.removeAttribute('aria-invalid'); }
+      recordar();
+    });
+  }
+  function crecer(t) { t.style.height = 'auto'; t.style.height = t.scrollHeight + 'px'; }
+
+  function campo(p) {
+    const base = {
+      class: 'p-input', id: 'i-' + p.id, maxlength: p.max || 300, placeholder: p.ph || 'Escribe tu respuesta aquí…',
+      'aria-labelledby': 't-' + p.id, 'aria-describedby': 'e-' + p.id, enterkeyhint: p.fin ? 'send' : 'next', autocomplete: p.ac || 'off'
+    };
+    let el;
+    if (p.tipo === 'largo') {
+      el = h('textarea', Object.assign(base, { rows: 1 }));
+      el.value = E.R[p.id] || '';
+      alEscribir(p, el, p.id);
+      requestAnimationFrame(() => crecer(el));
+      return h('div', null, el, tocar ? null : h('p', { class: 'p-nota' }, 'Shift + Enter ↵ para hacer un salto de línea'));
+    }
+    if (p.tipo === 'tel') {
+      el = h('input', Object.assign(base, { type: 'tel', inputmode: 'tel', autocomplete: 'tel-national', maxlength: 20 }));
+      el.value = E.R[p.id] || '';
+      alEscribir(p, el, p.id);
+      return h('div', { class: 'tel' }, h('b', { 'aria-hidden': 'true' }, '🇲🇽 +52'), el);
+    }
+    const sinMayus = p.tipo === 'email' || p.ac === 'url';
+    el = h('input', Object.assign(base, { type: p.tipo === 'email' ? 'email' : 'text', inputmode: p.tipo === 'email' ? 'email' : null,
+      autocapitalize: p.id === 'nombre' ? 'words' : sinMayus ? 'off' : null, spellcheck: sinMayus ? 'false' : null }));
+    el.value = E.R[p.id] || '';
+    alEscribir(p, el, p.id);
+    return el;
+  }
+
+  function opciones(p) {
+    const lista = h('div', { class: 'opciones', role: p.multi ? 'group' : 'radiogroup', 'aria-labelledby': 't-' + p.id });
+    const conDetalle = p.ops.find(o => o[2]);
+    let detalle = null;
+    p.ops.forEach((o, i) => {
+      const sel = p.multi ? [].concat(E.R[p.id] || []).includes(o[0]) : E.R[p.id] === o[0];
+      const b = h('button', { type: 'button', class: 'op' + (sel ? ' sel' : ''), role: p.multi ? 'checkbox' : 'radio', 'aria-checked': String(sel), 'data-v': o[0] },
+        h('kbd', { 'aria-hidden': 'true' }, String.fromCharCode(65 + i)), h('span', null, o[1]), h('span', { html: ICONO.check, style: 'display:contents' }));
+      b.addEventListener('click', () => elegir(p, o, b, lista, detalle));
+      lista.append(b);
+    });
+    if (conDetalle) {
+      const x = conDetalle[2], clave = p.id + '_detalle';
+      const el = x.fecha
+        ? h('input', { class: 'p-input', type: 'date', id: 'd-' + p.id, min: new Date().toISOString().slice(0, 10), 'aria-label': 'Fecha', enterkeyhint: 'next' })
+        : h('input', { class: 'p-input', type: 'text', id: 'd-' + p.id, maxlength: 500, placeholder: x.detalle, 'aria-label': x.detalle, enterkeyhint: 'next', autocomplete: 'off' });
+      el.value = E.R[clave] || '';
+      alEscribir(p, el, clave);
+      if (x.fecha) el.addEventListener('change', () => { E.R[clave] = el.value; recordar(); });
+      detalle = h('div', { class: 'op-detalle', hidden: E.R[p.id] !== conDetalle[0] }, el);
+      return h('div', null, lista, detalle);
+    }
+    return lista;
+  }
+
+  function elegir(p, o, b, lista, detalle) {
+    if (ocupado) return;
+    const err = document.getElementById('e-' + p.id);
+    if (err) err.textContent = '';
+    const accion = pantalla.querySelector('.p-accion');
+    if (p.multi) {
+      const arr = [].concat(E.R[p.id] || []);
+      const i = arr.indexOf(o[0]);
+      if (i >= 0) arr.splice(i, 1); else arr.push(o[0]);
+      E.R[p.id] = arr;
+      b.classList.toggle('sel', i < 0);
+      b.setAttribute('aria-checked', String(i < 0));
+      recordar();
+      return;
+    }
+    E.R[p.id] = o[0];
+    lista.querySelectorAll('.op').forEach(x => { x.classList.remove('sel', 'parpadea'); x.setAttribute('aria-checked', 'false'); });
+    b.classList.add('sel', 'parpadea');
+    b.setAttribute('aria-checked', 'true');
+    recordar();
+    if (o[2]) {                      // "Otro", "Sí, tengo ejemplos" o fecha exacta: pide el dato y espera el OK
+      detalle.hidden = false;
+      accion.hidden = false;
+      setTimeout(() => { const el = detalle.querySelector('input'); el.focus(); if (el.type === 'date' && el.showPicker && !tocar) try { el.showPicker(); } catch (x) { /* no disponible */ } }, 60);
+      return;
+    }
+    if (detalle) detalle.hidden = true;
+    ocupado = true;
+    setTimeout(() => { ocupado = false; if (actual === p.id) avanzar(); }, 400);
+  }
+
+  function marcarError(p, msg) {
+    const e = document.getElementById('e-' + p.id);
+    if (!e) return;
+    e.innerHTML = ICONO.alerta;
+    e.append(msg);
+    const campoEl = pantalla.querySelector('.op-detalle:not([hidden]) .p-input') || pantalla.querySelector('.p-control > .p-input, .p-control .tel .p-input, .p-control textarea');
+    if (campoEl) { campoEl.setAttribute('aria-invalid', 'true'); campoEl.focus({ preventScroll: true }); }
+  }
+
+  function avanzar() {
+    const p = porId(actual);
+    if (!p || ocupado) return;
+    const r = validar(p);
+    if (r !== true) { marcarError(p, r); return; }
+    if (p.id === 'whatsapp') { E.R.whatsapp = digitos(E.R.whatsapp); }
+    const vis = visibles();
+    const i = vis.findIndex(x => x.id === p.id);
+    if (i >= vis.findIndex(x => x.id === 'whatsapp') && !p.fin) guardarParcial(p.id);
+    if (p.fin) { enviar(p); return; }
+    const sig = vis[i + 1];
+    if (sig) mostrar(sig.id, 1);
+  }
+
+  function atras() {
+    if (ocupado) return;
+    const vis = visibles();
+    const i = vis.findIndex(x => x.id === actual);
+    if (i <= 0) { bienvenida(); return; }
+    mostrar(vis[i - 1].id, -1);
+  }
+
+  async function enviar(p) {
+    const boton = pantalla.querySelector('.ok');
+    // Bots: campo trampa lleno o formulario completo en menos de 5 segundos
+    if (document.getElementById('web2').value || Date.now() - E.t0 < 5000) { E.fin = { califica: false, falso: true }; recordar(); mostrarFinal(); return; }
+    boton.disabled = true;
+    boton.firstChild.textContent = 'Enviando…';
+    ocupado = true;
+    try {
+      await cola;
+      const r = await rpc('guardar_solicitud', { p_token: E.token, p_datos: datos(), p_paso: p.id, p_final: true });
+      E.fin = { califica: !!(r && r.califica) };
+    } catch (err) {
+      if (/solicitud_rapida/.test(err.message)) E.fin = { califica: false, falso: true };
+      else {
+        ocupado = false;
+        boton.disabled = false;
+        boton.firstChild.textContent = 'Enviar';
+        marcarError(p, /solicitudes_limite/.test(err.message)
+          ? 'Estamos recibiendo muchas solicitudes. Intenta en unos minutos o escríbeme por WhatsApp.'
+          : 'No se pudo enviar. Revisa tu conexión e intenta de nuevo.');
+        return;
+      }
+    }
+    ocupado = false;
+    recordar();
+    if (!E.fin.falso) {
+      const ruta = E.R.busca === 'mensual' ? 'mensual' : 'proyecto';
+      if (E.fin.califica) pixel('lead', 'track', 'Lead', { content_name: ruta });
+      else pixel('nolead', 'trackCustom', 'LeadNoCalifica', { content_name: ruta });
+    }
+    mostrarFinal();
+  }
+
+  // ---------- Finales ---------------------------------------------------
+  function mostrarFinal() {
+    document.body.classList.remove('en-pregunta', 'preguntando');
+    document.body.classList.add('final');
+    escena.textContent = '';
+    finalCaja.textContent = '';
+    window.scrollTo(0, 0);
+    if (E.fin.califica) finalCalifica(); else finalNoCalifica();
+    finalCaja.append(h('p', { class: 'reiniciar' }, h('button', { type: 'button', onclick: reiniciar }, 'Llenar otra solicitud')));
+  }
+
+  function reiniciar() {
+    try { localStorage.removeItem(CLAVE); } catch (x) { /* sin almacenamiento */ }
+    E = nuevo(); E.t0 = Date.now();
+    document.body.classList.remove('final');
+    document.body.classList.add('preguntando');
+    finalCaja.textContent = '';
+    pantalla = null;
+    bienvenida();
+  }
+
+  function botonWA(texto) {
+    const n = pila();
+    const msg = n ? `Hola Manuel, soy ${n}. Acabo de mandar mi solicitud desde la página.` : 'Hola Manuel, acabo de mandar mi solicitud desde la página.';
+    return h('a', { class: 'btn btn-wa', href: `https://wa.me/${C.WHATSAPP}?text=${encodeURIComponent(msg)}`, target: '_blank', rel: 'noopener' }, h('span', { html: ICONO.wa, style: 'display:contents' }), texto);
+  }
+
+  function finalCalifica() {
+    const intro = h('section', { class: 'f-intro entra' },
+      h('div', { class: 'palomita', html: ICONO.check }),
+      h('p', { class: 'ceja' }, pila() ? `Gracias, ${pila()}` : 'Solicitud recibida'),
+      h('h1', { class: 'f-titulo' }, 'Agenda una llamada para conocerte, platicar tu proyecto y ', h('em', null, 'darte precio.')));
+    if (E.R.decide && E.R.decide !== 'si') {
+      intro.append(h('div', { class: 'decide' }, h('span', { html: ICONO.gente, style: 'display:contents' }),
+        h('div', null, h('b', null, 'Invita a quien toma la decisión a la llamada.'), h('span', null, 'Al agendar puedes agregar su correo como invitado.'))));
+    }
+    finalCaja.append(intro);
+    const listo = h('div', { class: 'listo-cita' + (E.agendado ? ' ver' : ''), id: 'listo-cita', role: 'status' },
+      h('span', { html: ICONO.check, style: 'display:contents' }),
+      h('span', null, 'Listo, tu llamada quedó agendada. Te llegó la confirmación a tu correo con el link de la videollamada.'));
+    finalCaja.append(listo);
+    if (!E.agendado) {
+      const agenda = h('section', { class: 'agenda entra', id: 'agenda', 'aria-label': 'Agenda tu llamada', style: 'animation-delay:.15s' },
+        h('div', { class: 'agenda-cab' }, h('b', null, 'Agenda tu llamada'), h('span', null, 'Videollamada')),
+        h('div', { class: 'cargando' }, h('div', null, h('i'), 'Cargando horarios…')),
+        h('div', { id: 'cal' }));
+      finalCaja.append(agenda);
+      cargarAgenda(agenda);
+    }
+    finalCaja.append(h('div', { class: 'alterna' }, botonWA(E.agendado ? 'Escríbeme por WhatsApp' : '¿Ningún horario te queda? Escríbeme')));
+  }
+
+  function finalNoCalifica() {
+    const n = pila();
+    const intro = h('section', { class: 'f-intro entra' },
+      h('div', { class: 'palomita', html: ICONO.check }),
+      h('h1', { class: 'f-titulo' }, n ? `Gracias, ${n}.` : 'Gracias.'),
+      h('p', { class: 'f-texto' }, 'Revisé tu solicitud y te escribo por WhatsApp si veo una forma de ayudarte.'));
+    finalCaja.append(intro);
+    if (C.VIDEO_GRACIAS_URL) finalCaja.append(video(C.VIDEO_GRACIAS_URL));
+    finalCaja.append(h('div', { class: 'alterna' }, h('a', { class: 'btn', href: '/casos/' }, 'Mientras, mira nuestro trabajo')));
+  }
+
+  // Video: solo carga cuando le dan play (YouTube Short por ID, o .mp4)
+  function video(src) {
+    const esMp4 = /\.mp4(\?|$)/i.test(src);
+    const marco = h('div', { class: 'video-marco' }, h('button', { type: 'button', 'aria-label': 'Reproducir mensaje de Manuel' }, h('span', { html: ICONO.play })));
+    if (!esMp4) marco.style.background = `#111 url("https://i.ytimg.com/vi/${encodeURIComponent(src)}/oar2.jpg") center/cover`;
+    marco.addEventListener('click', () => {
+      if (marco.dataset.activo) return;
+      marco.dataset.activo = '1';
+      marco.textContent = '';
+      let el;
+      if (esMp4) { el = h('video', { src, controls: true, playsinline: true, autoplay: true }); }
+      else { el = h('iframe', { src: `https://www.youtube-nocookie.com/embed/${encodeURIComponent(src)}?autoplay=1&rel=0&playsinline=1`, allow: 'autoplay; encrypted-media; picture-in-picture; fullscreen', title: 'Mensaje de Manuel' }); }
+      marco.append(el);
+      if (window.fbq) fbq('trackCustom', 'VerMensaje');
+    });
+    return h('div', { class: 'video-msg entra', style: 'animation-delay:.2s' }, marco, h('div', null, h('b', null, 'Un mensaje para ti'), h('p', null, 'Un minuto sobre cómo trabajo y qué sigue.')));
+  }
+
+  // ---------- Agenda: Cal.com (o Calendly mientras no esté configurado) ---
+  function agendado(inicio) {
+    if (E.agendado) return;
+    E.agendado = true; recordar();
+    let cita = null;
+    try { if (inicio) cita = new Date(inicio).toISOString(); } catch (x) { /* sin fecha */ }
+    rpc('solicitud_agendada', { p_token: E.token, p_cita: cita }).catch(() => { /* el webhook de Cal.com lo confirma de todos modos */ });
+    pixel('agenda', 'track', 'Schedule');
+    const l = document.getElementById('listo-cita');
+    if (l) { l.classList.add('ver'); l.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+  }
+
+  function cargarAgenda(agenda) {
+    const lista = () => agenda.classList.add('lista');
+    setTimeout(lista, 8000);   // si tarda, quita el aviso de carga de todos modos
+    const R = E.R;
+    if (C.CAL_LINK && !/PLACEHOLDER/i.test(C.CAL_LINK)) {
+      (function (C, A, L) { let p = function (a, ar) { a.q.push(ar); }; let d = C.document; C.Cal = C.Cal || function () { let cal = C.Cal; let ar = arguments; if (!cal.loaded) { cal.ns = {}; cal.q = cal.q || []; d.head.appendChild(d.createElement("script")).src = A; cal.loaded = true; } if (ar[0] === L) { const api = function () { p(api, arguments); }; const namespace = ar[1]; api.q = api.q || []; if (typeof namespace === "string") { cal.ns[namespace] = cal.ns[namespace] || api; p(cal.ns[namespace], ar); p(cal, ["initNamespace", namespace]); } else p(cal, ar); return; } p(cal, ar); }; })(window, "https://app.cal.com/embed/embed.js", "init");
+      Cal('init', 'llamada', { origin: 'https://app.cal.com' });
+      const config = { layout: 'month_view', theme: 'dark', name: R.nombre, email: R.correo, 'metadata[solicitud]': E.token };
+      if (R.whatsapp) config.attendeePhoneNumber = '+52' + digitos(R.whatsapp);
+      Cal.ns.llamada('inline', { elementOrSelector: '#cal', calLink: C.CAL_LINK.replace(/^https?:\/\/(app\.)?cal\.com\//, ''), config });
+      Cal.ns.llamada('ui', { theme: 'dark', cssVarsPerTheme: { dark: { 'cal-brand': '#39FF88', 'cal-brand-text': '#000000' } }, hideEventTypeDetails: false, layout: 'month_view' });
+      Cal.ns.llamada('on', { action: 'linkReady', callback: lista });
+      Cal.ns.llamada('on', { action: 'bookingSuccessfulV2', callback: e => agendado(e && e.detail && e.detail.data && e.detail.data.startTime) });
+      Cal.ns.llamada('on', { action: 'bookingSuccessful', callback: e => agendado(e && e.detail && e.detail.data && e.detail.data.date) });
+      return;
+    }
+    // Respaldo: Calendly (el mismo de /gracias)
+    const url = new URL(C.CALENDLY_RESPALDO);
+    url.searchParams.set('hide_gdpr_banner', '1');
+    url.searchParams.set('background_color', '0b0b0c');
+    url.searchParams.set('text_color', 'f2efe9');
+    url.searchParams.set('primary_color', '39ff88');
+    ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'].forEach(k => { if ((E.origen || {})[k]) url.searchParams.set(k, E.origen[k]); });
+    // Calendly vuelve a codificar la URL: con URLSearchParams los espacios saldrían como "+"
+    let dataUrl = url.toString().replace(/\+/g, '%20');
+    if (R.nombre) dataUrl += '&name=' + encodeURIComponent(R.nombre.trim());
+    if (R.correo) dataUrl += '&email=' + encodeURIComponent(R.correo.trim());
+    const cont = document.getElementById('cal');
+    cont.className = 'calendly-inline-widget';
+    cont.dataset.url = dataUrl;
+    addEventListener('message', e => {
+      if (e.origin !== 'https://calendly.com' || !e.data || typeof e.data.event !== 'string') return;
+      if (e.data.event === 'calendly.event_type_viewed') lista();
+      if (e.data.event === 'calendly.event_scheduled') agendado(null);
+    });
+    document.head.append(h('script', { src: 'https://assets.calendly.com/assets/external/widget.js', async: true }));
+  }
+
+  // ---------- Teclado y navegación --------------------------------------
+  document.getElementById('atras').addEventListener('click', atras);
+  document.getElementById('adelante').addEventListener('click', avanzar);
+  document.addEventListener('keydown', ev => {
+    if (document.body.classList.contains('final') || ev.isComposing || ev.ctrlKey || ev.metaKey || ev.altKey) return;
+    const t = ev.target;
+    if (t.tagName === 'BUTTON' || t.tagName === 'A') return;          // Enter en un botón ya hace clic
+    if (ev.key === 'Enter') {
+      if (t.tagName === 'TEXTAREA' && ev.shiftKey) return;           // salto de línea
+      ev.preventDefault();
+      if (actual === null) empezar(); else avanzar();
+      return;
+    }
+    const p = porId(actual);
+    if (p && p.ops && !(t.tagName === 'INPUT' || t.tagName === 'TEXTAREA') && /^[a-z]$/i.test(ev.key)) {
+      const b = pantalla.querySelectorAll('.op')[ev.key.toUpperCase().charCodeAt(0) - 65];
+      if (b) { ev.preventDefault(); b.click(); }
+    }
+  });
+
+  // ---------- Arranque -----------------------------------------------------
+  if (E.fin) mostrarFinal();
+  else { document.body.classList.add('preguntando'); bienvenida(); }
+})();
+</script>
+</body>
+</html>

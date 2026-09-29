@@ -182,7 +182,7 @@ h1 em{font-style:normal;color:var(--verde)}
       <img class="logo" src="https://connectstudios.mx/assets/img/logo-connect.webp" alt="Connect Studios" width="640" height="180"
         onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'logo-txt',textContent:'Connect Studios'}))">
     </a>
-    <a class="btn btn-v btn-s" data-destino="/empezar/" href="/empezar/">Platiquemos</a>
+    <a class="btn btn-v btn-s" data-destino="/solicitud/" href="/solicitud/">Platiquemos</a>
   </div>
 </header>
 
@@ -222,7 +222,7 @@ h1 em{font-style:normal;color:var(--verde)}
     </div>
     <div class="gancho r">
       <p>El video completo no se publica.<small>Te lo enseño en la llamada, junto con lo que haría para tu negocio.</small></p>
-      <a class="btn btn-v" data-destino="/empezar/" href="/empezar/">Quiero verlo
+      <a class="btn btn-v" data-destino="/solicitud/" href="/solicitud/">Quiero verlo
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
       </a>
     </div>
@@ -285,7 +285,7 @@ h1 em{font-style:normal;color:var(--verde)}
     <h2>¿Tu negocio <em>es el siguiente?</em></h2>
     <p>Cuéntame qué quieres lograr. Si hay algo que hacer, te propongo cómo; si no, te llevas ideas claras.</p>
     <div class="acciones">
-      <a class="btn btn-v" data-destino="/empezar/" href="/empezar/">Platiquemos
+      <a class="btn btn-v" data-destino="/solicitud/" href="/solicitud/">Platiquemos
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
       </a>
       <a class="btn" data-destino="/guia/" href="/guia/">Ver la guía gratis</a>
@@ -300,7 +300,7 @@ const CONFIG = {
 };
 
 (function () {
-  // Los botones a /empezar y /guia llevan el origen del anuncio
+  // Los botones a /solicitud y /guia llevan el origen del anuncio
   const p = new URLSearchParams(location.search);
   document.querySelectorAll('[data-destino]').forEach(a => {
     const u = new URL(a.dataset.destino, location.origin);

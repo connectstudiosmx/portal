@@ -353,6 +353,12 @@ main.app{max-width:var(--ancho);margin:0 auto;padding:1.75rem 1.25rem 5rem}
 .sol-der .nota{white-space:nowrap}
 .sol-int{display:inline-block;font-size:.74rem;font-weight:700;padding:.15rem .55rem;border-radius:999px;border:1px solid var(--linea-2);color:var(--crema-2);white-space:nowrap}
 .sol-ok{border-color:rgba(57,255,136,.45);color:var(--verde)}
+.sol.no-califica{border-left-color:var(--linea-2)}
+.sol-det{margin-top:.6rem;font-size:.88rem}
+.sol-det summary{cursor:pointer;color:var(--crema-2);font-weight:600;width:max-content}
+.sol-det dl{display:grid;gap:.15rem;margin:.6rem 0 0}
+.sol-det dt{color:var(--crema-3);font-size:.8rem;margin-top:.45rem}
+.sol-det dd{margin:0;white-space:pre-wrap;overflow-wrap:anywhere}
 @media (max-width:640px){.sol{grid-template-columns:1fr}.sol-der{flex-direction:row;flex-wrap:wrap;align-items:center;justify-content:space-between;text-align:left}}
 
 /* Ventanas */
@@ -424,7 +430,7 @@ const sb = (configLista() && window.supabase)
 const S = {
   sesion: null, perfil: null,
   vista: 'produccion',
-  clientes: [], ciclos: [], videos: [], perfiles: [], asignaciones: [], solicitudes: [], reportes: [], mlLog: [], verAtendidas: false,
+  clientes: [], ciclos: [], videos: [], perfiles: [], asignaciones: [], solicitudes: [], reportes: [], mlLog: [], verAtendidas: false, solFiltro: { ruta: '', califica: '', estado: '' },
   portal: null, cicloCliente: null, previa: null, pestanaCli: 'videos',
   filtro: { cliente: 'todos', estado: 'todos', mios: false, entregados: false },
   calInicio: null, verTodos: {}, cargadoEn: 0
@@ -1038,7 +1044,7 @@ function vistaAccesos() {
   <p class="nota" style="margin-top:1rem">Para dar acceso, mándale a la persona el link del portal. Cada editor solo ve los clientes que le asignes. Para quitarle el acceso a alguien, cámbialo a Pendiente. Para borrarlo por completo, elimínalo en Supabase (Authentication, Users).</p>`;
 }
 
-// ---------- Solicitudes (página /empezar) -----------------------------
+// ---------- Solicitudes (páginas /solicitud y /guia) ------------------
 const INTERES = { mensual: 'Contenido mensual', proyecto: 'Video o proyecto', no_se: 'Aún no sabe' };
 const fHora = s => { const d = new Date(s); return `${d.getDate()} ${MESES_C[d.getMonth()]} · ${pad(d.getHours())}:${pad(d.getMinutes())}`; };
 const waDe = t => { let d = String(t || '').replace(/\D/g, ''); if (d.length === 10) d = '52' + d; return d; };
@@ -1049,38 +1055,72 @@ const sitioDe = t => {
   return enlace(/^https?:\/\//i.test(v) ? v : 'https://' + v, v.replace(/^https?:\/\//i, '')) || esc(v);
 };
 
+// /solicitud: ruta A (mensual) o B (proyecto), si califica y en qué va
+const RUTAS = { A: 'Mensual', B: 'Proyecto' };
+const ESTADOS_SOL = { incompleto: 'Incompleta', completo: 'Completa, sin agendar', agendado: 'Agendada' };
+const qaDe = x => Array.isArray((x.respuestas || {})._qa) ? x.respuestas._qa : [];
+function mensajeWA(x, pila) {
+  if (x.tipo === 'guia') return `Hola ${pila}, soy Manuel de Connect Studios. Vi que descargaste la guía de videos, ¿te sirvió?`;
+  if (x.tipo !== 'solicitud') return `Hola ${pila}, soy Manuel de Connect Studios. Vi tu solicitud.`;
+  if (x.estado === 'incompleto') return `Hola ${pila}, soy Manuel de Connect Studios. Vi que empezaste tu solicitud en la página, ¿te ayudo con algo?`;
+  if (x.estado === 'agendado') return `Hola ${pila}, soy Manuel de Connect Studios. Ya vi que agendaste nuestra llamada, ¡nos vemos!`;
+  if (x.califica) return `Hola ${pila}, soy Manuel de Connect Studios. Vi tu solicitud y me encantaría platicarla, ¿te ayudo a agendar la llamada?`;
+  return `Hola ${pila}, soy Manuel de Connect Studios. Revisé tu solicitud.`;
+}
+
 function vistaSolicitudes() {
-  const todas = S.solicitudes, nuevas = todas.filter(x => !x.atendida).length;
-  const lista = S.verAtendidas ? todas : todas.filter(x => !x.atendida);
-  const link = location.origin + '/empezar/';
+  const todas = S.solicitudes, nuevas = todas.filter(x => !x.atendida).length, f = S.solFiltro;
+  const filtrando = f.ruta || f.califica || f.estado;
+  const lista = todas.filter(x => (S.verAtendidas || !x.atendida)
+    && (!f.ruta || x.ruta === f.ruta)
+    && (!f.califica || (x.tipo === 'solicitud' && x.estado !== 'incompleto' && String(!!x.califica) === f.califica))
+    && (!f.estado || x.estado === f.estado));
+  const link = location.origin + '/solicitud/';
+  const opt = (v, t, actual) => `<option value="${v}"${actual === v ? ' selected' : ''}>${t}</option>`;
   return `<div class="encabezado">
-    <div><h1>Solicitudes</h1><p class="sub">Quien llena el formulario de <a href="${esc(link)}" target="_blank" rel="noopener">${esc(link.replace(/^https?:\/\//, ''))}</a> o descarga la <a href="${esc(location.origin + '/guia/')}" target="_blank" rel="noopener">guía</a> aparece aquí. Márcala como atendida cuando ya le escribiste.</p></div>
-    <label class="interruptor"><input type="checkbox" data-cambio="sol-ver-atendidas"${S.verAtendidas ? ' checked' : ''}> Ver atendidas</label>
+    <div><h1>Solicitudes</h1><p class="sub">Quien llena la <a href="${esc(link)}" target="_blank" rel="noopener">${esc(link.replace(/^https?:\/\//, ''))}</a> o descarga la <a href="${esc(location.origin + '/guia/')}" target="_blank" rel="noopener">guía</a> aparece aquí. Márcala como atendida cuando ya le escribiste.</p></div>
+    <div class="controles">
+      <select class="campo-in" data-cambio="sol-filtro" data-campo="ruta" aria-label="Filtrar por ruta">${opt('', 'Todas las rutas', f.ruta)}${opt('A', 'Mensual', f.ruta)}${opt('B', 'Proyecto', f.ruta)}</select>
+      <select class="campo-in" data-cambio="sol-filtro" data-campo="califica" aria-label="Filtrar por calificación">${opt('', 'Califica o no', f.califica)}${opt('true', 'Califica', f.califica)}${opt('false', 'No califica', f.califica)}</select>
+      <select class="campo-in" data-cambio="sol-filtro" data-campo="estado" aria-label="Filtrar por estado">${opt('', 'Todos los estados', f.estado)}${Object.entries(ESTADOS_SOL).map(([k, t]) => opt(k, t, f.estado)).join('')}</select>
+      <label class="interruptor"><input type="checkbox" data-cambio="sol-ver-atendidas"${S.verAtendidas ? ' checked' : ''}> Ver atendidas</label>
+    </div>
   </div>
   ${nuevas ? `<p class="aviso-linea">${nuevas === 1 ? 'Hay 1 solicitud sin atender.' : `Hay ${nuevas} solicitudes sin atender.`}</p>` : ''}
   ${lista.length ? `<div class="sol-lista">${lista.map(x => {
-    const o = x.origen || {}, wa = waDe(x.whatsapp), pila = String(x.nombre || '').split(/\s+/)[0];
-    const fuente = [o.utm_source, o.utm_campaign, o.utm_content].filter(Boolean).join(' · ');
-    return `<article class="sol${x.atendida ? ' atendida' : ''}">
+    const o = x.origen || {}, wa = waDe(x.whatsapp), pila = String(x.nombre || '').split(/\s+/)[0], qa = qaDe(x);
+    const conocio = (qa.find(r => r[0] === 'conocio') || [])[2];
+    const fuente = x.tipo === 'solicitud'
+      ? [conocio && !/^Llegó por un link/.test(conocio) ? conocio : o.utm_source, o.utm_campaign].filter(Boolean).join(' · ')
+      : [o.utm_source, o.utm_campaign, o.utm_content].filter(Boolean).join(' · ');
+    const sol = x.tipo === 'solicitud';
+    const ultima = sol && x.estado === 'incompleto' && qa.length ? qa[qa.length - 1][1] : '';
+    const detalle = qa.filter(r => !['nombre', 'correo', 'whatsapp'].includes(r[0]));
+    return `<article class="sol${x.atendida ? ' atendida' : ''}${sol && x.estado !== 'incompleto' && !x.califica ? ' no-califica' : ''}">
       <div>
-        <div class="sol-nombre">${esc(x.nombre)} <span>· ${esc(x.empresa)}</span></div>
+        <div class="sol-nombre">${esc(x.nombre)} <span>· ${x.empresa ? esc(x.empresa) : 'Sin negocio todavía'}</span></div>
         <div class="sol-meta">
-          ${wa ? `<a href="https://wa.me/${wa}?text=${encodeURIComponent(x.tipo === 'guia' ? `Hola ${pila}, soy Manuel de Connect Studios. Vi que descargaste la guía de videos, ¿te sirvió?` : `Hola ${pila}, soy Manuel de Connect Studios. Vi tu solicitud.`)}" target="_blank" rel="noopener">WhatsApp ${esc(x.whatsapp)}</a>` : ''}
+          ${wa ? `<a href="https://wa.me/${wa}?text=${encodeURIComponent(mensajeWA(x, pila))}" target="_blank" rel="noopener">WhatsApp ${esc(x.whatsapp)}</a>` : ''}
           <a href="mailto:${esc(x.correo)}">${esc(x.correo)}</a>
           ${x.sitio ? `<span>${sitioDe(x.sitio)}</span>` : ''}
         </div>
         ${x.mensaje ? `<p class="sol-msg">${esc(x.mensaje)}</p>` : ''}
+        ${ultima ? `<p class="nota">Se quedó después de: ${esc(ultima)}</p>` : ''}
+        ${sol && detalle.length ? `<details class="sol-det"><summary>Ver respuestas</summary><dl>${detalle.map(r =>`<dt>${esc(r[1])}</dt><dd>${esc(r[2])}</dd>`).join('')}</dl></details>` : ''}
       </div>
       <div class="sol-der">
-        <span class="sol-int">${x.tipo === 'guia' ? 'Descargó la guía' : esc(INTERES[x.interes] || x.interes)}</span>
-        ${x.confirmacion ? `<span class="sol-int sol-ok">${x.tipo === 'guia' ? 'Negocio operando' : 'Conoce la inversión'}</span>` : ''}
+        ${sol ? `${x.ruta ? `<span class="sol-int">${RUTAS[x.ruta]}</span>` : ''}
+          ${x.estado !== 'incompleto' ? `<span class="sol-int${x.califica ? ' sol-ok' : ''}">${x.califica ? 'Califica' : 'No califica'}</span>` : ''}
+          <span class="sol-int${x.estado === 'agendado' ? ' sol-ok' : ''}">${x.estado === 'agendado' && x.cita ? `Llamada ${esc(fHora(x.cita))}` : x.estado === 'completo' && !x.califica ? 'Completa' : esc(ESTADOS_SOL[x.estado] || '')}</span>`
+        : `<span class="sol-int">${x.tipo === 'guia' ? 'Descargó la guía' : esc(INTERES[x.interes] || x.interes)}</span>
+          ${x.confirmacion ? `<span class="sol-int sol-ok">${x.tipo === 'guia' ? 'Negocio operando' : 'Conoce la inversión'}</span>` : ''}`}
         ${x.acepta_correos ? '<span class="sol-int sol-ok">Acepta correos</span>' : ''}
         <span class="nota">${esc(fHora(x.created_at))}${fuente ? `<br>${esc(fuente)}` : ''}</span>
         <label class="interruptor"><input type="checkbox" data-cambio="sol-atendida" data-id="${x.id}"${x.atendida ? ' checked' : ''}> Atendida</label>
       </div>
     </article>`;
   }).join('')}</div>`
-    : `<div class="caja-vacia"><p>${todas.length ? 'Todas las solicitudes están atendidas.' : 'Todavía no hay solicitudes. Usa este link en tus anuncios o compártelo directo:'}</p>${todas.length ? '' : `<p><strong>${esc(link)}</strong></p>`}</div>`}`;
+    : `<div class="caja-vacia"><p>${filtrando ? 'Nada coincide con estos filtros.' : todas.length ? 'Todas las solicitudes están atendidas.' : 'Todavía no hay solicitudes. Usa este link en tus anuncios o compártelo directo:'}</p>${todas.length ? '' : `<p><strong>${esc(link)}</strong></p>`}</div>`}`;
 }
 
 async function marcarSolicitud(id, atendida) {
@@ -1980,6 +2020,7 @@ const CAMBIOS = {
   'perfil-cliente'(el) { actualizarPerfil(el.dataset.id, { client_id: el.value || null }, true); },
   'perfil-nombre'(el) { actualizarPerfil(el.dataset.id, { full_name: el.value.trim() || null }, false); },
   'sol-ver-atendidas'(el) { S.verAtendidas = el.checked; render(); },
+  'sol-filtro'(el) { S.solFiltro[el.dataset.campo] = el.value; render(); },
   'sol-atendida'(el) { marcarSolicitud(el.dataset.id, el.checked); }
 };
 
