@@ -50,6 +50,7 @@ body.final .fondo::after{background-color:rgba(0,0,0,.93)}
 
 .logo{position:fixed;top:1.1rem;left:clamp(1rem,4vw,2.5rem);z-index:5;display:block;width:112px;height:auto}
 .logo-txt{font-family:var(--display);text-transform:uppercase;font-size:1.1rem;letter-spacing:.02em}
+body.final .logo{position:absolute}   /* en la pantalla final se va con el scroll y no tapa la agenda */
 .progreso{position:fixed;top:0;left:0;right:0;height:4px;background:rgba(255,255,255,.08);z-index:6;opacity:0;transition:opacity .3s}
 .progreso i{display:block;height:100%;width:0;background:var(--verde);transition:width .5s var(--suave)}
 body.en-pregunta .progreso{opacity:1}
