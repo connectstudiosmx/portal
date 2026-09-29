@@ -15,8 +15,10 @@ window.SOLICITUD_CONFIG = {
   CAL_LINK: 'manuel-alejandro-perez-pbnkac/llamada',
   CALENDLY_RESPALDO: 'https://calendly.com/elojodemanu/45min',
 
-  // Video en la pantalla de "no califica": ID de un Short de YouTube (ej. 'abc123XYZ')
-  // o link a un .mp4. Vacío lo oculta.
+  // Videos: pega el link de YouTube (normal, no listado o Short), de Loom o de un .mp4. Vacío lo oculta.
+  // Confirmación: aparece en cuanto la persona agenda (quién eres, qué pasa en la llamada, un caso).
+  VIDEO_CONFIRMACION_URL: '',
+  // Pantalla de "no califica"
   VIDEO_GRACIAS_URL: '',
 
   LINK_AVISO_PRIVACIDAD: '/privacidad.html#solicitudes',

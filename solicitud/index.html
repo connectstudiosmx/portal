@@ -174,6 +174,9 @@ body.final .escena,body.final .nav{display:none}
 .video-marco button span{display:grid;place-items:center;width:2.8rem;height:2.8rem;border-radius:50%;background:var(--verde);color:#000}
 .video-marco button svg{width:16px;height:16px;margin-left:2px}
 .video-msg b{display:block;font-weight:700;margin-bottom:.25rem}
+.video-ancho{grid-template-columns:1fr;max-width:44rem;gap:.9rem;padding:1rem}
+.video-ancho > div:last-child{padding:0 .2rem .2rem}
+.video-marco.horizontal{aspect-ratio:16/9}
 .video-msg p{margin:0;color:var(--crema-2);font-size:.9rem}
 
 .entra{animation:aparece .7s var(--suave) both}
@@ -670,13 +673,14 @@ body.final .escena,body.final .nav{display:none}
       h('h1', { class: 'f-titulo' }, 'Agenda una llamada para conocerte, platicar tu proyecto y ', h('em', null, 'darte precio.')));
     if (E.R.decide && E.R.decide !== 'si') {
       intro.append(h('div', { class: 'decide' }, h('span', { html: ICONO.gente, style: 'display:contents' }),
-        h('div', null, h('b', null, 'Invita a quien toma la decisión a la llamada.'), h('span', null, 'Al agendar puedes agregar su correo como invitado.'))));
+        h('div', null, h('b', null, 'Invita a quien toma la decisión a la llamada.'), h('span', null, 'Agrega su correo como invitado al agendar, o reenvíale la confirmación.'))));
     }
     finalCaja.append(intro);
     const listo = h('div', { class: 'listo-cita' + (E.agendado ? ' ver' : ''), id: 'listo-cita', role: 'status' },
       h('span', { html: ICONO.check, style: 'display:contents' }),
       h('span', null, 'Listo, tu llamada quedó agendada. Te llegó la confirmación a tu correo con el link de la videollamada.'));
     finalCaja.append(listo);
+    finalCaja.append(h('div', { id: 'video-conf' }, E.agendado ? videoConfirmacion() : null));
     if (!E.agendado) {
       const agenda = h('section', { class: 'agenda entra', id: 'agenda', 'aria-label': 'Agenda tu llamada', style: 'animation-delay:.15s' },
         h('div', { class: 'agenda-cab' }, h('b', null, 'Agenda tu llamada'), h('span', null, 'Videollamada')),
@@ -695,26 +699,44 @@ body.final .escena,body.final .nav{display:none}
       h('h1', { class: 'f-titulo' }, n ? `Gracias, ${n}.` : 'Gracias.'),
       h('p', { class: 'f-texto' }, 'Revisé tu solicitud y te escribo por WhatsApp si veo una forma de ayudarte.'));
     finalCaja.append(intro);
-    if (C.VIDEO_GRACIAS_URL) finalCaja.append(video(C.VIDEO_GRACIAS_URL));
+    const v = video(C.VIDEO_GRACIAS_URL, { titulo: 'Un mensaje para ti', texto: 'Un minuto sobre cómo trabajo y qué sigue.', evento: 'gracias' });
+    if (v) finalCaja.append(v);
     finalCaja.append(h('div', { class: 'alterna' }, h('a', { class: 'btn', href: '/casos/' }, 'Mientras, mira nuestro trabajo')));
   }
 
-  // Video: solo carga cuando le dan play (YouTube Short por ID, o .mp4)
-  function video(src) {
-    const esMp4 = /\.mp4(\?|$)/i.test(src);
-    const marco = h('div', { class: 'video-marco' }, h('button', { type: 'button', 'aria-label': 'Reproducir mensaje de Manuel' }, h('span', { html: ICONO.play })));
-    if (!esMp4) marco.style.background = `#111 url("https://i.ytimg.com/vi/${encodeURIComponent(src)}/oar2.jpg") center/cover`;
+  // Video: acepta un link de YouTube (normal, no listado o Short), su ID, un link de Loom o un .mp4.
+  // Solo carga cuando le dan play.
+  function fuenteVideo(src) {
+    src = String(src || '').trim();
+    if (!src) return null;
+    if (/\.mp4(\?|$)/i.test(src)) return { mp4: src };
+    let m = src.match(/loom\.com\/(?:share|embed)\/([\w-]+)/i);
+    if (m) return { embed: `https://www.loom.com/embed/${m[1]}?autoplay=1&hide_owner=true&hide_share=true&hide_title=true` };
+    m = src.match(/(?:youtu\.be\/|[?&]v=|\/shorts\/|\/embed\/|\/live\/)([\w-]{11})/) || src.match(/^([\w-]{11})$/);
+    if (m) return { embed: `https://www.youtube-nocookie.com/embed/${m[1]}?autoplay=1&rel=0&playsinline=1`, yt: m[1] };
+    return null;
+  }
+  function video(src, o) {
+    const f = fuenteVideo(src);
+    if (!f) return null;
+    const marco = h('div', { class: 'video-marco' + (o.horizontal ? ' horizontal' : '') }, h('button', { type: 'button', 'aria-label': 'Reproducir: ' + o.titulo }, h('span', { html: ICONO.play })));
+    if (f.yt) marco.style.background = `#111 url("https://i.ytimg.com/vi/${f.yt}/${o.horizontal ? 'hqdefault' : 'oar2'}.jpg") center/cover`;
     marco.addEventListener('click', () => {
       if (marco.dataset.activo) return;
       marco.dataset.activo = '1';
       marco.textContent = '';
-      let el;
-      if (esMp4) { el = h('video', { src, controls: true, playsinline: true, autoplay: true }); }
-      else { el = h('iframe', { src: `https://www.youtube-nocookie.com/embed/${encodeURIComponent(src)}?autoplay=1&rel=0&playsinline=1`, allow: 'autoplay; encrypted-media; picture-in-picture; fullscreen', title: 'Mensaje de Manuel' }); }
-      marco.append(el);
-      if (window.fbq) fbq('trackCustom', 'VerMensaje');
+      marco.append(f.mp4
+        ? h('video', { src: f.mp4, controls: true, playsinline: true, autoplay: true })
+        : h('iframe', { src: f.embed, allow: 'autoplay; encrypted-media; picture-in-picture; fullscreen', allowfullscreen: true, title: o.titulo }));
+      if (window.fbq) fbq('trackCustom', 'VerMensaje', { content_name: o.evento });
     });
-    return h('div', { class: 'video-msg entra', style: 'animation-delay:.2s' }, marco, h('div', null, h('b', null, 'Un mensaje para ti'), h('p', null, 'Un minuto sobre cómo trabajo y qué sigue.')));
+    return h('div', { class: 'video-msg entra' + (o.horizontal ? ' video-ancho' : ''), style: 'animation-delay:.2s' }, marco, h('div', null, h('b', null, o.titulo), h('p', null, o.texto)));
+  }
+  // Después de agendar: quién soy, qué pasa en la llamada, un caso y "si alguien más decide, tráelo"
+  function videoConfirmacion() {
+    return video(C.VIDEO_CONFIRMACION_URL, { horizontal: true, evento: 'confirmacion',
+      titulo: 'Antes de la llamada, mira este video',
+      texto: 'Quién soy, qué vamos a ver en la llamada y un caso real. Son unos minutos y nos ahorra tiempo a los dos.' });
   }
 
   // ---------- Agenda: Cal.com (o Calendly mientras no esté configurado) ---
@@ -725,8 +747,9 @@ body.final .escena,body.final .nav{display:none}
     try { if (inicio) cita = new Date(inicio).toISOString(); } catch (x) { /* sin fecha */ }
     rpc('solicitud_agendada', { p_token: E.token, p_cita: cita }).catch(() => { /* el webhook de Cal.com lo confirma de todos modos */ });
     pixel('agenda', 'track', 'Schedule');
-    const l = document.getElementById('listo-cita');
-    if (l) { l.classList.add('ver'); l.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+    const l = document.getElementById('listo-cita'), vc = document.getElementById('video-conf');
+    if (vc && !vc.firstChild) { const v = videoConfirmacion(); if (v) vc.append(v); }
+    if (l) { l.classList.add('ver'); l.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
   }
 
   function cargarAgenda(agenda) {
