@@ -12,7 +12,7 @@ window.SOLICITUD_CONFIG = {
 
   // Tu evento de Cal.com: lo que va después de cal.com/ (ej. 'connectstudios/llamada').
   // Mientras diga PLACEHOLDER se usa el Calendly de abajo, así nada se rompe.
-  CAL_LINK: 'PLACEHOLDER/llamada',
+  CAL_LINK: 'manuel-alejandro-perez-pbnkac/llamada',
   CALENDLY_RESPALDO: 'https://calendly.com/elojodemanu/45min',
 
   // Video en la pantalla de "no califica": ID de un Short de YouTube (ej. 'abc123XYZ')
