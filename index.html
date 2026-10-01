@@ -1252,7 +1252,7 @@ function vistaPostulaciones() {
         <div class="sol-nombre">${esc(x.nombre)} <span>· ${esc(x.ciudad)}${deMexico(x) ? '' : `, ${esc(x.pais === 'Otro' ? 'otro país' : x.pais)}`}</span></div>
         <div class="sol-meta">
           ${wa ? `<a href="https://wa.me/${wa}?text=${encodeURIComponent(msj)}" target="_blank" rel="noopener">WhatsApp ${esc(x.whatsapp)}</a>` : ''}
-          <a href="mailto:${esc(x.correo)}">${esc(x.correo)}</a>
+          ${x.correo ? `<a href="mailto:${esc(x.correo)}">${esc(x.correo)}</a>` : ''}
           ${x.instagram ? `<span>${sitioDe(x.instagram)}</span>` : ''}
           ${x.experiencia ? `<span>${esc(EXPERIENCIA[x.experiencia] || x.experiencia)} de experiencia</span>` : ''}
         </div>
