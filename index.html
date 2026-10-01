@@ -1061,6 +1061,7 @@ const ESTADOS_SOL = { incompleto: 'Incompleta', completo: 'Completa, sin agendar
 const qaDe = x => Array.isArray((x.respuestas || {})._qa) ? x.respuestas._qa : [];
 function mensajeWA(x, pila) {
   if (x.tipo === 'guia') return `Hola ${pila}, soy Manuel de Connect Studios. Vi que descargaste la guía de videos, ¿te sirvió?`;
+  if (x.tipo === 'web') return `Hola ${pila}, soy Manuel de Connect Studios. Vi tu mensaje en la página.`;
   if (x.tipo !== 'solicitud') return `Hola ${pila}, soy Manuel de Connect Studios. Vi tu solicitud.`;
   if (x.estado === 'incompleto') return `Hola ${pila}, soy Manuel de Connect Studios. Vi que empezaste tu solicitud en la página, ¿te ayudo con algo?`;
   if (x.estado === 'agendado') return `Hola ${pila}, soy Manuel de Connect Studios. Ya vi que agendaste nuestra llamada, ¡nos vemos!`;
@@ -1112,7 +1113,7 @@ function vistaSolicitudes() {
         ${sol ? `${x.ruta ? `<span class="sol-int">${RUTAS[x.ruta]}</span>` : ''}
           ${x.estado !== 'incompleto' ? `<span class="sol-int${x.califica ? ' sol-ok' : ''}">${x.califica ? 'Califica' : 'No califica'}</span>` : ''}
           <span class="sol-int${x.estado === 'agendado' ? ' sol-ok' : ''}">${x.estado === 'agendado' && x.cita ? `Llamada ${esc(fHora(x.cita))}` : x.estado === 'completo' && !x.califica ? 'Completa' : esc(ESTADOS_SOL[x.estado] || '')}</span>`
-        : `<span class="sol-int">${x.tipo === 'guia' ? 'Descargó la guía' : esc(INTERES[x.interes] || x.interes)}</span>
+        : `<span class="sol-int">${x.tipo === 'guia' ? 'Descargó la guía' : x.tipo === 'web' ? 'Mensaje de la web' : esc(INTERES[x.interes] || x.interes)}</span>
           ${x.confirmacion ? `<span class="sol-int sol-ok">${x.tipo === 'guia' ? 'Negocio operando' : 'Conoce la inversión'}</span>` : ''}`}
         ${x.acepta_correos ? '<span class="sol-int sol-ok">Acepta correos</span>' : ''}
         <span class="nota">${esc(fHora(x.created_at))}${fuente ? `<br>${esc(fuente)}` : ''}</span>
