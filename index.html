@@ -58,14 +58,14 @@ button,input,select,textarea{font:inherit;color:inherit}
 
 /* Barra superior */
 .barra{position:sticky;top:0;z-index:30;background:rgba(0,0,0,.9);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid var(--linea);padding-top:env(safe-area-inset-top,0px)}
-.barra-in{max-width:var(--ancho);margin:0 auto;padding:.7rem 1.25rem;display:flex;align-items:center;gap:.5rem 1.25rem;flex-wrap:wrap}
+.barra-in{max-width:1400px;margin:0 auto;padding:.7rem 1.25rem;display:flex;align-items:center;gap:.5rem 1.25rem;flex-wrap:wrap}
 .marca{display:flex;align-items:baseline;gap:.55rem}
 .marca b{font-family:var(--display);font-weight:400;font-size:1.4rem;line-height:1;letter-spacing:.015em;text-transform:uppercase}
 .marca b::after{content:"";display:inline-block;width:.3em;height:.3em;margin-left:.12em;background:var(--verde);vertical-align:.02em}
 .marca span{font-size:.85rem;color:var(--crema-3);font-weight:500}
 .nav{display:flex;gap:.2rem;overflow-x:auto;scrollbar-width:none}
 .nav::-webkit-scrollbar{display:none}
-.nav button{border:0;background:none;padding:.45rem .75rem;border-radius:var(--r2);color:var(--crema-2);font-weight:600;font-size:.92rem;cursor:pointer;white-space:nowrap}
+.nav button{border:0;background:none;padding:.45rem .62rem;border-radius:var(--r2);color:var(--crema-2);font-weight:600;font-size:.92rem;cursor:pointer;white-space:nowrap}
 .nav button:hover{color:var(--crema);background:var(--panel-2)}
 .nav button[aria-current="page"]{background:var(--crema);color:#000}
 .punto{display:inline-grid;place-items:center;min-width:1.15rem;height:1.15rem;padding:0 .3rem;margin-left:.25rem;border-radius:999px;background:var(--dorado);color:#000;font-size:.68rem;font-weight:800;vertical-align:1px}
@@ -274,7 +274,9 @@ main.app{max-width:var(--ancho);margin:0 auto;padding:1.75rem 1.25rem 5rem}
 .rep-txt{margin:0;white-space:pre-wrap;color:var(--crema);font-size:.94rem;overflow-wrap:anywhere}
 .rep-caja .btn{margin-top:.8rem}
 /* Pestañas del cliente: Mis videos / Resultados */
-.cli-tabs{display:inline-flex;gap:4px;padding:4px;margin:0 0 1.2rem;border:1px solid var(--linea);border-radius:999px;background:var(--panel);max-width:100%}
+.cli-tabs{display:inline-flex;gap:4px;padding:4px;margin:0 0 1.2rem;border:1px solid var(--linea);border-radius:999px;background:var(--panel);max-width:100%;overflow-x:auto;scrollbar-width:none}
+.cli-tabs::-webkit-scrollbar{display:none}
+@media (max-width:440px){.cli-tabs button{padding:.5rem .8rem;font-size:.88rem}}
 .cli-tabs button{display:inline-flex;align-items:center;gap:.45rem;border:0;background:none;border-radius:999px;padding:.55rem 1.15rem;color:var(--crema-2);font-weight:700;font-size:.92rem;cursor:pointer;white-space:nowrap;transition:background .2s,color .2s}
 .cli-tabs button:hover{color:var(--crema)}
 .cli-tabs button[aria-selected="true"]{background:var(--crema);color:#000}
@@ -361,6 +363,54 @@ main.app{max-width:var(--ancho);margin:0 auto;padding:1.75rem 1.25rem 5rem}
 .sol-det dd{margin:0;white-space:pre-wrap;overflow-wrap:anywhere}
 @media (max-width:640px){.sol{grid-template-columns:1fr}.sol-der{flex-direction:row;flex-wrap:wrap;align-items:center;justify-content:space-between;text-align:left}}
 
+/* Postulaciones (connectstudios.mx/trabaja-con-nosotros) */
+.sol.p-interesa{border-left-color:var(--dorado)}
+.sol.p-contactado{border-left-color:var(--crema-2)}
+.sol.p-descartada{border-left-color:var(--linea-2);opacity:.6}
+.sol-acc{display:flex;flex-wrap:wrap;align-items:center;gap:.4rem;margin-top:.75rem}
+.sol-der .campo-in{height:1.95rem;font-size:.82rem;padding:0 .5rem}
+.p-nota{display:block;width:100%;margin-top:.7rem;min-height:2.4rem;background:var(--negro);border:1px solid var(--linea);border-radius:var(--r2);padding:.45rem .65rem;color:var(--crema);font-size:.86rem;line-height:1.4;resize:vertical}
+.p-nota:hover{border-color:var(--linea-2)}
+.p-nota:focus{border-color:var(--verde);outline:none}
+.p-nota::placeholder{color:var(--crema-3)}
+.link-tarjeta{display:inline-flex;align-items:center;gap:.5rem;flex-wrap:wrap;font-size:.86rem;color:var(--crema-2)}
+
+/* Pagos y facturas */
+.rep-cab .btn{align-self:center}
+.pago-datos{display:flex;flex-wrap:wrap;gap:10px;margin:0}
+.pago-dato{flex:1 1 190px;background:#0A0A0B;border:1px solid var(--linea);border-radius:10px;padding:.8rem 1rem;display:grid;gap:.3rem;align-content:start;min-width:0}
+.pago-dato dt{font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--crema-3)}
+.pago-dato dd{margin:0;font-weight:600;overflow-wrap:anywhere}
+.pago-dato.clave,.pago-dato.ancho{flex-basis:100%}
+.pago-dato.clave{border-color:rgba(57,255,136,.45);box-shadow:0 12px 32px -20px rgba(57,255,136,.6)}
+.pago-dato.clave dd{display:flex;flex-wrap:wrap;align-items:center;gap:.6rem 1.1rem}
+.clabe{font-family:var(--display);font-weight:400;font-size:clamp(1.55rem,5.4vw,2.4rem);line-height:1;letter-spacing:.05em;color:var(--verde);font-variant-numeric:tabular-nums;white-space:nowrap}
+.pago-notas{margin:1rem 0 0}
+.pago-pie{display:flex;flex-wrap:wrap;align-items:center;gap:.6rem 1.1rem;margin-top:1.1rem}
+.pago-pie .nota{color:var(--crema-2)}
+.fac-lista{display:grid;gap:8px}
+.fac{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:.5rem 1rem;background:#0A0A0B;border:1px solid var(--linea);border-radius:10px;padding:.8rem 1rem}
+.fac-tit{font-weight:700;overflow-wrap:anywhere}
+.fac-meta{font-size:.84rem;color:var(--crema-2);margin-top:.15rem}
+.fac-der{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;justify-content:flex-end}
+@media (max-width:560px){.fac{grid-template-columns:1fr}.fac-der{justify-content:flex-start}}
+.e-pendiente{border-color:var(--dorado);color:var(--dorado)}
+.e-emitida{background:var(--verde);color:#000}
+.e-cancelada{border-style:dashed;border-color:var(--crema-3);color:var(--crema-3)}
+.sol.f-emitida{border-left-color:var(--linea-2)}
+.sol.f-cancelada{border-left-color:var(--linea-2);opacity:.6}
+.sol.f-pendiente{border-left-color:var(--dorado)}
+.fiscal{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.1rem 1.2rem;margin:.7rem 0 0;font-size:.88rem}
+.fiscal div{min-width:0}
+.fiscal dt{color:var(--crema-3);font-size:.76rem;margin-top:.35rem}
+.fiscal dd{margin:0;overflow-wrap:anywhere}
+.titulo-sec{display:flex;align-items:flex-end;justify-content:space-between;gap:.8rem 1.5rem;flex-wrap:wrap;margin:2.2rem 0 1rem}
+.titulo-sec h2{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:clamp(1.8rem,4.5vw,2.4rem);line-height:.95;margin:0}
+.d-sep{margin:1.4rem 0 .9rem;padding-top:1.1rem;border-top:1px solid var(--linea)}
+.d-sep h3{margin:0;font-size:1rem}
+.d-sep p{margin:.25rem 0 0;font-size:.84rem;color:var(--crema-3)}
+.campo .opc{font-weight:400;color:var(--crema-3)}
+
 /* Ventanas */
 .velo{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.74);display:flex;align-items:flex-start;justify-content:center;padding:max(5vh,env(safe-area-inset-top,0px)) 1rem 2rem;overflow-y:auto}
 .dialogo{width:100%;max-width:640px;background:var(--panel);border:1px solid var(--linea-2);border-radius:12px;padding:1.4rem 1.4rem 1.2rem;animation:entra .16s ease-out}
@@ -378,6 +428,7 @@ main.app{max-width:var(--ancho);margin:0 auto;padding:1.75rem 1.25rem 5rem}
 .campo textarea{min-height:8rem;resize:vertical;line-height:1.45}
 .campo input:focus,.campo select:focus,.campo textarea:focus{border-color:var(--verde);outline:none}
 .fila-campos{display:grid;grid-template-columns:1fr 1fr;gap:0 1rem}
+.fila-campos>.campo{align-content:start}
 @media (max-width:560px){.fila-campos{grid-template-columns:1fr}}
 .resumen{background:var(--negro);border:1px solid var(--linea);border-radius:var(--r2);padding:.7rem .85rem;font-size:.88rem;color:var(--crema-2);margin-bottom:1rem}
 .resumen b{color:var(--crema)}
@@ -431,6 +482,8 @@ const S = {
   sesion: null, perfil: null,
   vista: 'produccion',
   clientes: [], ciclos: [], videos: [], perfiles: [], asignaciones: [], solicitudes: [], reportes: [], mlLog: [], verAtendidas: false, solFiltro: { ruta: '', califica: '', estado: '' },
+  postulaciones: [], postFiltro: { rol: '', estado: 'activas', pais: '' }, facturas: [], pagoDatos: null, facFiltro: 'pendiente', faltaBase: false,
+  pagosCli: null,
   portal: null, cicloCliente: null, previa: null, pestanaCli: 'videos',
   filtro: { cliente: 'todos', estado: 'todos', mios: false, entregados: false },
   calInicio: null, verTodos: {}, cargadoEn: 0
@@ -521,9 +574,16 @@ function humano(e) {
   if (/contact_email_check/.test(m)) return 'El correo de contacto no es válido.';
   if (/contact_phone_check/.test(m)) return 'El WhatsApp debe tener de 10 a 15 dígitos.';
   if (/contact_name_check/.test(m)) return 'El nombre de contacto es demasiado largo.';
+  if (/facturas_limite/.test(m)) return 'Ya pediste varias facturas en la última hora. Si te falta alguna, escríbenos por WhatsApp.';
+  if (/facturas_rfc_check|pago_datos_rfc_check/.test(m)) return 'Revisa el RFC: son 12 caracteres si es empresa o 13 si es persona física.';
+  if (/facturas_cp_check/.test(m)) return 'El código postal fiscal tiene 5 dígitos.';
+  if (/facturas_monto_check/.test(m)) return 'Revisa el monto del pago.';
+  if (/pago_datos_clabe_check/.test(m)) return 'La CLABE tiene 18 dígitos.';
+  if (/pago_datos_cuenta_check/.test(m)) return 'El número de cuenta solo lleva dígitos (de 6 a 20).';
   if (/name_check/.test(m)) return 'Escribe un nombre.';
   if (/duplicate key|_number_key/.test(m)) return 'Ya existe un video con ese número en este mes.';
   if (/JWT|jwt expired|invalid claim/i.test(m)) return 'Tu sesión expiró. Sal y vuelve a entrar.';
+  if (/Could not find the (function|table)|schema cache|does not exist/i.test(m) && /postula|factura|pago/i.test(m)) return 'Falta preparar la base de datos: corre trabajo-y-pagos.sql en Supabase (SQL Editor).';
   if (/Failed to fetch|NetworkError|Load failed/i.test(m)) return 'No hay conexión con la base de datos. Revisa tu internet. Si eres el administrador, revisa que el proyecto de Supabase no esté en pausa.';
   return m || 'Algo falló. Intenta de nuevo.';
 }
@@ -560,6 +620,16 @@ async function cargarEquipo() {
     catch (e) { S.solicitudes = []; }
     try { S.reportes = await q(sb.from('reportes').select('*')) || []; }
     catch (e) { S.reportes = []; }
+    // Postulaciones y pagos: si aún no se corre trabajo-y-pagos.sql, el portal sigue funcionando
+    const [post, facs, datos] = await Promise.all([
+      sb.from('postulaciones').select('*').order('created_at', { ascending: false }).limit(500),
+      sb.from('facturas').select('*').order('created_at', { ascending: false }).limit(300),
+      sb.from('pago_datos').select('*').eq('id', 1).maybeSingle()
+    ]);
+    S.postulaciones = post.error ? [] : post.data || [];
+    S.facturas = facs.error ? [] : facs.data || [];
+    S.pagoDatos = datos.error ? null : datos.data;
+    S.faltaBase = !!(post.error || facs.error || datos.error);
     try {
       await q(sb.rpc('mailerlite_revisar'));
       S.mlLog = await q(sb.from('mailerlite_sync_log').select('id,created_at,client_id,accion,origen,estado,mensaje,datos').order('id', { ascending: false }).limit(300)) || [];
@@ -569,7 +639,9 @@ async function cargarEquipo() {
 }
 
 async function cargarCliente() {
-  S.portal = await q(sb.rpc('client_portal'));
+  const [portal, pagos] = await Promise.all([q(sb.rpc('client_portal')), sb.rpc('client_pagos')]);
+  S.portal = portal;
+  S.pagosCli = pagos.error ? null : pagos.data;
   S.cargadoEn = Date.now();
   elegirMesCliente(S.portal);
 }
@@ -627,12 +699,17 @@ function pantallaSimple(titulo, texto, boton, accion) {
 // ---------- Barra superior ------------------------------------------
 function barra() {
   const p = S.perfil, esAdmin = p.role === 'admin';
-  const tabs = esAdmin ? [['produccion', 'Producción'], ['calendario', 'Calendario'], ['clientes', 'Clientes'], ['solicitudes', 'Solicitudes'], ['accesos', 'Accesos']]
+  const tabs = esAdmin ? [['produccion', 'Producción'], ['calendario', 'Calendario'], ['clientes', 'Clientes'], ['solicitudes', 'Solicitudes'],
+      ['postulaciones', 'Postulaciones'], ['pagos', 'Pagos'], ['accesos', 'Accesos']]
     : p.role === 'editor' ? [['produccion', 'Producción'], ['calendario', 'Calendario']] : [];
   const pendientes = esAdmin ? S.perfiles.filter(x => x.role === 'pendiente').length : 0;
   const nuevas = esAdmin ? S.solicitudes.filter(x => !x.atendida).length : 0;
   const errML = esAdmin ? mlConError().length : 0;
+  const porRevisar = esAdmin ? S.postulaciones.filter(x => x.estado === 'nueva').length : 0;
+  const porEmitir = esAdmin ? S.facturas.filter(x => x.estado === 'pendiente').length : 0;
   const punto = id => id === 'clientes' && errML ? `<span class="punto punto-error" aria-label="${errML} con error de MailerLite">!</span>`
+    : id === 'postulaciones' && porRevisar ? `<span class="punto" aria-label="${porRevisar} por revisar">${porRevisar}</span>`
+    : id === 'pagos' && porEmitir ? `<span class="punto" aria-label="${porEmitir} ${porEmitir === 1 ? 'factura' : 'facturas'} por emitir">${porEmitir}</span>`
     : id === 'accesos' && pendientes ? `<span class="punto" aria-label="${pendientes} pendientes">${pendientes}</span>`
     : id === 'solicitudes' && nuevas ? `<span class="punto" aria-label="${nuevas} sin atender">${nuevas}</span>` : '';
   const actual = S.vista === 'previa' ? 'clientes' : S.vista;
@@ -656,6 +733,8 @@ function render() {
   else if (S.vista === 'clientes' && S.perfil.role === 'admin') cuerpo = vistaClientes();
   else if (S.vista === 'accesos' && S.perfil.role === 'admin') cuerpo = vistaAccesos();
   else if (S.vista === 'solicitudes' && S.perfil.role === 'admin') cuerpo = vistaSolicitudes();
+  else if (S.vista === 'postulaciones' && S.perfil.role === 'admin') cuerpo = vistaPostulaciones();
+  else if (S.vista === 'pagos' && S.perfil.role === 'admin') cuerpo = vistaPagos();
   else cuerpo = vistaProduccion();
   pintar(barra() + `<main class="app">${cuerpo}</main>`);
 }
@@ -1133,6 +1212,208 @@ async function marcarSolicitud(id, atendida) {
   } catch (e) { aviso(humano(e), true); await recargar(); }
 }
 
+const avisoFaltaBase = () => S.faltaBase
+  ? '<p class="aviso-linea aviso-error">Falta preparar la base de datos: corre <b>trabajo-y-pagos.sql</b> en Supabase (SQL Editor). Mientras, esta sección no guarda nada.</p>' : '';
+
+// ---------- Postulaciones (connectstudios.mx/trabaja-con-nosotros) ------
+const TRABAJA_URL = 'https://connectstudios.mx/trabaja-con-nosotros/';
+const ROLES_POST = { editor: 'Editor de video', camarografo: 'Camarógrafo', fotografo: 'Fotógrafo', editor_camarografo: 'Edita y graba' };
+const rolPost = r => ROLES_POST[r] || String(r || '').replace(/_/g, ' ');
+const EXPERIENCIA = { menos_1: 'Menos de 1 año', '1_3': '1 a 3 años', '3_5': '3 a 5 años', mas_5: 'Más de 5 años' };
+const ESTADOS_POST = { nueva: 'Por revisar', interesa: 'Me interesa', contactado: 'Ya le escribí', descartada: 'Descartada' };
+
+function vistaPostulaciones() {
+  const todas = S.postulaciones, f = S.postFiltro;
+  const porRevisar = todas.filter(x => x.estado === 'nueva').length;
+  const deMexico = x => !x.pais || x.pais === 'México';
+  const lista = todas.filter(x => (!f.rol || x.rol === f.rol)
+    && (!f.pais || (f.pais === 'mx') === deMexico(x))
+    && (f.estado === 'activas' ? x.estado !== 'descartada' : !f.estado || x.estado === f.estado));
+  const opt = (v, t, actual) => `<option value="${v}"${actual === v ? ' selected' : ''}>${esc(t)}</option>`;
+  const roles = [...new Set(Object.keys(ROLES_POST).concat(todas.map(x => x.rol)))];
+  return `<div class="encabezado">
+    <div><h1>Postulaciones</h1><p class="sub">Editores, camarógrafos y fotógrafos que mandan su portafolio desde <a href="${TRABAJA_URL}" target="_blank" rel="noopener">${TRABAJA_URL.replace(/^https?:\/\//, '').replace(/\/$/, '')}</a>. Revísalas aquí y escríbele a quien te interese.</p></div>
+    <div class="controles">
+      <button class="btn btn-s" data-accion="copiar" data-texto="${TRABAJA_URL}" data-ok="Link copiado: pégalo donde quieras">Copiar link</button>
+      <select class="campo-in" data-cambio="post-filtro" data-campo="rol" aria-label="Filtrar por lo que hace">${opt('', 'Todos', f.rol)}${roles.map(r => opt(r, rolPost(r), f.rol)).join('')}</select>
+      <select class="campo-in" data-cambio="post-filtro" data-campo="pais" aria-label="Filtrar por país">${opt('', 'Todos los países', f.pais)}${opt('mx', 'México', f.pais)}${opt('fuera', 'Otros países', f.pais)}</select>
+      <select class="campo-in" data-cambio="post-filtro" data-campo="estado" aria-label="Filtrar por estado">${opt('activas', 'Sin descartadas', f.estado)}${Object.entries(ESTADOS_POST).map(([k, t]) => opt(k, t, f.estado)).join('')}${opt('', 'Todas', f.estado)}</select>
+    </div>
+  </div>
+  ${avisoFaltaBase()}
+  ${porRevisar ? `<p class="aviso-linea">${porRevisar === 1 ? 'Hay 1 postulación por revisar.' : `Hay ${porRevisar} postulaciones por revisar.`}</p>` : ''}
+  ${lista.length ? `<div class="sol-lista">${lista.map(x => {
+    const wa = waDe(x.whatsapp), pila = String(x.nombre || '').split(/\s+/)[0], o = x.origen || {};
+    const fuente = [o.utm_source, o.utm_campaign].filter(Boolean).join(' · ');
+    const portafolio = urlSegura(x.portafolio);
+    const msj = `Hola ${pila}, soy Manuel de Connect Studios. Vi tu portafolio y me gustaría platicar contigo.`;
+    return `<article class="sol p-${esc(x.estado)}">
+      <div>
+        <div class="sol-nombre">${esc(x.nombre)} <span>· ${esc(x.ciudad)}${deMexico(x) ? '' : `, ${esc(x.pais === 'Otro' ? 'otro país' : x.pais)}`}</span></div>
+        <div class="sol-meta">
+          ${wa ? `<a href="https://wa.me/${wa}?text=${encodeURIComponent(msj)}" target="_blank" rel="noopener">WhatsApp ${esc(x.whatsapp)}</a>` : ''}
+          <a href="mailto:${esc(x.correo)}">${esc(x.correo)}</a>
+          ${x.instagram ? `<span>${sitioDe(x.instagram)}</span>` : ''}
+          ${x.experiencia ? `<span>${esc(EXPERIENCIA[x.experiencia] || x.experiencia)} de experiencia</span>` : ''}
+        </div>
+        ${x.herramientas ? `<p class="sol-msg"><b>Trabaja con:</b> ${esc(x.herramientas)}</p>` : ''}
+        ${x.mensaje ? `<p class="sol-msg">${esc(x.mensaje)}</p>` : ''}
+        <div class="sol-acc">
+          ${portafolio ? `<a class="btn btn-s btn-p" href="${esc(portafolio)}" target="_blank" rel="noopener noreferrer">Ver portafolio ↗</a>` : ''}
+          <button class="btn btn-s btn-t btn-peligro" data-accion="borrar-postulacion" data-id="${x.id}">Borrar</button>
+        </div>
+        <textarea class="p-nota" data-cambio="post-nota" data-id="${x.id}" maxlength="1000" rows="1" aria-label="Nota privada sobre ${esc(x.nombre)}" placeholder="Nota privada: qué te pareció, tarifa, para qué proyecto…">${esc(x.nota || '')}</textarea>
+      </div>
+      <div class="sol-der">
+        <span class="sol-int${x.estado === 'interesa' ? ' sol-ok' : ''}">${esc(rolPost(x.rol))}</span>
+        <select class="campo-in" data-cambio="post-estado" data-id="${x.id}" aria-label="Estado de ${esc(x.nombre)}">${Object.entries(ESTADOS_POST).map(([k, t]) => opt(k, t, x.estado)).join('')}</select>
+        <span class="nota">${esc(fHora(x.created_at))}${fuente ? `<br>${esc(fuente)}` : ''}</span>
+      </div>
+    </article>`;
+  }).join('')}</div>`
+    : `<div class="caja-vacia"><p>${todas.length ? 'Nada coincide con estos filtros.' : 'Todavía no llega ninguna postulación. Comparte este link donde publiques que buscas editores o camarógrafos:'}</p>${todas.length ? '' : `<p><strong>${TRABAJA_URL}</strong></p><button class="btn btn-p" data-accion="copiar" data-texto="${TRABAJA_URL}" data-ok="Link copiado">Copiar link</button>`}</div>`}`;
+}
+
+async function guardarPostulacion(id, cambios, repintar) {
+  try {
+    await q(sb.from('postulaciones').update(cambios).eq('id', id));
+    const x = S.postulaciones.find(p => p.id === id);
+    if (x) Object.assign(x, cambios);
+    if (repintar) render();
+    aviso('nota' in cambios ? 'Nota guardada' : 'Guardado');
+  } catch (e) { aviso(humano(e), true); await recargar(); }
+}
+
+// ---------- Pagos y facturas -------------------------------------------
+// Catálogos del SAT (CFDI 4.0) que más se usan al facturar servicios
+const REGIMENES = { '601': 'General de Ley Personas Morales', '626': 'Régimen Simplificado de Confianza',
+  '612': 'Personas Físicas con Actividades Empresariales y Profesionales', '603': 'Personas Morales con Fines no Lucrativos',
+  '606': 'Arrendamiento', '621': 'Incorporación Fiscal', '625': 'Plataformas Tecnológicas', '605': 'Sueldos y Salarios',
+  '616': 'Sin obligaciones fiscales' };
+const USOS_CFDI = { G03: 'Gastos en general', G01: 'Adquisición de mercancías', S01: 'Sin efectos fiscales' };
+const ESTADOS_FAC = { pendiente: 'Por emitir', emitida: 'Emitida', cancelada: 'Cancelada' };
+const ESTADOS_FAC_CLI = { pendiente: 'En proceso', emitida: 'Lista', cancelada: 'Cancelada' };
+const dinero = n => (n === null || n === undefined || n === '') ? '' : '$' + Number(n).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const clabeBonita = c => String(c || '').replace(/(\d{4})(?=\d)/g, '$1 ');
+// Dígito verificador de la CLABE (pesos 3, 7, 1): evita publicar una CLABE con un número mal tecleado
+function clabeValida(c) {
+  if (!/^\d{18}$/.test(c)) return false;
+  let s = 0;
+  for (let i = 0; i < 17; i++) s += (Number(c[i]) * [3, 7, 1][i % 3]) % 10;
+  return (10 - s % 10) % 10 === Number(c[17]);
+}
+const regimenTxt = k => k ? `${k} · ${REGIMENES[k] || 'Otro'}` : '';
+const usoTxt = k => k ? `${k} · ${USOS_CFDI[k] || 'Otro'}` : '';
+const RFC_OK = /^[A-ZÑ&]{3,4}\d{6}[A-Z0-9]{3}$/;
+
+// Datos para transferir: igual para el admin y para el cliente
+function bloqueDatosPago(d) {
+  const filas = [['Banco', d.banco], ['Titular', d.titular], ['Número de cuenta', d.cuenta], ['RFC del titular', d.rfc]].filter(([, x]) => x);
+  return `<dl class="pago-datos">
+    <div class="pago-dato clave"><dt>CLABE interbancaria</dt><dd><span class="clabe">${esc(clabeBonita(d.clabe))}</span>
+      <button class="btn btn-s" data-accion="copiar" data-texto="${esc(d.clabe)}" data-ok="CLABE copiada">Copiar CLABE</button></dd></div>
+    ${filas.map(([k, x]) => `<div class="pago-dato"><dt>${k}</dt><dd>${esc(x)}</dd></div>`).join('')}
+    ${d.concepto ? `<div class="pago-dato ancho"><dt>Concepto de la transferencia</dt><dd>${esc(d.concepto)}</dd></div>` : ''}
+  </dl>
+  ${d.notas ? `<p class="rep-txt pago-notas">${esc(d.notas)}</p>` : ''}`;
+}
+
+// Todo lo que pide el sistema de facturación, listo para pegar
+function textoFiscal(x) {
+  const cl = clientePorId(x.client_id);
+  return [['Cliente', cl && cl.name], ['RFC', x.rfc], ['Razón social', x.razon_social], ['Código postal fiscal', x.cp],
+    ['Régimen fiscal', regimenTxt(x.regimen)], ['Uso del CFDI', usoTxt(x.uso_cfdi)], ['Correo', x.correo],
+    ['Concepto', x.concepto], ['Monto pagado', dinero(x.monto)], ['Fecha de pago', x.fecha_pago && fLarga(x.fecha_pago) + ' de ' + x.fecha_pago.slice(0, 4)],
+    ['Comentario', x.comentario]].filter(([, v]) => v).map(([k, v]) => `${k}: ${v}`).join('\n');
+}
+
+function vistaPagos() {
+  const d = S.pagoDatos, f = S.facFiltro;
+  const porEmitir = S.facturas.filter(x => x.estado === 'pendiente').length;
+  const lista = S.facturas.filter(x => !f || x.estado === f);
+  const opt = (v, t) => `<option value="${v}"${f === v ? ' selected' : ''}>${esc(t)}</option>`;
+  return `<div class="encabezado">
+    <div><h1>Pagos</h1><p class="sub">Tus clientes ven los datos para transferir y piden su factura en su portal, en la pestaña Pagos. Esos datos no están en el código de la página: solo los ve quien entra como cliente.</p></div>
+  </div>
+  ${avisoFaltaBase()}
+  <section class="rep">
+    <div class="rep-cab"><h2>Datos para <span>transferir</span></h2>${d ? '<button class="btn btn-s" data-accion="pago-datos">Editar</button>' : ''}</div>
+    ${d ? `${bloqueDatosPago(d)}<p class="nota" style="margin:.9rem 0 0">Última actualización: ${esc(fHora(d.updated_at))}</p>`
+      : `<div class="caja-vacia"><p>Todavía no hay datos. Agrégalos y tus clientes los verán en su portal, con un botón para copiar la CLABE.</p><button class="btn btn-p" data-accion="pago-datos">Agregar datos para transferir</button></div>`}
+  </section>
+  <div class="titulo-sec">
+    <h2>Facturas</h2>
+    <div class="controles"><select class="campo-in" data-cambio="fac-filtro" aria-label="Filtrar facturas">${opt('pendiente', 'Por emitir')}${opt('emitida', 'Emitidas')}${opt('cancelada', 'Canceladas')}${opt('', 'Todas')}</select></div>
+  </div>
+  ${porEmitir ? `<p class="aviso-linea">${porEmitir === 1 ? 'Hay 1 factura por emitir.' : `Hay ${porEmitir} facturas por emitir.`}</p>` : ''}
+  ${lista.length ? `<div class="sol-lista">${lista.map(x => {
+    const cl = clientePorId(x.client_id), quien = perfilPorId(x.solicitada_por);
+    const pago = [x.monto !== null && x.monto !== undefined ? `Pagó ${dinero(x.monto)}` : '', x.fecha_pago ? `el ${fLarga(x.fecha_pago)}` : ''].filter(Boolean).join(' ');
+    const link = urlSegura(x.factura_url);
+    return `<article class="sol f-${esc(x.estado)}">
+      <div>
+        <div class="sol-nombre">${esc(cl ? cl.name : 'Cliente borrado')} <span>· ${esc(x.concepto)}</span></div>
+        <div class="sol-meta">${pago ? `<span>${esc(pago)}</span>` : ''}<span>Mandarla a <a href="mailto:${esc(x.correo)}">${esc(x.correo)}</a></span></div>
+        <dl class="fiscal">
+          <div><dt>RFC</dt><dd>${esc(x.rfc)}</dd></div>
+          <div><dt>Razón social</dt><dd>${esc(x.razon_social)}</dd></div>
+          <div><dt>Código postal fiscal</dt><dd>${esc(x.cp)}</dd></div>
+          <div><dt>Régimen fiscal</dt><dd>${esc(regimenTxt(x.regimen))}</dd></div>
+          <div><dt>Uso del CFDI</dt><dd>${esc(usoTxt(x.uso_cfdi))}</dd></div>
+        </dl>
+        ${x.comentario ? `<p class="sol-msg">${esc(x.comentario)}</p>` : ''}
+        <div class="sol-acc">
+          <button class="btn btn-s" data-accion="copiar" data-texto="${esc(textoFiscal(x))}" data-ok="Datos de la factura copiados">Copiar datos</button>
+          ${x.estado === 'pendiente' ? `<button class="btn btn-s btn-p" data-accion="factura" data-id="${x.id}">Marcar emitida</button>`
+            : `${link ? `<a class="btn btn-s" href="${esc(link)}" target="_blank" rel="noopener noreferrer">Ver factura ↗</a>` : ''}<button class="btn btn-s btn-t" data-accion="factura" data-id="${x.id}">Cambiar</button>`}
+        </div>
+      </div>
+      <div class="sol-der">
+        <span class="estado e-${esc(x.estado)}">${esc(ESTADOS_FAC[x.estado] || x.estado)}</span>
+        <span class="nota">Pedida ${esc(fHora(x.created_at))}${quien ? `<br>por ${esc(nombreDe(quien))}` : ''}${x.emitida_at && x.estado === 'emitida' ? `<br>Emitida ${esc(fHora(x.emitida_at))}` : ''}</span>
+      </div>
+    </article>`;
+  }).join('')}</div>`
+    : `<div class="caja-vacia"><p>${S.facturas.length ? (f === 'pendiente' ? 'No hay facturas por emitir.' : 'Nada coincide con este filtro.') : 'Todavía nadie pide factura. Tus clientes la piden desde su portal, en la pestaña Pagos, y aquí te llega con todos sus datos fiscales.'}</p></div>`}`;
+}
+
+// Lo que ve el cliente en Pagos. G = { datos, facturas, fiscales } (client_pagos o pagosLocal)
+function vistaPagosCliente(G, P, previa) {
+  if (!G) return `<div class="caja-vacia"><p>Esta sección no cargó. Toca “Revisar de nuevo”; si sigue igual, pídenos los datos por WhatsApp.</p><button class="btn" data-accion="actualizar">Revisar de nuevo</button></div>`;
+  const d = G.datos, facs = G.facturas || [];
+  const wa = CONFIG.WHATSAPP ? `https://wa.me/${CONFIG.WHATSAPP}?text=${encodeURIComponent(d ? `Hola, te mando el comprobante de pago de ${P.client.name}.` : `Hola, ¿me pasas los datos para transferir? Soy de ${P.client.name}.`)}` : '';
+  return `<p class="rep-intro">Aquí tienes los datos para transferir y puedes pedir la factura de cada pago.</p>
+  <section class="rep">
+    <div class="rep-cab"><h2>Datos para <span>transferir</span></h2></div>
+    ${d ? `${bloqueDatosPago(d)}
+      <div class="pago-pie">${wa ? `<a class="btn" href="${esc(wa)}" target="_blank" rel="noopener noreferrer">Mandar comprobante por WhatsApp</a>` : ''}<span class="nota">Después de pagar, pide tu factura aquí abajo.</span></div>`
+      : `<p class="rep-txt">Pronto verás aquí los datos para transferir. Mientras, pídenoslos por WhatsApp.</p>${wa ? `<div class="pago-pie"><a class="btn" href="${esc(wa)}" target="_blank" rel="noopener noreferrer">Pedir datos por WhatsApp</a></div>` : ''}`}
+  </section>
+  <section class="rep">
+    <div class="rep-cab"><h2>Facturas</h2><button class="btn btn-p" data-accion="pedir-factura"${previa ? ' disabled title="En la vista previa no se piden facturas"' : ''}>Pedir factura</button></div>
+    ${facs.length ? `<div class="fac-lista">${facs.map(x => {
+      const pago = [x.monto !== null && x.monto !== undefined ? `Pagaste ${dinero(x.monto)}` : '', x.fecha_pago ? `el ${fLarga(x.fecha_pago)}` : ''].filter(Boolean).join(' ');
+      const link = urlSegura(x.factura_url);
+      return `<div class="fac"><div><div class="fac-tit">${esc(x.concepto)}</div>
+          <div class="fac-meta">${pago ? esc(pago) + ' · ' : ''}Pedida el ${esc(fCorta(x.created_at))}</div></div>
+        <div class="fac-der"><span class="estado e-${esc(x.estado)}">${esc(ESTADOS_FAC_CLI[x.estado] || x.estado)}</span>
+          ${link ? `<a class="btn btn-s btn-p" href="${esc(link)}" target="_blank" rel="noopener noreferrer">Descargar</a>` : ''}</div></div>`;
+    }).join('')}</div>
+      <p class="nota" style="margin:.9rem 0 0">También te llega al correo que nos diste. ¿Algún dato salió mal? Escríbenos por WhatsApp.</p>`
+      : `<p class="rep-txt">Cuando pagues, pide aquí tu factura. Te llega al correo que nos digas y también la vas a ver aquí.</p>`}
+  </section>`;
+}
+
+// Vista previa del admin: lo mismo que regresaría client_pagos para ese cliente
+function pagosLocal(idCliente) {
+  const d = S.pagoDatos, facs = S.facturas.filter(f => f.client_id === idCliente);
+  return {
+    datos: d ? { banco: d.banco, titular: d.titular, clabe: d.clabe, cuenta: d.cuenta, rfc: d.rfc, concepto: d.concepto, notas: d.notas } : null,
+    facturas: facs.map(f => Object.assign({}, f, { factura_url: f.estado === 'emitida' ? f.factura_url : null })),
+    fiscales: facs[0] || null
+  };
+}
+
 function celdaEditor(p) {
   const cls = clientesDeEditor(p.id);
   return `<button class="btn btn-s${cls.length ? '' : ' btn-p'}" data-accion="editor-clientes" data-id="${p.id}">${cls.length ? 'Cambiar clientes' : 'Asignar clientes'}</button>
@@ -1145,9 +1426,25 @@ function vistaCliente(P, previa) {
     return `<div class="caja-vacia"><p>Tu cuenta ya está activa, pero falta ligarla a tu empresa. Avísale a Connect Studios y en cuanto lo hagan verás aquí tus videos.</p><button class="btn" data-accion="actualizar">Revisar de nuevo</button></div>`;
   }
   const ciclos = P.cycles || [];
+  // Resultados: solo el reporte más reciente, en su propia pestaña
+  const ultimo = ultimoReporte(ciclos);
+  const nuevo = !previa && ultimo && reporteVisto() !== claveReporte(ultimo);
+  const pest = S.pestanaCli;
+  const tab = (id, txt) => `<button role="tab" aria-selected="${pest === id}" data-accion="cli-pestana" data-id="${id}">${txt}</button>`;
+  const pestanas = `<div class="cli-tabs" role="tablist" aria-label="Secciones">
+      ${tab('videos', 'Mis videos')}${tab('resultados', 'Resultados' + (nuevo ? ' <span class="cli-nuevo">Nuevo</span>' : ''))}${tab('pagos', 'Pagos')}
+    </div>`;
+  if (pest === 'pagos') {
+    return `${pestanas}<div class="cli-panel" role="tabpanel">${vistaPagosCliente(previa ? pagosLocal(S.previa) : S.pagosCli, P, previa)}</div>`;
+  }
+  if (pest === 'resultados') {
+    return `${pestanas}<div class="cli-panel" role="tabpanel">${ultimo
+      ? `<p class="rep-intro">Los números de tu mes más reciente de publicaciones. Cada mes que cerramos, aquí aparece el nuevo.</p>${bloqueReporte(ultimo.report, ultimo.name)}`
+      : `<div class="caja-vacia"><p>Aquí vas a ver cómo le fue a tu contenido: cuántas personas lo vieron, el video que mejor funcionó y qué ajustamos. Tus primeros resultados llegan al cerrar tu primer mes de publicaciones.</p><button class="btn" data-accion="cli-pestana" data-id="videos">Ver mis videos</button></div>`}</div>`;
+  }
   if (!ciclos.length) {
-    return `<section class="hero-cli"><p class="cli-empresa">${esc(P.client.name)}</p><h1 class="mes-grande">Bienvenido</h1></section>
-      <div class="caja-vacia"><p>Aún no hay meses programados. Cuando agendemos tu grabación, aquí verás cada video, del guion a la entrega.</p></div>`;
+    return `${pestanas}<div class="cli-panel" role="tabpanel"><section class="hero-cli"><p class="cli-empresa">${esc(P.client.name)}</p><h1 class="mes-grande">Bienvenido</h1></section>
+      <div class="caja-vacia"><p>Aún no hay meses programados. Cuando agendemos tu grabación, aquí verás cada video, del guion a la entrega.</p></div></div>`;
   }
   const c = ciclos.find(x => x.id === S.cicloCliente) || ciclos[0];
   const vs = c.videos || [];
@@ -1158,19 +1455,6 @@ function vistaCliente(P, previa) {
   else if (aISO(hoy()) > c.record_end || entregados) { mensaje = `Estamos editando. Van ${entregados} de ${vs.length} entregados.`; cuenta = entregados; que = 'entregados'; }
   else if (conGuion < vs.length) mensaje = `Llevas ${conGuion} de ${vs.length} guiones. Súbelos a más tardar el ${fLarga(c.script_due || c.record_start)}.`;
   else mensaje = `Tus ${vs.length} guiones están listos para grabar.`;
-  // Resultados: solo el reporte más reciente, en su propia pestaña
-  const ultimo = ultimoReporte(ciclos);
-  const nuevo = !previa && ultimo && reporteVisto() !== claveReporte(ultimo);
-  const enResultados = S.pestanaCli === 'resultados';
-  const pestanas = `<div class="cli-tabs" role="tablist" aria-label="Secciones">
-      <button role="tab" aria-selected="${!enResultados}" data-accion="cli-pestana" data-id="videos">Mis videos</button>
-      <button role="tab" aria-selected="${enResultados}" data-accion="cli-pestana" data-id="resultados">Resultados${nuevo ? ' <span class="cli-nuevo">Nuevo</span>' : ''}</button>
-    </div>`;
-  if (enResultados) {
-    return `${pestanas}<div class="cli-panel" role="tabpanel">${ultimo
-      ? `<p class="rep-intro">Los números de tu mes más reciente de publicaciones. Cada mes que cerramos, aquí aparece el nuevo.</p>${bloqueReporte(ultimo.report, ultimo.name)}`
-      : `<div class="caja-vacia"><p>Aquí vas a ver cómo le fue a tu contenido: cuántas personas lo vieron, el video que mejor funcionó y qué ajustamos. Tus primeros resultados llegan al cerrar tu primer mes de publicaciones.</p><button class="btn" data-accion="cli-pestana" data-id="videos">Ver mis videos</button></div>`}</div>`;
-  }
   return `${pestanas}<div class="cli-panel" role="tabpanel">
     ${ciclos.length > 1 ? `<div class="mes-tabs" role="group" aria-label="Meses">${ciclos.map(x => `<button data-accion="ver-mes" data-id="${x.id}" aria-pressed="${x.id === c.id}">${esc(x.name)}</button>`).join('')}</div>` : ''}
     <section class="hero-cli">
@@ -1653,6 +1937,90 @@ function modalCliente(id) {
   </form>`);
 }
 
+// Datos para transferir (admin)
+function modalPagoDatos() {
+  const d = S.pagoDatos || {};
+  const v = k => esc(d[k] || '');
+  abrirModal(`<form data-form="pago-datos" novalidate>
+    <div class="d-cab"><div><h2 class="d-titulo">Datos para transferir</h2><p class="d-sub">Los ven tus clientes en su portal, en la pestaña Pagos.</p></div></div>
+    <div class="fila-campos">
+      <div class="campo"><label for="pd-banco">Banco</label><input id="pd-banco" name="banco" maxlength="60" required value="${v('banco')}" placeholder="BBVA, Banorte, Santander…"></div>
+      <div class="campo"><label for="pd-titular">Titular de la cuenta</label><input id="pd-titular" name="titular" maxlength="120" required value="${v('titular')}" placeholder="Como aparece en el banco"></div>
+    </div>
+    <div class="campo"><label for="pd-clabe">CLABE interbancaria</label><input id="pd-clabe" name="clabe" inputmode="numeric" autocomplete="off" maxlength="24" required value="${esc(clabeBonita(d.clabe))}" placeholder="18 dígitos">
+      <p class="ayuda">Se revisa el dígito verificador, así que una CLABE mal tecleada no se guarda.</p></div>
+    <div class="fila-campos">
+      <div class="campo"><label for="pd-cuenta">Número de cuenta <span class="opc">(opcional)</span></label><input id="pd-cuenta" name="cuenta" inputmode="numeric" autocomplete="off" maxlength="24" value="${v('cuenta')}"></div>
+      <div class="campo"><label for="pd-rfc">RFC del titular <span class="opc">(opcional)</span></label><input id="pd-rfc" name="rfc" maxlength="13" autocapitalize="characters" autocomplete="off" value="${v('rfc')}"></div>
+    </div>
+    <div class="campo"><label for="pd-concepto">Qué poner en el concepto <span class="opc">(opcional)</span></label><input id="pd-concepto" name="concepto" maxlength="200" value="${v('concepto')}" placeholder="El nombre de tu empresa y el mes, por ejemplo: Dorma octubre"></div>
+    <div class="campo"><label for="pd-notas">Algo más <span class="opc">(opcional)</span></label><textarea id="pd-notas" name="notas" maxlength="600" style="min-height:4.5rem" placeholder="Por ejemplo: manda tu comprobante por WhatsApp el mismo día.">${v('notas')}</textarea></div>
+    <div class="d-pie">
+      <button type="button" class="btn" data-accion="cerrar">Cancelar</button>
+      <button type="submit" class="btn btn-p">Guardar datos</button>
+    </div>
+  </form>`);
+}
+
+// Marcar una factura como emitida, cancelada o regresarla a pendiente (admin)
+function modalFactura(id) {
+  const x = S.facturas.find(f => f.id === id); if (!x) return;
+  const cl = clientePorId(x.client_id);
+  const estado = x.estado === 'pendiente' ? 'emitida' : x.estado;
+  abrirModal(`<form data-form="factura" data-id="${x.id}" novalidate>
+    <div class="d-cab"><div><h2 class="d-titulo">Factura de ${esc(cl ? cl.name : 'cliente')}</h2>
+      <p class="d-sub">${esc(x.concepto)}${x.monto !== null && x.monto !== undefined ? ` · ${esc(dinero(x.monto))}` : ''} · RFC ${esc(x.rfc)}</p></div></div>
+    <div class="campo"><label for="fa-estado">Estado</label>
+      <select id="fa-estado" name="estado">${Object.entries(ESTADOS_FAC).map(([k, t]) => `<option value="${k}"${estado === k ? ' selected' : ''}>${t}</option>`).join('')}</select></div>
+    <div class="campo"><label for="fa-url">Link a la factura <span class="opc">(opcional)</span></label>
+      <input id="fa-url" name="factura_url" type="url" inputmode="url" placeholder="https://drive.google.com/..." value="${esc(x.factura_url || '')}">
+      <p class="ayuda">Una carpeta o archivo de Drive con el PDF y el XML, compartido como “cualquier persona con el link”. El cliente lo ve en su portal cuando la factura está emitida.</p></div>
+    <div class="d-pie">
+      <button type="button" class="btn btn-t btn-peligro izq" data-accion="borrar-factura" data-id="${x.id}">Borrar</button>
+      <button type="button" class="btn" data-accion="cerrar">Cancelar</button>
+      <button type="submit" class="btn btn-p">Guardar</button>
+    </div>
+  </form>`);
+}
+
+// Pedir factura (cliente). Los datos fiscales salen llenos con los de la última vez.
+function modalPedirFactura() {
+  const G = S.pagosCli || {}, fz = G.fiscales || {};
+  const ciclos = ((S.portal && S.portal.cycles) || []).slice(0, 6);
+  const conceptos = ['Anticipo (primer pago)'].concat(ciclos.map(c => `Mensualidad de ${c.name}`), ['Día adicional de grabación', 'Otro (lo explico en el comentario)']);
+  const opt = (v, t, actual) => `<option value="${esc(v)}"${actual === v ? ' selected' : ''}>${esc(t)}</option>`;
+  const correo = fz.correo || (S.sesion && S.sesion.user && S.sesion.user.email) || '';
+  abrirModal(`<form data-form="pedir-factura" novalidate>
+    <div class="d-cab"><div><h2 class="d-titulo">Pedir factura</h2><p class="d-sub">Te la mandamos al correo que pongas aquí y también la verás en tu portal.</p></div></div>
+    <div class="campo"><label for="pf-concepto">¿Qué pago quieres facturar?</label>
+      <select id="pf-concepto" name="concepto" required><option value="" selected disabled>Elige el pago</option>${conceptos.map(c => opt(c, c, '')).join('')}</select></div>
+    <div class="fila-campos">
+      <div class="campo"><label for="pf-fecha">Fecha del pago</label><input id="pf-fecha" name="fecha_pago" type="date" required value="${aISO(hoy())}" max="${aISO(sumarDias(hoy(), 1))}"></div>
+      <div class="campo"><label for="pf-monto">Monto que pagaste <span class="opc">(opcional)</span></label><input id="pf-monto" name="monto" inputmode="decimal" autocomplete="off" placeholder="$0.00"></div>
+    </div>
+    <div class="d-sep"><h3>Tus datos fiscales</h3><p>Cópialos tal cual de tu Constancia de Situación Fiscal.${fz.rfc ? ' Ya están los de tu última factura: revisa que sigan iguales.' : ''}</p></div>
+    <div class="fila-campos">
+      <div class="campo"><label for="pf-rfc">RFC</label><input id="pf-rfc" name="rfc" maxlength="15" required autocapitalize="characters" autocomplete="off" spellcheck="false" value="${esc(fz.rfc || '')}" placeholder="12 o 13 caracteres"></div>
+      <div class="campo"><label for="pf-cp">Código postal fiscal</label><input id="pf-cp" name="cp" inputmode="numeric" maxlength="5" required autocomplete="off" value="${esc(fz.cp || '')}" placeholder="44100"></div>
+    </div>
+    <div class="campo"><label for="pf-razon">Nombre o razón social</label><input id="pf-razon" name="razon_social" maxlength="254" required autocomplete="organization" value="${esc(fz.razon_social || '')}">
+      <p class="ayuda">Como aparece en tu constancia, sin “S.A. de C.V.” ni otro régimen de capital.</p></div>
+    <div class="fila-campos">
+      <div class="campo"><label for="pf-regimen">Régimen fiscal</label>
+        <select id="pf-regimen" name="regimen" required><option value=""${fz.regimen ? '' : ' selected'} disabled>Elige tu régimen</option>${Object.entries(REGIMENES).map(([k, t]) => opt(k, `${k} · ${t}`, fz.regimen)).join('')}</select></div>
+      <div class="campo"><label for="pf-uso">Uso del CFDI</label>
+        <select id="pf-uso" name="uso_cfdi" required>${Object.entries(USOS_CFDI).map(([k, t]) => opt(k, `${k} · ${t}`, fz.uso_cfdi || 'G03')).join('')}</select>
+        <p class="ayuda">Si no sabes, déjalo en G03.</p></div>
+    </div>
+    <div class="campo"><label for="pf-correo">Correo para recibir la factura</label><input id="pf-correo" name="correo" type="email" inputmode="email" maxlength="200" required value="${esc(correo)}"></div>
+    <div class="campo"><label for="pf-com">Comentario <span class="opc">(opcional)</span></label><textarea id="pf-com" name="comentario" maxlength="1000" style="min-height:4.5rem" placeholder="Por ejemplo: necesito que diga el número de orden de compra"></textarea></div>
+    <div class="d-pie">
+      <button type="button" class="btn" data-accion="cerrar">Cancelar</button>
+      <button type="submit" class="btn btn-p">Pedir factura</button>
+    </div>
+  </form>`);
+}
+
 // ---------- Formularios -----------------------------------------------
 const valor = (f, n) => { const el = f.elements[n]; if (!el || el.disabled) return undefined; return String(el.value).trim(); };
 function revisarLinks(f, nombres) {
@@ -1832,6 +2200,61 @@ const FORMS = {
       aviso(f.dataset.id ? 'Cliente actualizado' : 'Cliente creado');
       await recargar();
     } catch (e) { aviso(humano(e), true); }
+  },
+  async 'pago-datos'(f) {
+    const soloDigitos = x => (x || '').replace(/[\s-]/g, '');
+    const d = { id: 1, banco: valor(f, 'banco'), titular: valor(f, 'titular'), clabe: soloDigitos(valor(f, 'clabe')),
+      cuenta: soloDigitos(valor(f, 'cuenta')) || null, rfc: (valor(f, 'rfc') || '').toUpperCase().replace(/[\s-]/g, '') || null,
+      concepto: valor(f, 'concepto') || null, notas: valor(f, 'notas') || null };
+    if (!d.banco || d.banco.length < 2) { aviso('Escribe el banco.', true); return f.elements.banco.focus(); }
+    if (!d.titular || d.titular.length < 2) { aviso('Escribe el titular de la cuenta.', true); return f.elements.titular.focus(); }
+    if (!/^\d{18}$/.test(d.clabe)) { aviso('La CLABE tiene 18 dígitos.', true); return f.elements.clabe.focus(); }
+    if (!clabeValida(d.clabe)) { aviso('Esa CLABE no es válida: revisa que no falte o sobre un número.', true); return f.elements.clabe.focus(); }
+    if (d.cuenta && !/^\d{6,20}$/.test(d.cuenta)) { aviso('El número de cuenta solo lleva dígitos (de 6 a 20).', true); return f.elements.cuenta.focus(); }
+    if (d.rfc && !RFC_OK.test(d.rfc)) { aviso('Revisa el RFC: son 12 caracteres si es empresa o 13 si es persona física.', true); return f.elements.rfc.focus(); }
+    try {
+      await q(sb.from('pago_datos').upsert(d));
+      cerrarModal();
+      aviso('Datos guardados: tus clientes ya los ven');
+      await recargar();
+    } catch (e) { aviso(humano(e), true); }
+  },
+  async factura(f) {
+    const x = S.facturas.find(y => y.id === f.dataset.id); if (!x) return;
+    if (!revisarLinks(f, ['factura_url'])) return;
+    const estado = valor(f, 'estado');
+    const cambios = { estado, factura_url: valor(f, 'factura_url') || null,
+      emitida_at: estado === 'emitida' ? (x.emitida_at || new Date().toISOString()) : null };
+    try {
+      await q(sb.from('facturas').update(cambios).eq('id', x.id));
+      cerrarModal();
+      aviso(estado === 'emitida' ? (cambios.factura_url ? 'Factura emitida: el cliente ya puede descargarla' : 'Factura marcada como emitida') : 'Factura actualizada');
+      await recargar();
+    } catch (e) { aviso(humano(e), true); }
+  },
+  async 'pedir-factura'(f) {
+    const d = {
+      p_concepto: valor(f, 'concepto') || '', p_fecha_pago: valor(f, 'fecha_pago') || null,
+      p_rfc: (valor(f, 'rfc') || '').toUpperCase().replace(/[\s-]/g, ''), p_razon_social: valor(f, 'razon_social') || '',
+      p_regimen: valor(f, 'regimen') || '', p_cp: valor(f, 'cp') || '', p_uso_cfdi: valor(f, 'uso_cfdi') || 'G03',
+      p_correo: valor(f, 'correo') || '', p_comentario: valor(f, 'comentario') || ''
+    };
+    const montoTxt = (valor(f, 'monto') || '').replace(/[$,\s]/g, '');
+    d.p_monto = montoTxt === '' ? null : Number(montoTxt);
+    if (!d.p_concepto) { aviso('Elige qué pago quieres facturar.', true); return f.elements.concepto.focus(); }
+    if (!d.p_fecha_pago) { aviso('Pon la fecha en que pagaste.', true); return f.elements.fecha_pago.focus(); }
+    if (d.p_monto !== null && !(d.p_monto > 0 && d.p_monto < 1e7)) { aviso('Revisa el monto: solo números, por ejemplo 16818.84', true); return f.elements.monto.focus(); }
+    if (!RFC_OK.test(d.p_rfc)) { aviso('Revisa el RFC: son 12 caracteres si es empresa o 13 si es persona física.', true); return f.elements.rfc.focus(); }
+    if (!/^\d{5}$/.test(d.p_cp)) { aviso('El código postal fiscal tiene 5 dígitos.', true); return f.elements.cp.focus(); }
+    if (d.p_razon_social.length < 2) { aviso('Escribe tu nombre o razón social.', true); return f.elements.razon_social.focus(); }
+    if (!d.p_regimen) { aviso('Elige tu régimen fiscal (viene en tu constancia).', true); return f.elements.regimen.focus(); }
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(d.p_correo)) { aviso('Revisa el correo donde quieres recibir la factura.', true); return f.elements.correo.focus(); }
+    try {
+      await q(sb.rpc('client_pedir_factura', d));
+      cerrarModal();
+      aviso('Listo: pediste tu factura. Aquí verás cuando esté.');
+      await recargar();
+    } catch (e) { aviso(humano(e), true); }
   }
 };
 
@@ -1859,7 +2282,7 @@ const ACC = {
   previa(el, id) { S.previa = id; S.vista = 'previa'; S.cicloCliente = null; S.pestanaCli = 'videos'; elegirMesCliente(portalLocal(id)); render(); window.scrollTo(0, 0); },
   'ver-mes'(el, id) { S.cicloCliente = id; render(); },
   'cli-pestana'(el, id) {
-    S.pestanaCli = id === 'resultados' ? 'resultados' : 'videos';
+    S.pestanaCli = ['resultados', 'pagos'].includes(id) ? id : 'videos';
     if (S.pestanaCli === 'resultados' && S.vista !== 'previa') {
       const u = ultimoReporte(S.portal && S.portal.cycles);
       if (u) marcarReporteVisto(u);
@@ -1987,6 +2410,37 @@ const ACC = {
     try { await q(sb.from('reportes').delete().eq('cycle_id', id)); aviso('Reporte borrado'); await recargar(); }
     catch (e) { aviso(humano(e), true); }
   },
+  async copiar(el) {
+    const t = el.dataset.texto || '', ok = el.dataset.ok || 'Copiado';
+    try { await navigator.clipboard.writeText(t); return aviso(ok); } catch (e) { /* sin permiso: método viejo */ }
+    const ta = document.createElement('textarea');
+    ta.value = t; ta.setAttribute('readonly', ''); ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0';
+    document.body.appendChild(ta); ta.select();
+    let hecho = false;
+    try { hecho = document.execCommand('copy'); } catch (e) { hecho = false; }
+    ta.remove();
+    aviso(hecho ? ok : 'No se pudo copiar. Selecciónalo y cópialo a mano.', !hecho);
+  },
+  async 'borrar-postulacion'(el, id) {
+    const x = S.postulaciones.find(p => p.id === id); if (!x) return;
+    if (!await confirmar(`¿Borrar la postulación de ${x.nombre}?`, 'Se borran sus datos y tu nota. Hazlo si te lo pide o si no te sirve guardarla. No se puede deshacer.', 'Borrar', true)) return;
+    try { await q(sb.from('postulaciones').delete().eq('id', id)); aviso('Postulación borrada'); await recargar(); }
+    catch (e) { aviso(humano(e), true); }
+  },
+  'pago-datos'() { modalPagoDatos(); },
+  factura(el, id) { modalFactura(id); },
+  async 'borrar-factura'(el, id) {
+    const x = S.facturas.find(f => f.id === id); if (!x) return;
+    const cl = clientePorId(x.client_id);
+    if (!await confirmar(`¿Borrar la solicitud de factura de ${cl ? cl.name : 'este cliente'}?`, 'El cliente deja de verla en su portal. Si ya la emitiste y solo hubo un error, mejor márcala como cancelada.', 'Borrar', true)) return;
+    try { await q(sb.from('facturas').delete().eq('id', id)); aviso('Solicitud de factura borrada'); await recargar(); }
+    catch (e) { aviso(humano(e), true); }
+  },
+  'pedir-factura'() {
+    if (S.vista === 'previa') return aviso('En la vista previa no se piden facturas.');
+    if (!S.pagosCli) return aviso('Esta sección no cargó. Toca “Revisar de nuevo”.', true);
+    modalPedirFactura();
+  },
   'nuevo-ciclo'(el, id) { modalCiclo(null, id); },
   'editar-ciclo'(el, id) { modalCiclo(id); },
   async 'borrar-ciclo'(el, id) {
@@ -2022,7 +2476,14 @@ const CAMBIOS = {
   'perfil-nombre'(el) { actualizarPerfil(el.dataset.id, { full_name: el.value.trim() || null }, false); },
   'sol-ver-atendidas'(el) { S.verAtendidas = el.checked; render(); },
   'sol-filtro'(el) { S.solFiltro[el.dataset.campo] = el.value; render(); },
-  'sol-atendida'(el) { marcarSolicitud(el.dataset.id, el.checked); }
+  'sol-atendida'(el) { marcarSolicitud(el.dataset.id, el.checked); },
+  'post-filtro'(el) { S.postFiltro[el.dataset.campo] = el.value; render(); },
+  'post-estado'(el) { guardarPostulacion(el.dataset.id, { estado: el.value }, true); },
+  'post-nota'(el) {
+    const x = S.postulaciones.find(p => p.id === el.dataset.id), nota = el.value.trim() || null;
+    if (x && (x.nota || null) !== nota) guardarPostulacion(el.dataset.id, { nota }, false);
+  },
+  'fac-filtro'(el) { S.facFiltro = el.value; render(); }
 };
 
 document.addEventListener('click', ev => {
