@@ -204,7 +204,7 @@ h1 em{font-style:normal;color:var(--verde)}
   </div>
 
   <!-- Caso 1 -->
-  <article class="caso">
+  <article class="caso" id="cabb">
     <div class="caso-cab r">
       <div><span class="caso-num">01 · Video institucional</span><h2>CABB Arrenda</h2></div>
       <div class="caso-tags"><span class="tag">Arrendadora</span><span class="tag">Guadalajara</span><span class="tag">2024</span></div>
@@ -220,9 +220,14 @@ h1 em{font-style:normal;color:var(--verde)}
       <div class="r d1"><h3><b>02</b>La decisión</h3><p>Me pidieron un video de aniversario y propuse no hacer un aniversario: contar la historia de la empresa y, sobre todo, cómo se siente ser su cliente. El aniversario pasó de ser el tema a ser el motivo.</p></div>
       <div class="r d2"><h3><b>03</b>Cómo se resolvió</h3><p>Se grabó donde de verdad pasa: la recepción, el trato, la firma y el cierre en la distribuidora, cuando el cliente recibe las llaves. Encima, la voz con la trayectoria de la empresa.</p></div>
     </div>
+    <div class="reel r" data-video="DnunIRVCx58" data-titulo="Video institucional de CABB Arrenda" data-evento="VerCasoCABB" style="margin-top:1.25rem">
+      <img src="https://connectstudios.mx/assets/img/cabb/cabb-2-junta.webp" alt="Video institucional de CABB Arrenda" loading="lazy">
+      <button class="reel-play" type="button" aria-label="Reproducir el video de CABB Arrenda"><span><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg></span></button>
+      <div class="reel-info">CABB Arrenda · 10 años</div>
+    </div>
     <div class="gancho r">
-      <p>El video completo no se publica.<small>Te lo enseño en la llamada, junto con lo que haría para tu negocio.</small></p>
-      <a class="btn btn-v" data-destino="/solicitud/" href="/solicitud/">Quiero verlo
+      <p>¿Algo así para tu empresa?<small>Te cuento en una llamada cómo lo haría para tu negocio.</small></p>
+      <a class="btn btn-v" data-destino="/solicitud/" href="/solicitud/">Platiquemos
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
       </a>
     </div>
@@ -328,19 +333,18 @@ const CONFIG = {
     cont.appendChild(img);
   }));
 
-  // Demo reel: YouTube solo se carga al darle play
-  const reel = document.getElementById('reel');
-  reel.addEventListener('click', () => {
+  // Demo reel y video de CABB: YouTube solo se carga al darle play
+  document.querySelectorAll('.reel[data-video]').forEach(reel => reel.addEventListener('click', () => {
     if (reel.classList.contains('activo')) return;
     const f = document.createElement('iframe');
     f.src = `https://www.youtube-nocookie.com/embed/${reel.dataset.video}?autoplay=1&rel=0&modestbranding=1`;
-    f.title = 'Demo reel 2026 de Connect Studios';
+    f.title = reel.dataset.titulo || 'Demo reel 2026 de Connect Studios';
     f.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
     f.allowFullscreen = true;
     reel.appendChild(f);
     reel.classList.add('activo');
-    if (window.fbq) fbq('trackCustom', 'VerReel');
-  });
+    if (window.fbq) fbq('trackCustom', reel.dataset.evento || 'VerReel');
+  }));
 
   // Revelado al hacer scroll y video de detrás de cámara que se reproduce al verse
   const PENDIENTES = '.r:not(.visto)';
