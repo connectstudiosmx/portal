@@ -375,6 +375,20 @@ main.app{max-width:var(--ancho);margin:0 auto;padding:1.75rem 1.25rem 5rem}
 .p-nota::placeholder{color:var(--crema-3)}
 .link-tarjeta{display:inline-flex;align-items:center;gap:.5rem;flex-wrap:wrap;font-size:.86rem;color:var(--crema-2)}
 
+/* Propuestas en línea */
+.e-sin_enviar{border-style:dashed;border-color:var(--crema-3);color:var(--crema-3)}
+.e-enviada{border-color:var(--crema-2);color:var(--crema-2)}
+.e-vista{border-color:var(--dorado);color:var(--dorado)}
+.e-aceptada{background:var(--verde);color:#000}
+.e-rechazada,.e-vencida{border-style:dashed;border-color:var(--linea-2);color:var(--crema-3)}
+.sol.pr-sin_enviar,.sol.pr-enviada{border-left-color:var(--crema-3)}
+.sol.pr-vista{border-left-color:var(--dorado)}
+.sol.pr-aceptada{border-left-color:var(--verde)}
+.sol.pr-rechazada,.sol.pr-vencida{border-left-color:var(--linea-2);opacity:.72}
+.sol-meta b{color:var(--crema);font-weight:700}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.link-prop{display:flex;align-items:center;gap:.5rem;background:var(--negro);border:1px solid var(--linea-2);border-radius:var(--r2);padding:.55rem .7rem;font-size:.86rem;overflow-wrap:anywhere;margin:0 0 1rem}
+
 /* Pagos y facturas */
 .rep-cab .btn{align-self:center}
 .pago-datos{display:flex;flex-wrap:wrap;gap:10px;margin:0}
@@ -483,7 +497,7 @@ const S = {
   vista: 'produccion',
   clientes: [], ciclos: [], videos: [], perfiles: [], asignaciones: [], solicitudes: [], reportes: [], mlLog: [], verAtendidas: false, solFiltro: { ruta: '', califica: '', estado: '' },
   postulaciones: [], postFiltro: { rol: '', estado: 'activas', pais: '' }, facturas: [], pagoDatos: null, facFiltro: 'pendiente', faltaBase: false,
-  pagosCli: null,
+  pagosCli: null, propuestas: [], propFiltro: 'activas',
   portal: null, cicloCliente: null, previa: null, pestanaCli: 'videos',
   filtro: { cliente: 'todos', estado: 'todos', mios: false, entregados: false },
   calInicio: null, verTodos: {}, cargadoEn: 0
@@ -580,10 +594,17 @@ function humano(e) {
   if (/facturas_monto_check/.test(m)) return 'Revisa el monto del pago.';
   if (/pago_datos_clabe_check/.test(m)) return 'La CLABE tiene 18 dígitos.';
   if (/pago_datos_cuenta_check/.test(m)) return 'El número de cuenta solo lleva dígitos (de 6 a 20).';
+  if (/acceso_propio/.test(m)) return 'No puedes borrarte a ti mismo.';
+  if (/acceso_admin/.test(m)) return 'Primero cámbialo de Administrador a otro rol y después bórralo.';
+  if (/propuestas_precio_check|propuestas_anticipo_check/.test(m)) return 'Revisa el precio y el anticipo: tienen que ser mayores a cero.';
+  if (/propuestas_whatsapp_check/.test(m)) return 'El WhatsApp debe tener de 10 a 15 dígitos.';
+  if (/propuestas_correo_check/.test(m)) return 'El correo no es válido.';
+  if (/propuestas_(nombre|empresa|titulo)_check/.test(m)) return 'Faltan el nombre, la empresa o el título de la propuesta.';
+  if (/propuestas_\w+_check/.test(m)) return 'Algún texto de la propuesta es demasiado largo.';
   if (/name_check/.test(m)) return 'Escribe un nombre.';
   if (/duplicate key|_number_key/.test(m)) return 'Ya existe un video con ese número en este mes.';
   if (/JWT|jwt expired|invalid claim/i.test(m)) return 'Tu sesión expiró. Sal y vuelve a entrar.';
-  if (/Could not find the (function|table)|schema cache|does not exist/i.test(m) && /postula|factura|pago/i.test(m)) return 'Falta preparar la base de datos: corre trabajo-y-pagos.sql en Supabase (SQL Editor).';
+  if (/Could not find the (function|table)|schema cache|does not exist/i.test(m) && /postula|factura|pago|propuesta/i.test(m)) return 'Falta preparar la base de datos: corre trabajo-y-pagos.sql en Supabase (SQL Editor).';
   if (/Failed to fetch|NetworkError|Load failed/i.test(m)) return 'No hay conexión con la base de datos. Revisa tu internet. Si eres el administrador, revisa que el proyecto de Supabase no esté en pausa.';
   return m || 'Algo falló. Intenta de nuevo.';
 }
@@ -621,11 +642,13 @@ async function cargarEquipo() {
     try { S.reportes = await q(sb.from('reportes').select('*')) || []; }
     catch (e) { S.reportes = []; }
     // Postulaciones y pagos: si aún no se corre trabajo-y-pagos.sql, el portal sigue funcionando
-    const [post, facs, datos] = await Promise.all([
+    const [post, facs, datos, props] = await Promise.all([
       sb.from('postulaciones').select('*').order('created_at', { ascending: false }).limit(500),
       sb.from('facturas').select('*').order('created_at', { ascending: false }).limit(300),
-      sb.from('pago_datos').select('*').eq('id', 1).maybeSingle()
+      sb.from('pago_datos').select('*').eq('id', 1).maybeSingle(),
+      sb.from('propuestas').select('*').order('created_at', { ascending: false }).limit(300)
     ]);
+    S.propuestas = props.error ? [] : props.data || [];
     S.postulaciones = post.error ? [] : post.data || [];
     S.facturas = facs.error ? [] : facs.data || [];
     S.pagoDatos = datos.error ? null : datos.data;
@@ -700,14 +723,16 @@ function pantallaSimple(titulo, texto, boton, accion) {
 function barra() {
   const p = S.perfil, esAdmin = p.role === 'admin';
   const tabs = esAdmin ? [['produccion', 'Producción'], ['calendario', 'Calendario'], ['clientes', 'Clientes'], ['solicitudes', 'Solicitudes'],
-      ['postulaciones', 'Postulaciones'], ['pagos', 'Pagos'], ['accesos', 'Accesos']]
+      ['propuestas', 'Propuestas'], ['postulaciones', 'Postulaciones'], ['pagos', 'Pagos'], ['accesos', 'Accesos']]
     : p.role === 'editor' ? [['produccion', 'Producción'], ['calendario', 'Calendario']] : [];
   const pendientes = esAdmin ? S.perfiles.filter(x => x.role === 'pendiente').length : 0;
   const nuevas = esAdmin ? S.solicitudes.filter(x => !x.atendida).length : 0;
   const errML = esAdmin ? mlConError().length : 0;
   const porRevisar = esAdmin ? S.postulaciones.filter(x => x.estado === 'nueva').length : 0;
   const porEmitir = esAdmin ? S.facturas.filter(x => x.estado === 'pendiente').length : 0;
+  const porConvertir = esAdmin ? S.propuestas.filter(x => x.aceptada_at && !x.client_id).length : 0;
   const punto = id => id === 'clientes' && errML ? `<span class="punto punto-error" aria-label="${errML} con error de MailerLite">!</span>`
+    : id === 'propuestas' && porConvertir ? `<span class="punto" aria-label="${porConvertir} ${porConvertir === 1 ? 'aceptada' : 'aceptadas'} sin dar de alta como cliente">${porConvertir}</span>`
     : id === 'postulaciones' && porRevisar ? `<span class="punto" aria-label="${porRevisar} por revisar">${porRevisar}</span>`
     : id === 'pagos' && porEmitir ? `<span class="punto" aria-label="${porEmitir} ${porEmitir === 1 ? 'factura' : 'facturas'} por emitir">${porEmitir}</span>`
     : id === 'accesos' && pendientes ? `<span class="punto" aria-label="${pendientes} pendientes">${pendientes}</span>`
@@ -733,6 +758,7 @@ function render() {
   else if (S.vista === 'clientes' && S.perfil.role === 'admin') cuerpo = vistaClientes();
   else if (S.vista === 'accesos' && S.perfil.role === 'admin') cuerpo = vistaAccesos();
   else if (S.vista === 'solicitudes' && S.perfil.role === 'admin') cuerpo = vistaSolicitudes();
+  else if (S.vista === 'propuestas' && S.perfil.role === 'admin') cuerpo = vistaPropuestas();
   else if (S.vista === 'postulaciones' && S.perfil.role === 'admin') cuerpo = vistaPostulaciones();
   else if (S.vista === 'pagos' && S.perfil.role === 'admin') cuerpo = vistaPagos();
   else cuerpo = vistaProduccion();
@@ -1108,7 +1134,7 @@ function vistaAccesos() {
   </div>
   ${pend ? `<p class="aviso-linea">${pend === 1 ? 'Hay 1 persona esperando acceso.' : `Hay ${pend} personas esperando acceso.`}</p>` : ''}
   <div class="tabla-env"><table class="tabla">
-    <thead><tr><th>Persona</th><th>Rol</th><th>Cliente o clientes que edita</th><th>Primer acceso</th></tr></thead>
+    <thead><tr><th>Persona</th><th>Rol</th><th>Cliente o clientes que edita</th><th>Primer acceso</th><th><span class="sr-only">Borrar</span></th></tr></thead>
     <tbody>${lista.map(p => `<tr class="${p.role === 'pendiente' ? 'pendiente' : ''}">
       <td><input class="campo-in" value="${esc(p.full_name || '')}" placeholder="Nombre" data-cambio="perfil-nombre" data-id="${p.id}" aria-label="Nombre de ${esc(p.email || '')}">
         <div class="nota">${esc(p.email || '')}${p.id === S.perfil.id ? ' (tú)' : ''}</div></td>
@@ -1118,9 +1144,10 @@ function vistaAccesos() {
         : p.role === 'editor' ? celdaEditor(p)
         : '<span class="nota">No aplica</span>'}</td>
       <td class="nota">${p.created_at ? fCorta(p.created_at) : ''}</td>
+      <td>${p.id !== S.perfil.id && p.role !== 'admin' ? `<button class="btn btn-s btn-t btn-peligro" data-accion="borrar-acceso" data-id="${p.id}">Borrar</button>` : ''}</td>
     </tr>`).join('')}</tbody>
   </table></div>
-  <p class="nota" style="margin-top:1rem">Para dar acceso, mándale a la persona el link del portal. Cada editor solo ve los clientes que le asignes. Para quitarle el acceso a alguien, cámbialo a Pendiente. Para borrarlo por completo, elimínalo en Supabase (Authentication, Users).</p>`;
+  <p class="nota" style="margin-top:1rem">Para dar acceso, mándale a la persona el link del portal. Cada editor solo ve los clientes que le asignes. Para quitarle el acceso a alguien, cámbialo a Pendiente o bórralo; si vuelve a entrar con Google, aparece otra vez como pendiente. Los administradores no se pueden borrar desde aquí: primero cámbiales el rol.</p>`;
 }
 
 // ---------- Solicitudes (páginas /solicitud y /guia) ------------------
@@ -1187,6 +1214,9 @@ function vistaSolicitudes() {
         ${x.mensaje ? `<p class="sol-msg">${esc(x.mensaje)}</p>` : ''}
         ${ultima ? `<p class="nota">Se quedó después de: ${esc(ultima)}</p>` : ''}
         ${sol && detalle.length ? `<details class="sol-det"><summary>Ver respuestas</summary><dl>${detalle.map(r =>`<dt>${esc(r[1])}</dt><dd>${esc(r[2])}</dd>`).join('')}</dl></details>` : ''}
+        ${x.tipo !== 'guia' ? (prop => `<div class="sol-acc">${prop
+          ? `<button class="btn btn-s" data-accion="ir-propuestas">Propuesta: ${esc(estadoPropuesta(prop).txt.toLowerCase())}</button>`
+          : `<button class="btn btn-s btn-t" data-accion="prop-nueva" data-id="${x.id}">Hacer propuesta</button>`}</div>`)(S.propuestas.find(pr => pr.solicitud_id === x.id)) : ''}
       </div>
       <div class="sol-der">
         ${sol ? `${x.ruta ? `<span class="sol-int">${RUTAS[x.ruta]}</span>` : ''}
@@ -1210,6 +1240,110 @@ async function marcarSolicitud(id, atendida) {
     if (x) x.atendida = atendida;
     render();
   } catch (e) { aviso(humano(e), true); await recargar(); }
+}
+
+// ---------- Propuestas en línea (portal.connectstudios.mx/propuesta/#código) ----------
+const linkPropuesta = (x, previa) => `${PORTAL_URL}/propuesta/${previa ? '?previa' : ''}#${x.token}`;
+const MOTIVOS_PROP = { precio: 'El precio', tiempos: 'Los tiempos', otra_opcion: 'Eligió otra opción', no_prioridad: 'No es prioridad ahora', otro: 'Otro motivo' };
+const IVA_PROP = { mas_iva: '+ IVA', incluido: 'IVA incluido', sin_iva: 'sin IVA' };
+function estadoPropuesta(x) {
+  if (x.aceptada_at) return { clave: 'aceptada', txt: `Aceptada el ${fCorta(x.aceptada_at)}` };
+  if (x.vigencia < aISO(hoy())) return { clave: 'vencida', txt: `Venció el ${fCorta(x.vigencia)}` };
+  if (x.rechazada_at) return { clave: 'rechazada', txt: 'Dijo que ahora no' };
+  if (x.vistas) return { clave: 'vista', txt: `La abrió ${x.vistas === 1 ? '1 vez' : x.vistas + ' veces'}` };
+  if (x.enviada_at) return { clave: 'enviada', txt: 'Enviada, sin abrir' };
+  return { clave: 'sin_enviar', txt: 'Sin enviar' };
+}
+// Textos de arranque según el tipo; salen de los términos del servicio y se pueden cambiar en cada propuesta
+const PROP_DEF = {
+  mensual: {
+    titulo: 'Contenido mensual para redes', precio: 14499, precio_nota: 'al mes',
+    incluye: ['12 videos verticales al mes, editados para tus redes',
+      'Guiones acompañados: tú decides los temas y yo reviso cada guion',
+      '2 días de grabación al mes en tu negocio, en la Zona Metropolitana de Guadalajara',
+      'Texto de publicación y portada de cada video',
+      'Publicación programada lunes, miércoles y viernes, en hasta 4 redes',
+      'Una sesión de estrategia al mes y tu reporte de resultados',
+      'Tu portal para seguir guiones, fechas y entregas'].join('\n'),
+    forma_pago: 'Anticipo del 50% de la primera mensualidad al firmar. Después pagas una mensualidad completa en cada fecha de entrega (día 1 o 15), con 5 días de tolerancia. Cada pago lleva su factura.',
+    condiciones: ['Plazo mínimo de 3 meses; después se renueva mes con mes y se puede terminar avisando con 30 días',
+      'Primer mes sin riesgo: si después de tu primera entrega decides no seguir, avisas dentro de 5 días y solo pagas el resto de ese mes',
+      'Si por causa mía se entregan menos videos de los acordados, el siguiente pago se ajusta',
+      'Una ronda de ajustes por entrega, dentro de los 3 días hábiles siguientes'].join('\n')
+  },
+  proyecto: {
+    titulo: 'Video corporativo', precio: '', precio_nota: '',
+    incluye: ['Diagnóstico y guion',
+      'Preproducción: locaciones, fechas y plan de rodaje',
+      'Grabación con dirección creativa',
+      'Edición con música con licencia',
+      'Una ronda de ajustes',
+      'Entrega en los formatos que necesites'].join('\n'),
+    forma_pago: '50% de anticipo para apartar las fechas de grabación y 50% al entregar. Cada pago lleva su factura.',
+    condiciones: ['Incluye una ronda de ajustes sobre la edición',
+      'Grabación dentro de la Zona Metropolitana de Guadalajara; fuera de ella, los viáticos se cotizan aparte'].join('\n')
+  }
+};
+
+function vistaPropuestas() {
+  const todas = S.propuestas, f = S.propFiltro;
+  const lista = todas.filter(x => { const e = estadoPropuesta(x).clave; return f === 'activas' ? ['sin_enviar', 'enviada', 'vista'].includes(e) : !f || e === f; });
+  const porConvertir = todas.filter(x => x.aceptada_at && !x.client_id).length;
+  const opt = (v, t) => `<option value="${v}"${f === v ? ' selected' : ''}>${esc(t)}</option>`;
+  return `<div class="encabezado">
+    <div><h1>Propuestas</h1><p class="sub">Después de la llamada, arma la propuesta y mándale el link. Ves cuándo la abre y te avisa por Telegram cuando la acepta o te dice que no. Al aceptarla ve los datos para el anticipo.</p></div>
+    <div class="controles">
+      <select class="campo-in" data-cambio="prop-filtro" aria-label="Filtrar propuestas">${opt('activas', 'En espera')}${opt('aceptada', 'Aceptadas')}${opt('rechazada', 'Dijeron que no')}${opt('vencida', 'Vencidas')}${opt('', 'Todas')}</select>
+      <button class="btn btn-p" data-accion="prop-nueva">Nueva propuesta</button>
+    </div>
+  </div>
+  ${S.faltaBase ? avisoFaltaBase() : ''}
+  ${porConvertir ? `<p class="aviso-linea">${porConvertir === 1 ? '1 propuesta aceptada todavía no está dada de alta como cliente.' : `${porConvertir} propuestas aceptadas todavía no están dadas de alta como clientes.`}</p>` : ''}
+  ${lista.length ? `<div class="sol-lista">${lista.map(x => {
+    const e = estadoPropuesta(x), abierta = !x.aceptada_at && e.clave !== 'vencida';
+    return `<article class="sol pr-${e.clave}">
+      <div>
+        <div class="sol-nombre">${esc(x.empresa)} <span>· ${esc(x.nombre)}</span></div>
+        <div class="sol-meta">
+          <span>${esc(x.titulo)}</span>
+          <span><b>${esc(dinero(x.precio))}</b> ${esc([IVA_PROP[x.iva], x.precio_nota].filter(Boolean).join(' '))}</span>
+          <span>Vigente hasta el ${esc(fCorta(x.vigencia))}</span>
+        </div>
+        ${x.aceptada_at ? `<p class="sol-msg">Aceptó <b>${esc(x.aceptada_por || x.nombre)}</b> el ${esc(fHora(x.aceptada_at))}. Siguiente: mándale el contrato y confirma el anticipo.</p>` : ''}
+        ${x.rechazada_at && !x.aceptada_at ? `<p class="sol-msg"><b>Motivo:</b> ${esc(MOTIVOS_PROP[x.motivo] || 'Otro')}${x.comentario ? ` · ${esc(x.comentario)}` : ''}</p>` : ''}
+        ${x.notas ? `<p class="nota" style="margin:.5rem 0 0">Nota: ${esc(x.notas)}</p>` : ''}
+        <div class="sol-acc">
+          ${abierta ? `<button class="btn btn-s btn-p" data-accion="prop-wa" data-id="${x.id}">Enviar por WhatsApp</button>` : ''}
+          <button class="btn btn-s" data-accion="prop-copiar" data-id="${x.id}">Copiar link</button>
+          <a class="btn btn-s btn-t" href="${esc(linkPropuesta(x, true))}" target="_blank" rel="noopener">Vista previa</a>
+          <button class="btn btn-s btn-t" data-accion="prop-editar" data-id="${x.id}">Editar</button>
+          <button class="btn btn-s btn-t" data-accion="prop-duplicar" data-id="${x.id}">Duplicar</button>
+          ${x.aceptada_at && !x.client_id ? `<button class="btn btn-s btn-p" data-accion="prop-cliente" data-id="${x.id}">Dar de alta como cliente</button>` : ''}
+          ${x.client_id ? '<span class="sol-int sol-ok">Ya es cliente</span>' : ''}
+        </div>
+      </div>
+      <div class="sol-der">
+        <span class="estado e-${e.clave}">${esc(e.txt)}</span>
+        <span class="nota">Creada ${esc(fHora(x.created_at))}${x.ultima_vista ? `<br>Última vez que la abrió: ${esc(fHora(x.ultima_vista))}` : ''}</span>
+      </div>
+    </article>`;
+  }).join('')}</div>`
+    : `<div class="caja-vacia"><p>${todas.length ? 'Nada en este filtro.' : 'Todavía no hay propuestas. Hazla desde una solicitud (botón "Hacer propuesta") o empieza una aquí.'}</p>${todas.length ? '' : '<button class="btn btn-p" data-accion="prop-nueva">Nueva propuesta</button>'}</div>`}`;
+}
+
+// Mensaje de WhatsApp para mandar el link
+function textoWAPropuesta(x) {
+  const pila = String(x.nombre || '').split(/\s+/)[0];
+  return `Hola ${pila}, te comparto la propuesta para ${x.empresa}: ${linkPropuesta(x)}\n\nAhí viene lo que platicamos, qué incluye y la inversión. Si te hace sentido, la puedes aceptar desde ahí mismo. Cualquier duda me dices por aquí.`;
+}
+async function marcarEnviada(x) {
+  if (x.enviada_at) return;
+  try {
+    const ahora = new Date().toISOString();
+    await q(sb.from('propuestas').update({ enviada_at: ahora }).eq('id', x.id));
+    x.enviada_at = ahora;
+    if (S.vista === 'propuestas') render();
+  } catch (e) { /* no importa si no se marca */ }
 }
 
 const avisoFaltaBase = () => S.faltaBase
@@ -1937,6 +2071,79 @@ function modalCliente(id) {
   </form>`);
 }
 
+// Propuesta: crear, editar o duplicar. desde = { solicitud } o { duplicar }
+function modalPropuesta(id, desde) {
+  desde = desde || {};
+  const x = id ? S.propuestas.find(pr => pr.id === id) : null;
+  const base = x || desde.duplicar || null;
+  const sol = desde.solicitud || null;
+  const tipo = base ? base.tipo : (sol && (sol.ruta === 'B' || sol.interes === 'proyecto') ? 'proyecto' : 'mensual');
+  const def = PROP_DEF[tipo];
+  const v = (k, otro) => esc(base ? (base[k] ?? '') : (otro ?? def[k] ?? ''));
+  const para = k => esc(x ? x[k] || '' : sol ? sol[k] || '' : '');
+  const vigencia = x ? x.vigencia : aISO(sumarDias(hoy(), 15));
+  abrirModal(`<form data-form="propuesta" data-id="${x ? x.id : ''}" data-solicitud="${sol ? sol.id : ''}" novalidate>
+    <div class="d-cab"><div><h2 class="d-titulo">${x ? 'Editar propuesta' : 'Nueva propuesta'}</h2>
+      <p class="d-sub">${x && x.aceptada_at ? 'Ya la aceptó: si la cambias, verá la versión nueva.' : 'Lo que escribas aquí es lo que ve tu prospecto, salvo las notas internas.'}</p></div></div>
+    <div class="fila-campos">
+      <div class="campo"><label for="pr-nombre">Nombre de la persona</label><input id="pr-nombre" name="nombre" maxlength="120" required value="${para('nombre')}"></div>
+      <div class="campo"><label for="pr-empresa">Empresa o marca</label><input id="pr-empresa" name="empresa" maxlength="160" required value="${para('empresa')}"></div>
+    </div>
+    <div class="fila-campos">
+      <div class="campo"><label for="pr-wa">WhatsApp</label><input id="pr-wa" name="whatsapp" type="tel" inputmode="tel" maxlength="25" value="${para('whatsapp')}" placeholder="33 1234 5678"></div>
+      <div class="campo"><label for="pr-correo">Correo <span class="opc">(opcional)</span></label><input id="pr-correo" name="correo" type="email" inputmode="email" maxlength="200" value="${para('correo')}"></div>
+    </div>
+    <div class="d-sep"><h3>La propuesta</h3><p>Al cambiar el tipo se ponen los textos de arranque, si no los habías cambiado.</p></div>
+    <div class="fila-campos">
+      <div class="campo"><label for="pr-tipo">Tipo</label><select id="pr-tipo" name="tipo"><option value="mensual"${tipo === 'mensual' ? ' selected' : ''}>Contenido mensual</option><option value="proyecto"${tipo === 'proyecto' ? ' selected' : ''}>Proyecto (corporativo, evento)</option></select></div>
+      <div class="campo"><label for="pr-titulo">Título</label><input id="pr-titulo" name="titulo" maxlength="140" required value="${v('titulo')}"></div>
+    </div>
+    <div class="campo"><label for="pr-diag">Lo que entendí en la llamada</label><textarea id="pr-diag" name="diagnostico" maxlength="3000" style="min-height:6rem" placeholder="Con tus palabras: qué quiere lograr, qué le preocupa y por qué ahora. Es lo primero que lee.">${base ? esc(base.diagnostico || '') : ''}</textarea></div>
+    <div class="campo"><label for="pr-incluye">Qué incluye</label><textarea id="pr-incluye" name="incluye" maxlength="3000" style="min-height:9rem">${v('incluye')}</textarea><p class="ayuda">Un punto por renglón.</p></div>
+    <div class="d-sep"><h3>Inversión</h3></div>
+    <div class="fila-campos">
+      <div class="campo"><label for="pr-precio">Precio (MXN)</label><input id="pr-precio" name="precio" inputmode="decimal" autocomplete="off" required value="${base ? esc(base.precio) : esc(def.precio)}" placeholder="14499"></div>
+      <div class="campo"><label for="pr-iva">IVA</label><select id="pr-iva" name="iva">${Object.entries({ mas_iva: 'Más IVA', incluido: 'IVA incluido', sin_iva: 'Sin IVA' }).map(([k, t]) => `<option value="${k}"${(base ? base.iva : 'mas_iva') === k ? ' selected' : ''}>${t}</option>`).join('')}</select></div>
+    </div>
+    <div class="fila-campos">
+      <div class="campo"><label for="pr-nota">Junto al precio <span class="opc">(opcional)</span></label><input id="pr-nota" name="precio_nota" maxlength="120" value="${v('precio_nota')}" placeholder="al mes"></div>
+      <div class="campo"><label for="pr-anticipo">Anticipo (MXN)</label><input id="pr-anticipo" name="anticipo" inputmode="decimal" autocomplete="off" value="${base && base.anticipo ? esc(base.anticipo) : ''}" placeholder="50% del precio"><p class="ayuda">Si lo dejas vacío, se pone el 50% del precio.</p></div>
+    </div>
+    <div class="campo"><label for="pr-pago">Forma de pago</label><textarea id="pr-pago" name="forma_pago" maxlength="1500" style="min-height:5rem">${v('forma_pago')}</textarea></div>
+    <div class="campo"><label for="pr-cond">Condiciones</label><textarea id="pr-cond" name="condiciones" maxlength="2500" style="min-height:7rem">${v('condiciones')}</textarea><p class="ayuda">Un punto por renglón.</p></div>
+    <div class="fila-campos">
+      <div class="campo"><label for="pr-ej">Video de ejemplo <span class="opc">(opcional)</span></label><input id="pr-ej" name="ejemplo_url" type="url" inputmode="url" value="${base ? esc(base.ejemplo_url || '') : ''}" placeholder="https://youtube.com/..."><p class="ayuda">Si lo dejas vacío, se muestran tus casos.</p></div>
+      <div class="campo"><label for="pr-vig">Vigente hasta</label><input id="pr-vig" name="vigencia" type="date" required value="${esc(vigencia)}"></div>
+    </div>
+    <div class="campo"><label for="pr-notas">Notas internas <span class="opc">(solo tú las ves)</span></label><textarea id="pr-notas" name="notas" maxlength="2000" style="min-height:4rem">${base ? esc(base.notas || '') : ''}</textarea></div>
+    <div class="d-pie">
+      ${x ? `<button type="button" class="btn btn-t btn-peligro izq" data-accion="prop-borrar" data-id="${x.id}">Borrar</button>` : ''}
+      <button type="button" class="btn" data-accion="cerrar">Cancelar</button>
+      <button type="submit" class="btn btn-p">${x ? 'Guardar cambios' : 'Crear propuesta'}</button>
+    </div>
+  </form>`, dlg => {
+    // Al cambiar el tipo, los textos que no tocaste cambian a los del otro tipo
+    const f = dlg.querySelector('form'), CAMPOS = ['titulo', 'incluye', 'forma_pago', 'condiciones', 'precio_nota', 'precio'];
+    let anterior = f.elements.tipo.value;
+    f.elements.tipo.addEventListener('change', () => {
+      const de = PROP_DEF[anterior], a = PROP_DEF[f.elements.tipo.value];
+      CAMPOS.forEach(k => { const el = f.elements[k]; if (!el.value.trim() || el.value.trim() === String(de[k]).trim()) el.value = a[k]; });
+      anterior = f.elements.tipo.value;
+    });
+  });
+}
+
+// Recién creada: mandarla o verla
+function modalPropuestaLista(x) {
+  abrirModal(`<div class="d-cab"><div><h2 class="d-titulo">Propuesta lista</h2><p class="d-sub">Para ${esc(x.nombre)}, de ${esc(x.empresa)}. Revísala en vista previa antes de mandarla.</p></div></div>
+    <p class="link-prop">${esc(linkPropuesta(x))}</p>
+    <div class="d-pie">
+      <a class="btn izq" href="${esc(linkPropuesta(x, true))}" target="_blank" rel="noopener">Vista previa</a>
+      <button class="btn" data-accion="prop-copiar" data-id="${x.id}">Copiar link</button>
+      <button class="btn btn-p" data-accion="prop-wa" data-id="${x.id}">Enviar por WhatsApp</button>
+    </div>`);
+}
+
 // Datos para transferir (admin)
 function modalPagoDatos() {
   const d = S.pagoDatos || {};
@@ -2201,6 +2408,41 @@ const FORMS = {
       await recargar();
     } catch (e) { aviso(humano(e), true); }
   },
+  async propuesta(f) {
+    const num = n => { const t = (valor(f, n) || '').replace(/[$,\s]/g, ''); return t === '' ? null : Number(t); };
+    const d = {
+      nombre: valor(f, 'nombre'), empresa: valor(f, 'empresa'), whatsapp: valor(f, 'whatsapp') || null, correo: valor(f, 'correo') || null,
+      tipo: valor(f, 'tipo'), titulo: valor(f, 'titulo'), diagnostico: valor(f, 'diagnostico') || null, incluye: valor(f, 'incluye') || null,
+      precio: num('precio'), iva: valor(f, 'iva'), precio_nota: valor(f, 'precio_nota') || null, anticipo: num('anticipo'),
+      forma_pago: valor(f, 'forma_pago') || null, condiciones: valor(f, 'condiciones') || null,
+      ejemplo_url: valor(f, 'ejemplo_url') || null, vigencia: valor(f, 'vigencia'), notas: valor(f, 'notas') || null
+    };
+    if (!d.nombre || d.nombre.length < 2) { aviso('Escribe el nombre de la persona.', true); return f.elements.nombre.focus(); }
+    if (!d.empresa) { aviso('Escribe la empresa o marca.', true); return f.elements.empresa.focus(); }
+    if (d.whatsapp && !/^\d{10,15}$/.test(d.whatsapp.replace(/\D/g, ''))) { aviso('El WhatsApp debe tener de 10 a 15 dígitos.', true); return f.elements.whatsapp.focus(); }
+    if (d.correo && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(d.correo)) { aviso('El correo no es válido.', true); return f.elements.correo.focus(); }
+    if (!d.titulo || d.titulo.length < 2) { aviso('Escribe el título de la propuesta.', true); return f.elements.titulo.focus(); }
+    if (!(d.precio > 0)) { aviso('Pon el precio, solo números (por ejemplo 14499).', true); return f.elements.precio.focus(); }
+    if (d.anticipo === null) d.anticipo = Math.round(d.precio * 50) / 100;
+    if (!(d.anticipo > 0)) { aviso('Revisa el anticipo: solo números.', true); return f.elements.anticipo.focus(); }
+    if (!d.vigencia) { aviso('Pon hasta cuándo es válida.', true); return f.elements.vigencia.focus(); }
+    if (!revisarLinks(f, ['ejemplo_url'])) return;
+    try {
+      if (f.dataset.id) {
+        await q(sb.from('propuestas').update(d).eq('id', f.dataset.id));
+        cerrarModal();
+        aviso('Propuesta guardada');
+        await recargar();
+      } else {
+        if (f.dataset.solicitud) d.solicitud_id = f.dataset.solicitud;
+        const nueva = await q(sb.from('propuestas').insert(d).select('*').single());
+        S.propFiltro = 'activas'; S.vista = 'propuestas';
+        await recargar();
+        if (!S.propuestas.some(pr => pr.id === nueva.id)) S.propuestas.unshift(nueva);
+        modalPropuestaLista(S.propuestas.find(pr => pr.id === nueva.id));
+      }
+    } catch (e) { aviso(humano(e), true); }
+  },
   async 'pago-datos'(f) {
     const soloDigitos = x => (x || '').replace(/[\s-]/g, '');
     const d = { id: 1, banco: valor(f, 'banco'), titular: valor(f, 'titular'), clabe: soloDigitos(valor(f, 'clabe')),
@@ -2428,6 +2670,56 @@ const ACC = {
     catch (e) { aviso(humano(e), true); }
   },
   'pago-datos'() { modalPagoDatos(); },
+  'prop-nueva'(el, id) {
+    const sol = id ? S.solicitudes.find(x => x.id === id) : null;
+    modalPropuesta(null, sol ? { solicitud: sol } : {});
+  },
+  'prop-editar'(el, id) { modalPropuesta(id); },
+  'prop-duplicar'(el, id) {
+    const x = S.propuestas.find(pr => pr.id === id); if (!x) return;
+    modalPropuesta(null, { duplicar: Object.assign({}, x, { nombre: '', empresa: '', whatsapp: '', correo: '', diagnostico: '', notas: '' }) });
+  },
+  'ir-propuestas'() { S.vista = 'propuestas'; S.propFiltro = ''; render(); window.scrollTo(0, 0); },
+  async 'prop-copiar'(el, id) {
+    const x = S.propuestas.find(pr => pr.id === id); if (!x) return;
+    el.dataset.texto = linkPropuesta(x); el.dataset.ok = 'Link copiado: pégalo en tu mensaje';
+    await ACC.copiar(el);
+    marcarEnviada(x);
+  },
+  'prop-wa'(el, id) {
+    const x = S.propuestas.find(pr => pr.id === id); if (!x) return;
+    window.open(`https://wa.me/${waDe(x.whatsapp)}?text=${encodeURIComponent(textoWAPropuesta(x))}`, '_blank', 'noopener');
+    cerrarModal();
+    marcarEnviada(x);
+  },
+  async 'prop-borrar'(el, id) {
+    const x = S.propuestas.find(pr => pr.id === id); if (!x) return;
+    if (!await confirmar(`¿Borrar la propuesta para ${x.empresa}?`, 'El link deja de funcionar. No se puede deshacer.', 'Borrar', true)) return;
+    try { await q(sb.from('propuestas').delete().eq('id', id)); aviso('Propuesta borrada'); await recargar(); }
+    catch (e) { aviso(humano(e), true); }
+  },
+  async 'prop-cliente'(el, id) {
+    const x = S.propuestas.find(pr => pr.id === id); if (!x) return;
+    if (!await confirmar(`¿Dar de alta a ${x.empresa} como cliente?`, 'Se crea el cliente con su contacto. Después le creas su primer mes en Clientes.', 'Dar de alta')) return;
+    try {
+      const datos = { name: x.empresa, contact_name: x.nombre || null, contact_email: x.correo || null, contact_phone: x.whatsapp || null,
+        onboarding_date: aISO(hoy()), videos_per_cycle: 12 };
+      const cl = await q(sb.from('clients').insert(datos).select('id').single());
+      await q(sb.from('propuestas').update({ client_id: cl.id }).eq('id', x.id));
+      await recargar();
+      const pila = String(x.nombre || '').split(/\s+/)[0];
+      abrirModal(`<div class="d-cab"><div><h2 class="d-titulo">${esc(x.empresa)} ya es cliente</h2><p class="d-sub">Mándale la página de bienvenida: qué sigue, qué necesitas de él y cómo funciona cada mes.</p></div></div>
+        <div class="campo"><label for="wa-texto">Mensaje</label><textarea id="wa-texto" maxlength="1500">${esc(`Hola ${pila}, ¡qué gusto que arranquemos! Aquí está todo lo que sigue: ${PORTAL_URL}/bienvenida/\n\nCualquier duda me dices por aquí.`)}</textarea></div>
+        <div class="d-pie"><button class="btn" data-accion="cerrar">Ahora no</button><button class="btn btn-p" data-accion="wa-abrir" data-id="${esc(waDe(x.whatsapp))}">Abrir WhatsApp</button></div>`);
+    } catch (e) { aviso(humano(e), true); }
+  },
+  async 'borrar-acceso'(el, id) {
+    const p = perfilPorId(id); if (!p) return;
+    const editor = p.role === 'editor';
+    if (!await confirmar(`¿Borrar a ${nombreDe(p)}?`, `Se borra su acceso al portal${editor ? ' y los clientes que tenía asignados; sus videos se quedan sin editor' : ''}. Si vuelve a entrar con Google, aparece otra vez como pendiente.`, 'Borrar', true)) return;
+    try { await q(sb.rpc('admin_borrar_acceso', { p_id: id })); aviso('Acceso borrado'); await recargar(); }
+    catch (e) { aviso(humano(e), true); }
+  },
   factura(el, id) { modalFactura(id); },
   async 'borrar-factura'(el, id) {
     const x = S.facturas.find(f => f.id === id); if (!x) return;
@@ -2483,7 +2775,8 @@ const CAMBIOS = {
     const x = S.postulaciones.find(p => p.id === el.dataset.id), nota = el.value.trim() || null;
     if (x && (x.nota || null) !== nota) guardarPostulacion(el.dataset.id, { nota }, false);
   },
-  'fac-filtro'(el) { S.facFiltro = el.value; render(); }
+  'fac-filtro'(el) { S.facFiltro = el.value; render(); },
+  'prop-filtro'(el) { S.propFiltro = el.value; render(); }
 };
 
 document.addEventListener('click', ev => {
