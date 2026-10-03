@@ -173,8 +173,92 @@ h1{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size
 .pago dd{margin:.15rem 0 0;font-weight:600;overflow-wrap:anywhere}
 .listo-marca{display:inline-flex;align-items:center;gap:.5rem;padding:.35rem .8rem;border-radius:999px;background:var(--verde-t);color:var(--verde);font-weight:700;font-size:.8rem;letter-spacing:.06em}
 
+/* Cuándo arrancamos */
+.fechas-ini{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:.9rem}
+.fecha-caja{background:var(--panel);border:1px solid var(--linea);border-radius:18px;padding:1.4rem 1.5rem}
+.fecha-caja.principal{border-color:rgba(57,255,136,.4);box-shadow:0 24px 60px -40px rgba(57,255,136,.5)}
+.fecha-caja .et{display:block;font-size:.74rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--verde);margin-bottom:1rem}
+.fecha-caja:not(.principal) .et{color:var(--crema-3)}
+.fecha-caja .fila{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.fecha-caja small{display:block;font-size:.78rem;color:var(--crema-3);font-weight:600}
+.fecha-caja b{display:block;font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:clamp(1.45rem,3vw,2.1rem);line-height:1;margin-top:.3rem}
+.fecha-caja:not(.principal) b{font-size:clamp(1.2rem,2.4vw,1.5rem);color:var(--crema-2)}
+
+/* Pasos después de aceptar */
+.pasos-sig > li.hecho{border-color:rgba(57,255,136,.45)}
+.pasos-sig > li.hecho::before{content:"✓";font-family:var(--texto);font-weight:800;font-size:1.5rem;top:1.15rem}
+.pasos-sig > li.espera{opacity:.55}
+.pasos-sig .acciones{margin-top:.9rem}
+.transfer{margin-top:.9rem}
+
+/* Panel para firmar y vista del contrato */
+.capa{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.82);overflow-y:auto;padding:clamp(.5rem,3vw,2rem) .6rem}
+.capa-in{max-width:52rem;margin:0 auto;background:var(--panel);border:1px solid var(--linea-2);border-radius:20px;padding:clamp(1.2rem,4vw,2.4rem)}
+.capa-cab{display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;margin-bottom:1.4rem}
+.capa-cab h2{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:clamp(2rem,5vw,3rem);line-height:.95;margin:0;padding-top:.1em}
+.capa-cab p{color:var(--crema-2);margin:.5rem 0 0}
+.cerrar{flex:none;width:2.6rem;height:2.6rem;border-radius:50%;border:1px solid var(--linea-2);background:none;cursor:pointer;font-size:1.3rem;line-height:1}
+.cerrar:hover{border-color:var(--crema-3)}
+.bloque-firma{margin:1.6rem 0 0;padding-top:1.4rem;border-top:1px solid var(--linea)}
+.bloque-firma h3{margin:0 0 .3rem;font-size:1.1rem}
+.bloque-firma > p{color:var(--crema-3);font-size:.9rem;margin:0 0 1rem}
+.dos{display:grid;grid-template-columns:1fr 1fr;gap:0 1rem}
+.plataformas{display:flex;flex-wrap:wrap;gap:.45rem}
+.plataformas label{display:inline-flex;align-items:center;gap:.45rem;padding:.5rem .8rem;border:1px solid var(--linea);border-radius:999px;cursor:pointer;font-weight:500;color:var(--crema)}
+.plataformas input{accent-color:var(--verde);margin:0}
+.plataformas label:has(input:checked){border-color:var(--verde);background:var(--verde-t)}
+.campo .ayuda{font-size:.8rem;color:var(--crema-3);margin:0}
+.lienzo{position:relative;background:#fff;border-radius:12px;overflow:hidden;touch-action:none;height:190px;max-width:560px}
+.lienzo canvas{display:block;width:100%;height:100%;cursor:crosshair}
+.lienzo .linea-firma{position:absolute;left:8%;right:8%;bottom:42px;border-top:1px solid #c9c5bd;pointer-events:none}
+.lienzo .pista{position:absolute;left:0;right:0;bottom:14px;text-align:center;color:#8a867f;font-size:.8rem;pointer-events:none}
+.acepto{display:flex;gap:.6rem;align-items:flex-start;margin:1rem 0;color:var(--crema-2);font-size:.92rem;cursor:pointer}
+.acepto input{accent-color:var(--verde);width:1.1rem;height:1.1rem;margin:.15rem 0 0;flex:none}
+
+/* El contrato: hoja clara, se lee y se imprime igual */
+.hoja{font-variant-numeric:lining-nums;background:#fbfaf7;color:#1b1a18;border-radius:12px;padding:clamp(1.2rem,4vw,2.6rem);font-family:Georgia,'Times New Roman',serif;font-size:.95rem;line-height:1.6}
+.hoja-scroll{max-height:62vh;overflow-y:auto;border:1px solid var(--linea-2);border-radius:12px}
+.hoja h1{font-family:var(--texto);font-size:1.15rem;text-align:center;line-height:1.35;margin:0 0 1.2rem;text-transform:uppercase;letter-spacing:.02em}
+.hoja h2{font-family:var(--texto);font-size:1rem;text-align:center;margin:1.6rem 0 .8rem;letter-spacing:.06em}
+.hoja h3{font-family:var(--texto);font-size:.92rem;margin:1.2rem 0 .4rem}
+.hoja p{margin:0 0 .7rem}
+.hoja ol,.hoja ul{margin:0 0 .8rem;padding-left:1.4rem}
+.hoja li{margin:.25rem 0}
+.hoja .inciso{padding-left:1.4rem;text-indent:-1.1rem}
+.hoja .inciso span{display:inline-block;width:1.1rem;text-indent:0}
+.hoja table{width:100%;border-collapse:collapse;margin:0 0 1rem;font-size:.88rem}
+.hoja th,.hoja td{border:1px solid #d9d4ca;padding:.45rem .6rem;text-align:left;vertical-align:top}
+.hoja th{width:38%;font-family:var(--texto);font-weight:600;background:#f1eee7}
+.hoja .anexo{margin-top:2rem;padding-top:1rem;border-top:2px solid #1b1a18}
+.hoja mark{background:#e8f9ee;color:inherit;padding:0 .15rem;border-radius:3px}
+.hoja mark.falta{background:#fde9e4;color:#9b2c1a;font-style:italic}
+.firmas{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin:1.8rem 0 1rem;font-family:var(--texto)}
+.firma-col{display:grid;gap:.15rem;align-content:end;text-align:center}
+.firma-col span{font-size:.75rem;font-weight:700;letter-spacing:.1em}
+.firma-col img{height:80px;width:auto;max-width:100%;margin:.4rem auto 0;object-fit:contain}
+.firma-col .sin-firma{display:block;height:80px;line-height:80px;color:#8a867f;font-size:.85rem}
+.firma-col b{border-top:1px solid #1b1a18;padding-top:.35rem;font-size:.9rem}
+.firma-col small{color:#5d5a55;font-size:.78rem}
+.certificado{margin-top:1.6rem;padding:1rem 1.1rem;border:1px dashed #b8b2a6;border-radius:8px;font-family:var(--texto);font-size:.8rem;color:#3d3b37;overflow-wrap:anywhere}
+.certificado h3{margin:0 0 .5rem;font-size:.85rem}
+.certificado p{margin:.2rem 0}
+.contrato-acciones{display:flex;flex-wrap:wrap;gap:.6rem;margin:0 0 1rem}
+
+@media print{
+  @page{margin:16mm}
+  body.imprimiendo > :not(#capa-contrato){display:none!important}
+  body.imprimiendo{background:#fff}
+  body.imprimiendo .capa{position:static;background:none;padding:0;overflow:visible}
+  body.imprimiendo .capa-in{border:0;padding:0;background:none;max-width:none}
+  body.imprimiendo .capa-cab,body.imprimiendo .contrato-acciones{display:none}
+  body.imprimiendo .hoja{padding:0;background:#fff;border-radius:0;font-size:10.5pt}
+  body.imprimiendo .hoja mark{background:none;padding:0}
+  body.imprimiendo .hoja h3,body.imprimiendo .firmas,body.imprimiendo .certificado,body.imprimiendo table{break-inside:avoid}
+}
+
 /* Barra para aceptar sin regresar hasta abajo */
 .fija{position:fixed;left:50%;bottom:calc(1rem + env(safe-area-inset-bottom,0px));transform:translate(-50%,140%);z-index:30;display:flex;align-items:center;gap:1rem;max-width:calc(100% - 1.5rem);padding:.55rem .55rem .55rem 1.2rem;border:1px solid var(--linea-2);border-radius:999px;background:rgba(11,11,12,.9);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);box-shadow:0 18px 50px rgba(0,0,0,.6);transition:transform .45s var(--suave)}
+.fija:not(.ver){visibility:hidden;transition:transform .45s var(--suave),visibility 0s .45s}
 .fija.ver{transform:translate(-50%,0)}
 .fija span{font-size:.88rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .fija b{font-family:var(--display);font-weight:400;font-size:1.25rem;color:var(--verde);margin-left:.3rem}
@@ -196,7 +280,7 @@ h1{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size
 .js .r.visto{opacity:1;transform:none}
 
 @media (max-width:900px){
-  .cab,.entendi,.inversion{grid-template-columns:1fr}
+  .cab,.entendi,.inversion,.fechas-ini{grid-template-columns:1fr}
   .linea-t{grid-template-columns:1fr;gap:0}
   .linea-t::before,.linea-t::after{left:.45rem;right:auto;top:0;bottom:0;width:1px;height:auto}
   .linea-t::after{transform:scaleY(0);transform-origin:top}
@@ -205,7 +289,8 @@ h1{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size
   .etapa::before{top:.15rem}
 }
 @media (max-width:600px){
-  .lista{grid-template-columns:1fr}
+  .lista,.dos,.firmas{grid-template-columns:1fr}
+  .fecha-caja .fila{grid-template-columns:1fr}
   .logo{width:108px}
   .meta{gap:.9rem 1.6rem}
   .pasos-sig > li{padding-left:1.2rem;padding-top:3.2rem}
@@ -229,13 +314,16 @@ h1{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size
 const CONFIG = {
   URL: 'https://ypguioklwhyixacfuksu.supabase.co/rest/v1/rpc/',
   LLAVE: 'sb_publishable_qjTIY_M5HJ9R653m_uOmXw_bBbVTibS',
-  WHATSAPP: '523323362662'
+  WHATSAPP: '523323362662',
+  PAGOS: 'https://ypguioklwhyixacfuksu.supabase.co/functions/v1/stripe-pagos'   // Stripe (Edge Function)
 };
 const token = decodeURIComponent(location.hash.replace(/^#/, '')).trim();
 const previa = new URLSearchParams(location.search).has('previa');
 const app = document.getElementById('app');
 let P = null;          // la propuesta
 let panel = '';        // '', 'aceptar' o 'rechazar'
+let verTransferencia = false;
+const pagoVuelta = new URLSearchParams(location.search).get('pago') === 'ok';   // regresó de Stripe
 
 // ---------- Utilidades ----------
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -248,6 +336,12 @@ const wa = txt => `https://wa.me/${CONFIG.WHATSAPP}?text=${encodeURIComponent(tx
 const IVA = { mas_iva: '+ IVA', incluido: 'IVA incluido', sin_iva: '' };
 const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
 const WA_ICONO = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.8-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.3 2.2 2.2 0 0 0 .2-1.3c-.1-.1-.3-.2-.5-.3Z"/></svg>';
+const fCorta = s => { const [, m, d] = String(s).slice(0, 10).split('-').map(Number); return `${d} de ${MESES[m - 1]}`; };
+const rangoVentana = v => { const [, m1, d1] = v.inicio.split('-').map(Number), [, m2, d2] = v.fin.split('-').map(Number);
+  return m1 === m2 ? `del ${d1} al ${d2} de ${MESES[m2 - 1]}` : `del ${fCorta(v.inicio)} al ${fCorta(v.fin)}`; };
+const fechaHora = iso => new Date(iso).toLocaleString('es-MX', { timeZone: 'America/Mexico_City', day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+const PLATAFORMAS = ['Instagram', 'Facebook', 'TikTok', 'LinkedIn', 'YouTube'];
+const RFC_OK = /^[A-ZÑ&]{3,4}\d{6}[A-Z0-9]{3}$/;
 const MOTIVOS = { precio: 'El precio', tiempos: 'Los tiempos no me cuadran', otra_opcion: 'Elegí otra opción', no_prioridad: 'No es prioridad ahora', otro: 'Otro motivo' };
 
 // Cómo trabajamos, según el tipo de propuesta
@@ -304,6 +398,22 @@ function bloqueEjemplo() {
   </a>`;
 }
 
+// Fechas del primer mes (solo contenido mensual): la ventana que alcanza con el margen de días
+function bloqueFechas() {
+  if (P.tipo !== 'mensual') return '';
+  const c = P.contrato && P.contrato.primer_ciclo;
+  const v = c || (P.ventanas || [])[0], sig = !c && (P.ventanas || [])[1];
+  if (!v) return '';
+  const et = P.pagada_at ? 'Tu primer mes' : `Si ${c ? 'tu anticipo llega' : 'firmas y pagas'} a más tardar el ${fCorta(v.limite)}`;
+  const caja = (x, titulo, principal) => `<div class="fecha-caja${principal ? ' principal' : ''} r"><span class="et">${esc(titulo)}</span>
+      <div class="fila"><div><small>Grabamos</small><b>${esc(rangoVentana(x))}</b></div><div><small>Recibes tus videos</small><b>${esc(fCorta(x.entrega))}</b></div></div></div>`;
+  return `<section class="seccion">
+    <div class="cab r"><div><span>Fechas</span><h2>Cuándo arrancamos</h2></div>
+      <p>Cada mes se graba en la misma mitad del mes: si grabamos del 1 al 15, te entrego el día 1 del mes siguiente; si grabamos del 16 en adelante, el día 15. Entre tu pago y la primera grabación dejo ${esc(P.margen_dias)} días para la sesión de arranque y tus guiones.</p></div>
+    <div class="fechas-ini">${caja(v, et, true)}${sig ? caja(sig, 'Si no, arrancamos en la siguiente', false) : ''}</div>
+  </section>`;
+}
+
 function totalAnticipo() {
   if (!P.anticipo) return null;
   return P.iva === 'mas_iva' ? Math.round(P.anticipo * 116) / 100 : Number(P.anticipo);
@@ -313,31 +423,54 @@ function bloqueDecision() {
   const pila = String(P.nombre || '').split(/\s+/)[0];
   const dudas = `<a class="btn" href="${esc(wa(`Hola Manuel, tengo una duda sobre la propuesta para ${P.empresa}.`))}" target="_blank" rel="noopener">${WA_ICONO} Tengo dudas</a>`;
 
-  // Ya aceptada: lo que sigue y los datos para el anticipo
+  // Ya aceptada: firmar el contrato, pagar el anticipo y agendar la sesión de arranque
   if (P.aceptada_at) {
+    const mensual = P.tipo === 'mensual', firmado = !!P.contrato, pagado = !!P.pagada_at;
+    const puedePagar = !mensual || firmado || !P.contrato_listo;
     const tot = totalAnticipo(), g = P.pago;
-    const anticipo = P.anticipo
-      ? `<b>${dinero(P.anticipo)}</b>${P.iva === 'mas_iva' ? ` + IVA = <b>${dinero(tot)}</b>` : P.iva === 'incluido' ? ' (IVA incluido)' : ''}`
-      : '';
-    const datos = g ? `<div class="pago">
+    const monto = P.anticipo ? `${dinero(P.anticipo)}${P.iva === 'mas_iva' ? ` + IVA = ${dinero(tot)}` : P.iva === 'incluido' ? ' (IVA incluido)' : ''}` : '';
+    const paso = (clase, titulo, texto, extra) => `<li class="${clase}"><h3>${titulo}</h3><p>${texto}</p>${extra || ''}</li>`;
+    const transferencia = g ? `<div class="pago">
         <div class="clabe-caja"><div><small>CLABE interbancaria</small><span class="clabe">${esc(String(g.clabe).replace(/(\d{4})(?=\d)/g, '$1 '))}</span></div>
           <button class="btn" type="button" data-accion="copiar" data-texto="${esc(g.clabe)}">Copiar CLABE</button></div>
         <dl><div><dt>Banco</dt><dd>${esc(g.banco)}</dd></div><div><dt>Titular</dt><dd>${esc(g.titular)}</dd></div>
           ${g.cuenta ? `<div><dt>Cuenta</dt><dd>${esc(g.cuenta)}</dd></div>` : ''}
           <div><dt>Concepto</dt><dd>${esc(P.empresa)} anticipo</dd></div></dl>
+        <div class="acciones"><a class="btn" href="${esc(wa(`Hola Manuel, te mando el comprobante del anticipo de ${P.empresa}.`))}" target="_blank" rel="noopener">${WA_ICONO} Mandar comprobante</a></div>
       </div>` : '<p>Te mando los datos para transferir por WhatsApp.</p>';
+    const opcionesPago = P.stripe
+      ? `<div class="acciones"><button class="btn btn-v" type="button" data-accion="pagar-tarjeta"${previa ? ' disabled' : ''}>Pagar con tarjeta</button>
+          <button class="enlace" type="button" data-accion="ver-transferencia">${verTransferencia ? 'Ocultar datos para transferir' : 'Prefiero transferir'}</button></div>
+          <p class="error" data-error-pago hidden></p>
+          ${verTransferencia ? `<div class="transfer">${transferencia}</div>` : ''}`
+      : transferencia;
+
+    const p1 = !mensual
+      ? paso('', 'Confirmamos alcance y fechas', 'Te escribo para confirmar las fechas de grabación y arrancar el guion.')
+      : firmado
+        ? paso('hecho', 'Contrato firmado', `Lo firmaste el ${esc(fechaHora(P.contrato.firmado_at))}.`, `<div class="acciones"><button class="btn" type="button" data-accion="ver-contrato">Ver o descargar el contrato</button></div>`)
+        : P.contrato_listo
+          ? paso('', 'Firma tu contrato', 'Lee tu contrato, ya con lo de esta propuesta, y fírmalo aquí mismo con el dedo o el mouse. Toma un par de minutos.', `<div class="acciones"><button class="btn btn-v" type="button" data-accion="abrir-firma">Revisar y firmar</button></div>`)
+          : paso('', 'Firma tu contrato', 'Te lo mando para firmar en línea, con lo que viene en esta propuesta.');
+    const p2 = pagado
+      ? paso('hecho', 'Anticipo pagado', `Lo recibí ${P.pago_metodo === 'tarjeta' ? 'con tarjeta' : 'por transferencia'}. ¡Gracias!`)
+      : !puedePagar
+        ? paso('espera', `Anticipo${monto ? ': ' + monto : ''}`, 'En cuanto firmes, aquí mismo pagas tu anticipo con tarjeta o por transferencia.')
+        : paso('', `Anticipo${monto ? ': ' + monto : ''}`, P.anticipo ? 'Con este pago apartamos tus fechas.' : 'El monto te lo confirmo con el contrato.', opcionesPago);
+    const msjArranque = pagado
+      ? `Hola Manuel, ya ${mensual ? 'firmé y ' : ''}pagué el anticipo de ${P.empresa}. ¿Qué día hacemos la sesión de arranque?`
+      : `Hola Manuel, ya ${mensual && firmado ? 'firmé el contrato de' : 'acepté la propuesta para'} ${P.empresa}. ¿Qué día hacemos la sesión de arranque?`;
+    const p3 = paso(pagado ? '' : 'espera', mensual ? 'Agenda tu sesión de arranque' : 'Arrancamos',
+      mensual ? 'Es en persona: estrategia, tu portal y cómo escribir tus guiones. Escríbeme para elegir el día. <a href="/bienvenida/">Mira cómo arrancamos</a>.'
+              : 'Con el anticipo apartamos las fechas de grabación y arrancamos el guion.',
+      `<div class="acciones"><a class="btn${pagado ? ' btn-v' : ''}" href="${esc(wa(msjArranque))}" target="_blank" rel="noopener">${WA_ICONO} ${mensual ? 'Agendar por WhatsApp' : 'Escribirme'}</a></div>`);
+
     return `<div class="decision r" id="decision">
       <span class="listo-marca">${CHECK.replace('<svg', '<svg width="16" height="16"')} Propuesta aceptada</span>
       <h2>Gracias, <em>${esc(String(P.aceptada_por || pila).split(/\s+/)[0])}.</em></h2>
-      <p class="txt">Aceptaste el ${esc(fecha(String(P.aceptada_at).slice(0, 10)))}. Esto es lo que sigue:</p>
-      <ol class="pasos-sig">
-        <li><h3>Firmamos el contrato</h3><p>Te lo mando para firmar en línea, con lo que viene en esta propuesta.</p></li>
-        <li><h3>Anticipo${anticipo ? `: ${anticipo}` : ''}</h3><p>${P.anticipo ? 'Con este pago apartamos tus fechas.' : 'El monto te lo confirmo con el contrato.'}</p>${datos}
-          <div class="acciones" style="margin-top:1rem"><a class="btn btn-v" href="${esc(wa(`Hola Manuel, te mando el comprobante del anticipo de ${P.empresa}.`))}" target="_blank" rel="noopener">${WA_ICONO} Mandar comprobante</a></div></li>
-        <li><h3>${P.tipo === 'mensual' ? 'Sesión de arranque' : 'Fechas de grabación'}</h3><p>${P.tipo === 'mensual'
-          ? 'Con el anticipo agendamos la sesión de arranque y fijamos tus primeras fechas de grabación. <a href="/bienvenida/">Mira cómo arrancamos</a>.'
-          : 'Con el anticipo apartamos las fechas de grabación y arrancamos el guion.'}</p></li>
-      </ol>
+      <p class="txt">${pagado ? 'Ya quedó todo. Solo falta agendar tu sesión de arranque.' : 'Esto es lo que sigue, en orden:'}</p>
+      ${pagoVuelta && !pagado ? '<p class="listo-marca" data-confirmando style="margin:0 0 1rem">Confirmando tu pago con el banco…</p>' : ''}
+      <ol class="pasos-sig">${p1}${p2}${p3}</ol>
     </div>`;
   }
 
@@ -443,6 +576,8 @@ function pintar() {
       <div class="linea-t r">${etapas.map(e => `<div class="etapa"><small>${esc(e[0])}</small><h3>${esc(e[1])}</h3><p>${esc(e[2])}</p></div>`).join('')}</div>
     </section>
 
+    ${bloqueFechas()}
+
     <section class="seccion">
       <div class="cab r"><div><span>Inversión</span><h2>Cuánto y cómo</h2></div></div>
       <div class="inversion">
@@ -471,6 +606,192 @@ function pintar() {
   <footer class="pie">Connect Studios · Guadalajara, México${P.tipo === 'mensual' ? ' · <a href="https://connectstudios.mx/terminos/" target="_blank" rel="noopener">Términos del servicio</a>' : ''} · <a href="/privacidad.html" target="_blank" rel="noopener">Aviso de privacidad</a></footer>`;
   animar();
   barraFija();
+}
+
+// ---------- Contrato ----------
+const CAMPOS_CLIENTE = { CLIENTE_NOMBRE: ['razon_social', 'nombre o razón social'], CLIENTE_RFC: ['rfc', 'RFC'],
+  CLIENTE_REPRESENTANTE: ['representante', ''], CLIENTE_DOMICILIO: ['domicilio', 'domicilio'], CLIENTE_CORREO: ['correo', 'correo'],
+  CLIENTE_WHATSAPP: ['whatsapp', 'WhatsApp'], CLIENTE_GOOGLE: ['correo_google', 'cuenta de Google'], PLATAFORMAS: ['plataformas', 'plataformas'] };
+
+function bloqueFirmas(c, d) {
+  const cliente = c ? c.razon_social : (d.razon_social || '');
+  const por = c ? c.representante : d.representante;
+  return `<div class="firmas">
+    <div class="firma-col"><span>EL PRESTADOR</span>${c && c.firma_prestador ? `<img src="${esc(c.firma_prestador)}" alt="Firma de EL PRESTADOR">` : '<i class="sin-firma">Pendiente</i>'}
+      <b>Manuel Alejandro Pérez Becerra</b><small>Connect Studios${c && c.firma_prestador_at ? ' · ' + esc(fechaHora(c.firma_prestador_at)) : ''}</small></div>
+    <div class="firma-col"><span>EL CLIENTE</span>${c ? `<img src="${esc(c.firma_cliente)}" alt="Firma de EL CLIENTE">` : '<i class="sin-firma">Tu firma va aquí</i>'}
+      <b>${esc(cliente) || '&nbsp;'}</b><small>${por ? 'Por: ' + esc(por) + ' · ' : ''}${c ? esc(c.firmado_por) + ' · ' + esc(fechaHora(c.firmado_at)) : 'Firma abajo'}</small></div>
+  </div>`;
+}
+
+// Vista previa: los datos del cliente se llenan mientras escribe. El texto que se guarda lo arma la base.
+function llenarContrato(d) {
+  let h = P.contrato_plantilla || '';
+  for (const [k, [campo, nombre]] of Object.entries(CAMPOS_CLIENTE)) {
+    let v = String(d[campo] || '').trim();
+    if (k === 'CLIENTE_REPRESENTANTE' && !v) v = 'No aplica';
+    h = h.split(`{{${k}}}`).join(v ? `<mark>${esc(v)}</mark>` : `<mark class="falta">[${esc(nombre)}]</mark>`);
+  }
+  return h.split('{{FIRMAS}}').join(bloqueFirmas(null, d));
+}
+
+function datosFirma(f) {
+  return {
+    razon_social: f.elements.razon_social.value.trim(), rfc: f.elements.rfc.value.toUpperCase().replace(/[\s-]/g, ''),
+    representante: f.elements.representante.value.trim(), domicilio: f.elements.domicilio.value.trim(),
+    correo: f.elements.correo.value.trim(), whatsapp: f.elements.whatsapp.value.trim(), correo_google: f.elements.correo_google.value.trim(),
+    plataformas: [...f.querySelectorAll('input[name=plataforma]:checked')].map(x => x.value).join(', '),
+    nombre_firma: f.elements.nombre_firma.value.trim()
+  };
+}
+
+let lienzo = null;
+function abrirFirma() {
+  cerrarCapa();
+  const gmail = /@gmail\.com$/i.test(P.correo || '') ? P.correo : '';
+  const capa = document.createElement('div');
+  capa.className = 'capa'; capa.id = 'capa-firma';
+  capa.innerHTML = `<div class="capa-in" role="dialog" aria-modal="true" aria-labelledby="firma-titulo">
+    <div class="capa-cab"><div><h2 id="firma-titulo">Tu contrato</h2><p>Llena tus datos, léelo y fírmalo. Al final lo puedes descargar.</p></div>
+      <button class="cerrar" type="button" data-accion="cerrar-capa" aria-label="Cerrar">×</button></div>
+    <form data-form="firmar" novalidate>
+      <div class="bloque-firma" style="margin-top:0;padding-top:0;border:0"><h3>1. Tus datos para el contrato</h3><p>Como aparecen en tu constancia de situación fiscal.</p>
+        <div class="campo"><label for="c-razon">Nombre o razón social</label><input id="c-razon" name="razon_social" maxlength="254" autocomplete="organization" value="${esc(P.empresa)}"></div>
+        <div class="dos">
+          <div class="campo"><label for="c-rfc">RFC</label><input id="c-rfc" name="rfc" maxlength="15" autocapitalize="characters" spellcheck="false" autocomplete="off"></div>
+          <div class="campo"><label for="c-rep">Representante legal <span style="font-weight:400;color:var(--crema-3)">(si es empresa)</span></label><input id="c-rep" name="representante" maxlength="120" autocomplete="name"></div>
+        </div>
+        <div class="campo"><label for="c-dom">Domicilio</label><input id="c-dom" name="domicilio" maxlength="300" autocomplete="street-address" placeholder="Calle, número, colonia, ciudad y código postal"></div>
+        <div class="dos">
+          <div class="campo"><label for="c-correo">Correo para avisos</label><input id="c-correo" name="correo" type="email" maxlength="200" autocomplete="email" value="${esc(P.correo || '')}"></div>
+          <div class="campo"><label for="c-wa">WhatsApp para avisos</label><input id="c-wa" name="whatsapp" type="tel" maxlength="25" autocomplete="tel" value="${esc(P.whatsapp || '')}"></div>
+        </div>
+        <div class="campo"><label for="c-google">Cuenta de Google para el portal</label><input id="c-google" name="correo_google" type="email" maxlength="200" value="${esc(gmail)}" placeholder="tucorreo@gmail.com"><p class="ayuda">Con esa cuenta vas a entrar a tu portal.</p></div>
+        <div class="campo"><span class="lbl">Redes donde publicamos <span style="font-weight:400;color:var(--crema-3)">(hasta 4)</span></span>
+          <div class="plataformas">${PLATAFORMAS.map(x => `<label><input type="checkbox" name="plataforma" value="${x}"${['Instagram', 'Facebook'].includes(x) ? ' checked' : ''}> ${x}</label>`).join('')}</div></div>
+      </div>
+      <div class="bloque-firma"><h3>2. Lee tu contrato</h3><p>Lo que está en verde son tus datos y los de esta propuesta.</p>
+        <div class="hoja-scroll"><div class="hoja" data-vista></div></div>
+      </div>
+      <div class="bloque-firma"><h3>3. Firma</h3><p>Con el dedo o el mouse, dentro del recuadro.</p>
+        <div class="campo"><label for="c-nombre">Nombre de quien firma</label><input id="c-nombre" name="nombre_firma" maxlength="120" autocomplete="name" value="${esc(P.aceptada_por || P.nombre)}"></div>
+        <div class="lienzo"><canvas aria-label="Recuadro para firmar"></canvas><div class="linea-firma"></div><div class="pista" data-pista>Firma aquí</div></div>
+        <div class="acciones" style="margin-top:.6rem"><button class="enlace" type="button" data-accion="borrar-firma">Borrar firma</button></div>
+        <label class="acepto"><input type="checkbox" name="acepto"> <span>Leí el contrato y su Anexo 1, y acepto firmarlos con firma electrónica, con la misma validez que una firma autógrafa.</span></label>
+        <div class="acciones"><button class="btn btn-v btn-grande" type="submit"${previa ? ' disabled' : ''}>Firmar contrato</button><button class="enlace" type="button" data-accion="cerrar-capa">Ahora no</button></div>
+        <p class="error" data-error hidden></p>
+      </div>
+    </form>
+  </div>`;
+  document.body.appendChild(capa);
+  document.body.style.overflow = 'hidden';
+  const f = capa.querySelector('form');
+  const pintarVista = () => { capa.querySelector('[data-vista]').innerHTML = llenarContrato(datosFirma(f)); };
+  f.addEventListener('input', pintarVista);
+  f.addEventListener('change', e => {
+    if (e.target.name === 'plataforma' && f.querySelectorAll('input[name=plataforma]:checked').length > 4) { e.target.checked = false; }
+    pintarVista();
+  });
+  pintarVista();
+  lienzo = prepararLienzo(capa.querySelector('canvas'), capa.querySelector('[data-pista]'));
+  f.elements.rfc.focus({ preventScroll: true });
+}
+
+// Recuadro de firma: trazos suaves, nítido en pantallas de alta densidad
+function prepararLienzo(cv, pista) {
+  const ctx = cv.getContext('2d');
+  let trazos = 0, dibujando = false, ultimo = null;
+  const ajustar = () => {
+    const r = cv.getBoundingClientRect(), dpr = Math.min(window.devicePixelRatio || 1, 2);
+    cv.width = Math.round(r.width * dpr); cv.height = Math.round(r.height * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = '#111'; ctx.lineWidth = 2.4;
+  };
+  ajustar();
+  const punto = e => { const r = cv.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
+  cv.addEventListener('pointerdown', e => { dibujando = true; ultimo = punto(e); pista.hidden = true; try { cv.setPointerCapture(e.pointerId); } catch (_) { /* sin captura, igual dibuja */ } e.preventDefault(); });
+  cv.addEventListener('pointermove', e => {
+    if (!dibujando) return;
+    const p = punto(e);
+    ctx.beginPath(); ctx.moveTo(ultimo.x, ultimo.y);
+    ctx.quadraticCurveTo(ultimo.x, ultimo.y, (ultimo.x + p.x) / 2, (ultimo.y + p.y) / 2); ctx.lineTo(p.x, p.y); ctx.stroke();
+    ultimo = p; trazos++;
+  });
+  const soltar = () => { dibujando = false; };
+  cv.addEventListener('pointerup', soltar); cv.addEventListener('pointercancel', soltar);
+  return {
+    vacio: () => trazos < 12,
+    borrar: () => { ctx.clearRect(0, 0, cv.width, cv.height); trazos = 0; pista.hidden = false; },
+    png: () => {
+      // Recorta el espacio vacío para que la imagen pese poco
+      const w = cv.width, h = cv.height, px = ctx.getImageData(0, 0, w, h).data;
+      let x0 = w, y0 = h, x1 = 0, y1 = 0;
+      for (let y = 0; y < h; y += 2) for (let x = 0; x < w; x += 2) if (px[(y * w + x) * 4 + 3] > 0) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+      const m = 12, ox = Math.max(0, x0 - m), oy = Math.max(0, y0 - m), ow = Math.min(w, x1 + m) - ox, oh = Math.min(h, y1 + m) - oy;
+      const out = document.createElement('canvas'); out.width = ow; out.height = oh;
+      out.getContext('2d').drawImage(cv, ox, oy, ow, oh, 0, 0, ow, oh);
+      return out.toDataURL('image/png');
+    }
+  };
+}
+
+function verContrato() {
+  cerrarCapa();
+  const c = P.contrato;
+  const capa = document.createElement('div');
+  capa.className = 'capa'; capa.id = 'capa-contrato';
+  capa.innerHTML = `<div class="capa-in" role="dialog" aria-modal="true" aria-labelledby="contrato-titulo">
+    <div class="capa-cab"><div><h2 id="contrato-titulo">Tu contrato</h2><p>${c.firma_prestador_at ? 'Firmado por las dos partes.' : 'Firmado por ti. Falta mi firma: te aviso cuando esté.'}</p></div>
+      <button class="cerrar" type="button" data-accion="cerrar-capa" aria-label="Cerrar">×</button></div>
+    <div class="contrato-acciones"><button class="btn btn-v" type="button" data-accion="imprimir">Descargar PDF</button><span style="color:var(--crema-3);font-size:.85rem;align-self:center">Elige "Guardar como PDF" en la ventana que se abre.</span></div>
+    <div class="hoja">${c.html.split('{{FIRMAS}}').join(bloqueFirmas(c))}
+      <div class="certificado"><h3>Certificado de firma electrónica</h3>
+        <p><b>Documento:</b> Contrato de prestación de servicios de producción de contenido audiovisual y su Anexo 1 (versión ${esc(c.version)}).</p>
+        <p><b>Huella del documento (SHA-256):</b> ${esc(c.hash)}</p>
+        <p><b>Firmó EL CLIENTE:</b> ${esc(c.firmado_por)}, por ${esc(c.razon_social)}, el ${esc(fechaHora(c.firmado_at))} (hora del centro de México)${c.firma_ip ? `, desde la IP ${esc(c.firma_ip)}` : ''}.</p>
+        ${c.firma_navegador ? `<p><b>Navegador:</b> ${esc(c.firma_navegador)}</p>` : ''}
+        <p><b>Firmó EL PRESTADOR:</b> ${c.firma_prestador_at ? `Manuel Alejandro Pérez Becerra, el ${esc(fechaHora(c.firma_prestador_at))} (hora del centro de México)` : 'pendiente'}.</p>
+        <p><b>Plataforma:</b> Portal de Connect Studios (portal.connectstudios.mx). Cualquier cambio al texto cambiaría su huella.</p>
+      </div>
+    </div>
+  </div>`;
+  document.body.appendChild(capa);
+  document.body.style.overflow = 'hidden';
+}
+
+function cerrarCapa() {
+  document.querySelectorAll('.capa').forEach(x => x.remove());
+  document.body.style.overflow = '';
+  lienzo = null;
+}
+
+async function pagarConTarjeta(boton) {
+  const err = document.querySelector('[data-error-pago]');
+  boton.disabled = true; const txt = boton.textContent; boton.textContent = 'Abriendo el pago…';
+  try {
+    const r = await fetch(CONFIG.PAGOS, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ accion: 'anticipo', token }) });
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok || !d.url) throw new Error(d.error || 'No se pudo iniciar el pago.');
+    location.href = d.url;
+  } catch (e) {
+    boton.disabled = false; boton.textContent = txt;
+    if (err) { err.textContent = String(e.message || e) + ' También puedes pagar por transferencia.'; err.hidden = false; }
+  }
+}
+
+// Al regresar de Stripe el aviso del banco tarda unos segundos: se revisa varias veces
+async function confirmarPago(intentos) {
+  if (!pagoVuelta || !P || P.pagada_at || intentos <= 0) {
+    if (pagoVuelta) history.replaceState(null, '', location.pathname + location.hash);
+    return;
+  }
+  await new Promise(r => setTimeout(r, 3000));
+  try {
+    const nuevo = await rpc('propuesta_ver', { p_token: token, p_registrar: false });
+    if (nuevo && nuevo.pagada_at) { P = nuevo; pintar(); document.getElementById('decision').scrollIntoView({ block: 'start' }); history.replaceState(null, '', location.pathname + location.hash); return; }
+  } catch (e) { /* se vuelve a intentar */ }
+  if (intentos === 1) { const m = document.querySelector('[data-confirmando]'); if (m) m.textContent = 'Tu pago se está procesando. En cuanto el banco lo confirme lo verás aquí.'; }
+  return confirmarPago(intentos - 1);
 }
 
 function repintarDecision(enfocar) {
@@ -520,6 +841,13 @@ document.addEventListener('click', async ev => {
   if (a === 'abrir-aceptar' || a === 'ir-aceptar') { panel = 'aceptar'; repintarDecision(true); }
   else if (a === 'abrir-rechazar') { panel = 'rechazar'; repintarDecision(true); }
   else if (a === 'cerrar-panel') { panel = ''; repintarDecision(false); }
+  else if (a === 'abrir-firma') { abrirFirma(); }
+  else if (a === 'ver-contrato') { verContrato(); }
+  else if (a === 'cerrar-capa') { cerrarCapa(); }
+  else if (a === 'borrar-firma') { if (lienzo) lienzo.borrar(); }
+  else if (a === 'imprimir') { document.body.classList.add('imprimiendo'); window.print(); setTimeout(() => document.body.classList.remove('imprimiendo'), 500); }
+  else if (a === 'pagar-tarjeta') { if (!previa) pagarConTarjeta(el); }
+  else if (a === 'ver-transferencia') { verTransferencia = !verTransferencia; repintarDecision(false); }
   else if (a === 'ver-video') {
     const caja = el.closest('[data-yt]');
     caja.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${caja.dataset.yt}?autoplay=1&rel=0" title="Ejemplo de video" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`;
@@ -541,6 +869,7 @@ document.addEventListener('submit', async ev => {
   const err = f.querySelector('[data-error]'), boton = f.querySelector('[type=submit]');
   const decir = t => { err.textContent = t; err.hidden = !t; };
   decir('');
+  if (f.dataset.form === 'firmar') return firmar(f, boton, decir);
   try {
     if (f.dataset.form === 'aceptar') {
       const nombre = f.elements.nombre.value.trim();
@@ -567,6 +896,38 @@ document.addEventListener('submit', async ev => {
   }
 });
 
+async function firmar(f, boton, decir) {
+  const d = datosFirma(f);
+  const correoOk = t => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(t);
+  const falta = (campo, txt) => { decir(txt); const el = f.elements[campo]; if (el && el.focus) el.focus(); };
+  if (d.razon_social.length < 2) return falta('razon_social', 'Escribe tu nombre o razón social.');
+  if (!RFC_OK.test(d.rfc)) return falta('rfc', 'Revisa tu RFC: son 12 caracteres si es empresa o 13 si es persona física.');
+  if (d.domicilio.length < 5) return falta('domicilio', 'Escribe tu domicilio completo.');
+  if (!correoOk(d.correo)) return falta('correo', 'Revisa el correo para avisos.');
+  if (!/^\d{10,15}$/.test(d.whatsapp.replace(/\D/g, ''))) return falta('whatsapp', 'Revisa el WhatsApp: 10 dígitos.');
+  if (!correoOk(d.correo_google)) return falta('correo_google', 'Escribe la cuenta de Google con la que vas a entrar al portal.');
+  if (!d.plataformas) return decir('Elige al menos una red donde publicamos.');
+  if (d.nombre_firma.length < 2) return falta('nombre_firma', 'Escribe el nombre de quien firma.');
+  if (!lienzo || lienzo.vacio()) return decir('Dibuja tu firma en el recuadro.');
+  if (!f.elements.acepto.checked) return decir('Marca la casilla para aceptar firmar el contrato.');
+  boton.disabled = true; boton.textContent = 'Firmando…';
+  try {
+    P = await rpc('contrato_firmar', { p_token: token, p_datos: d, p_firma: lienzo.png() });
+    cerrarCapa();
+    pintar();
+    document.getElementById('decision').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } catch (e) {
+    boton.disabled = false; boton.textContent = 'Firmar contrato';
+    const m = String(e && e.message || '');
+    decir(/contratos_rfc_check/.test(m) ? 'Revisa tu RFC.' : /contratos_(correo|correo_google)_check/.test(m) ? 'Revisa los correos.'
+      : /contratos_whatsapp_check/.test(m) ? 'Revisa el WhatsApp.' : /contratos_domicilio_check/.test(m) ? 'Revisa el domicilio.'
+      : /Failed to fetch|NetworkError|Load failed/i.test(m) ? 'No hay conexión. Revisa tu internet e inténtalo de nuevo.'
+      : 'No se pudo firmar. Inténtalo de nuevo o escríbeme por WhatsApp.');
+  }
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && document.querySelector('.capa')) cerrarCapa(); });
+
 // ---------- Arranque ----------
 async function arrancar() {
   if (!/^[A-Za-z0-9_-]{10,40}$/.test(token)) {
@@ -584,6 +945,8 @@ async function arrancar() {
       `<a class="btn btn-v" href="${esc(wa('Hola Manuel, no encuentro la propuesta que me mandaste. ¿Me la compartes de nuevo?'))}" target="_blank" rel="noopener">${WA_ICONO} Escribirme</a>`);
   }
   pintar();
+  if (new URLSearchParams(location.search).has('contrato') && P.contrato) verContrato();
+  confirmarPago(10);
 }
 window.addEventListener('hashchange', () => location.reload());
 arrancar();

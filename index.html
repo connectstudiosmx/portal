@@ -386,6 +386,13 @@ main.app{max-width:var(--ancho);margin:0 auto;padding:1.75rem 1.25rem 5rem}
 .sol.pr-aceptada{border-left-color:var(--verde)}
 .sol.pr-rechazada,.sol.pr-vencida{border-left-color:var(--linea-2);opacity:.72}
 .sol-meta b{color:var(--crema);font-weight:700}
+.firma-pad{position:relative;background:#fff;border-radius:var(--r2);height:150px;max-width:420px;touch-action:none;overflow:hidden}
+.firma-pad canvas{display:block;width:100%;height:100%;cursor:crosshair}
+.firma-pad span{position:absolute;left:0;right:0;bottom:10px;text-align:center;color:#8a867f;font-size:.78rem;pointer-events:none}
+.firma-img{background:#fff;border-radius:var(--r1);padding:.3rem .6rem;height:56px;width:auto;max-width:100%;object-fit:contain}
+.codigo{display:block;background:var(--negro);border:1px solid var(--linea-2);border-radius:var(--r2);padding:.55rem .7rem;font-family:ui-monospace,Consolas,monospace;font-size:.78rem;overflow-wrap:anywhere;margin:.35rem 0 .6rem}
+.pasos-stripe{margin:.4rem 0 0;padding-left:1.2rem;color:var(--crema-2);font-size:.9rem}
+.pasos-stripe li{margin:.5rem 0}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 .link-prop{display:flex;align-items:center;gap:.5rem;background:var(--negro);border:1px solid var(--linea-2);border-radius:var(--r2);padding:.55rem .7rem;font-size:.86rem;overflow-wrap:anywhere;margin:0 0 1rem}
 
@@ -485,6 +492,10 @@ const CONFIG = {
 };
 // =====================================================================
 
+// Regresó de pagar con tarjeta (Stripe): se lee antes de limpiar la URL
+const PAGO_OK = new URLSearchParams(location.search).get('pago') === 'ok';
+const PAGOS_URL = 'https://ypguioklwhyixacfuksu.supabase.co/functions/v1/stripe-pagos';
+
 const configLista = () => !/TU-PROYECTO|PEGA_AQUI/.test(CONFIG.SUPABASE_URL + CONFIG.SUPABASE_KEY);
 const sb = (configLista() && window.supabase)
   ? window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY, {
@@ -497,7 +508,7 @@ const S = {
   vista: 'produccion',
   clientes: [], ciclos: [], videos: [], perfiles: [], asignaciones: [], solicitudes: [], reportes: [], mlLog: [], verAtendidas: false, solFiltro: { ruta: '', califica: '', estado: '' },
   postulaciones: [], postFiltro: { rol: '', estado: 'activas', pais: '' }, facturas: [], pagoDatos: null, facFiltro: 'pendiente', faltaBase: false,
-  pagosCli: null, propuestas: [], propFiltro: 'activas',
+  pagosCli: null, propuestas: [], propFiltro: 'activas', ajustes: null, contratos: [], pagosStripe: [],
   portal: null, cicloCliente: null, previa: null, pestanaCli: 'videos',
   filtro: { cliente: 'todos', estado: 'todos', mios: false, entregados: false },
   calInicio: null, verTodos: {}, cargadoEn: 0
@@ -594,6 +605,10 @@ function humano(e) {
   if (/facturas_monto_check/.test(m)) return 'Revisa el monto del pago.';
   if (/pago_datos_clabe_check/.test(m)) return 'La CLABE tiene 18 dígitos.';
   if (/pago_datos_cuenta_check/.test(m)) return 'El número de cuenta solo lleva dígitos (de 6 a 20).';
+  if (/ajustes_prestador_rfc_check/.test(m)) return 'Revisa tu RFC: 13 caracteres (persona física).';
+  if (/ajustes_prestador_domicilio_check/.test(m)) return 'Escribe tu domicilio completo.';
+  if (/ajustes_\w+_check/.test(m)) return 'Revisa los datos del contrato.';
+  if (/clients_mensualidad_check/.test(m)) return 'Revisa la mensualidad: solo números.';
   if (/acceso_propio/.test(m)) return 'No puedes borrarte a ti mismo.';
   if (/acceso_admin/.test(m)) return 'Primero cámbialo de Administrador a otro rol y después bórralo.';
   if (/propuestas_precio_check|propuestas_anticipo_check/.test(m)) return 'Revisa el precio y el anticipo: tienen que ser mayores a cero.';
@@ -649,6 +664,14 @@ async function cargarEquipo() {
       sb.from('propuestas').select('*').order('created_at', { ascending: false }).limit(300)
     ]);
     S.propuestas = props.error ? [] : props.data || [];
+    const [aj, cts, ps] = await Promise.all([
+      sb.from('ajustes').select('*').eq('id', 1).maybeSingle(),
+      sb.from('contratos').select('id,propuesta_id,client_id,razon_social,rfc,correo,whatsapp,correo_google,plataformas,firmado_por,firmado_at,firma_prestador_at,primer_ciclo').order('firmado_at', { ascending: false }).limit(300),
+      sb.from('pagos_stripe').select('*').order('created_at', { ascending: false }).limit(100)
+    ]);
+    S.ajustes = aj.error ? null : aj.data;
+    S.contratos = cts.error ? [] : cts.data || [];
+    S.pagosStripe = ps.error ? [] : ps.data || [];
     S.postulaciones = post.error ? [] : post.data || [];
     S.facturas = facs.error ? [] : facs.data || [];
     S.pagoDatos = datos.error ? null : datos.data;
@@ -730,9 +753,9 @@ function barra() {
   const errML = esAdmin ? mlConError().length : 0;
   const porRevisar = esAdmin ? S.postulaciones.filter(x => x.estado === 'nueva').length : 0;
   const porEmitir = esAdmin ? S.facturas.filter(x => x.estado === 'pendiente').length : 0;
-  const porConvertir = esAdmin ? S.propuestas.filter(x => x.aceptada_at && !x.client_id).length : 0;
+  const porConvertir = esAdmin ? S.propuestas.filter(x => x.aceptada_at && !x.client_id).length + S.contratos.filter(c => !c.firma_prestador_at).length : 0;
   const punto = id => id === 'clientes' && errML ? `<span class="punto punto-error" aria-label="${errML} con error de MailerLite">!</span>`
-    : id === 'propuestas' && porConvertir ? `<span class="punto" aria-label="${porConvertir} ${porConvertir === 1 ? 'aceptada' : 'aceptadas'} sin dar de alta como cliente">${porConvertir}</span>`
+    : id === 'propuestas' && porConvertir ? `<span class="punto" aria-label="${porConvertir} ${porConvertir === 1 ? 'pendiente' : 'pendientes'}: contratos por firmar o aceptadas sin dar de alta">${porConvertir}</span>`
     : id === 'postulaciones' && porRevisar ? `<span class="punto" aria-label="${porRevisar} por revisar">${porRevisar}</span>`
     : id === 'pagos' && porEmitir ? `<span class="punto" aria-label="${porEmitir} ${porEmitir === 1 ? 'factura' : 'facturas'} por emitir">${porEmitir}</span>`
     : id === 'accesos' && pendientes ? `<span class="punto" aria-label="${pendientes} pendientes">${pendientes}</span>`
@@ -1255,6 +1278,8 @@ function estadoPropuesta(x) {
   return { clave: 'sin_enviar', txt: 'Sin enviar' };
 }
 // Textos de arranque según el tipo; salen de los términos del servicio y se pueden cambiar en cada propuesta
+const contratoDe = x => S.contratos.find(c => c.propuesta_id === x.id);
+const contratoListo = () => { const a = S.ajustes; return !!(a && a.prestador_rfc && a.prestador_domicilio && a.horas_jornada && a.precio_dia_adicional && S.pagoDatos); };
 const PROP_DEF = {
   mensual: {
     titulo: 'Contenido mensual para redes', precio: 14499, precio_nota: 'al mes',
@@ -1298,6 +1323,7 @@ function vistaPropuestas() {
     </div>
   </div>
   ${S.faltaBase ? avisoFaltaBase() : ''}
+  ${S.ajustes && !contratoListo() ? '<p class="aviso-linea">Para que tus clientes firmen el contrato en línea, llena tus datos del contrato en <button class="f-ver" data-accion="ir" data-id="pagos">Pagos</button>. Mientras, la propuesta les dice que les mandas el contrato.</p>' : ''}
   ${porConvertir ? `<p class="aviso-linea">${porConvertir === 1 ? '1 propuesta aceptada todavía no está dada de alta como cliente.' : `${porConvertir} propuestas aceptadas todavía no están dadas de alta como clientes.`}</p>` : ''}
   ${lista.length ? `<div class="sol-lista">${lista.map(x => {
     const e = estadoPropuesta(x), abierta = !x.aceptada_at && e.clave !== 'vencida';
@@ -1311,6 +1337,10 @@ function vistaPropuestas() {
         </div>
         ${x.aceptada_at ? `<p class="sol-msg">Aceptó <b>${esc(x.aceptada_por || x.nombre)}</b> el ${esc(fHora(x.aceptada_at))}. Siguiente: mándale el contrato y confirma el anticipo.</p>` : ''}
         ${x.rechazada_at && !x.aceptada_at ? `<p class="sol-msg"><b>Motivo:</b> ${esc(MOTIVOS_PROP[x.motivo] || 'Otro')}${x.comentario ? ` · ${esc(x.comentario)}` : ''}</p>` : ''}
+        ${x.aceptada_at ? (ct => `<div class="sol-meta">
+          ${x.tipo === 'mensual' ? (ct ? `<span class="sol-int sol-ok">Contrato firmado el ${esc(fCorta(ct.firmado_at))}</span>${ct.firma_prestador_at ? '<span class="sol-int sol-ok">Ya lo firmaste</span>' : '<span class="sol-int">Falta tu firma</span>'}` : '<span class="sol-int">Contrato sin firmar</span>') : ''}
+          ${x.pagada_at ? `<span class="sol-int sol-ok">Anticipo pagado ${x.pago_metodo === 'tarjeta' ? 'con tarjeta' : 'por transferencia'}</span>` : '<span class="sol-int">Anticipo pendiente</span>'}
+        </div>`)(contratoDe(x)) : ''}
         ${x.notas ? `<p class="nota" style="margin:.5rem 0 0">Nota: ${esc(x.notas)}</p>` : ''}
         <div class="sol-acc">
           ${abierta ? `<button class="btn btn-s btn-p" data-accion="prop-wa" data-id="${x.id}">Enviar por WhatsApp</button>` : ''}
@@ -1318,6 +1348,8 @@ function vistaPropuestas() {
           <a class="btn btn-s btn-t" href="${esc(linkPropuesta(x, true))}" target="_blank" rel="noopener">Vista previa</a>
           <button class="btn btn-s btn-t" data-accion="prop-editar" data-id="${x.id}">Editar</button>
           <button class="btn btn-s btn-t" data-accion="prop-duplicar" data-id="${x.id}">Duplicar</button>
+          ${(ct => ct ? `<a class="btn btn-s" href="${esc(linkPropuesta(x, true).replace('?previa', '?previa&contrato'))}" target="_blank" rel="noopener">Ver contrato</a>${ct.firma_prestador_at ? '' : `<button class="btn btn-s btn-p" data-accion="contrato-firmar" data-id="${ct.id}">Firmar contrato</button>`}` : '')(contratoDe(x))}
+          ${x.aceptada_at && !x.pagada_at ? `<button class="btn btn-s btn-t" data-accion="prop-pagada" data-id="${x.id}">Marcar anticipo pagado</button>` : ''}
           ${x.aceptada_at && !x.client_id ? `<button class="btn btn-s btn-p" data-accion="prop-cliente" data-id="${x.id}">Dar de alta como cliente</button>` : ''}
           ${x.client_id ? '<span class="sol-int sol-ok">Ya es cliente</span>' : ''}
         </div>
@@ -1475,6 +1507,13 @@ function vistaPagos() {
     ${d ? `${bloqueDatosPago(d)}<p class="nota" style="margin:.9rem 0 0">Última actualización: ${esc(fHora(d.updated_at))}</p>`
       : `<div class="caja-vacia"><p>Todavía no hay datos. Agrégalos y tus clientes los verán en su portal, con un botón para copiar la CLABE.</p><button class="btn btn-p" data-accion="pago-datos">Agregar datos para transferir</button></div>`}
   </section>
+  ${bloqueAjustes()}
+  ${S.pagosStripe.length ? `<div class="titulo-sec"><h2>Pagos con tarjeta</h2></div>
+    <div class="tabla-env"><table class="tabla"><thead><tr><th>Fecha</th><th>Concepto</th><th>De</th><th>Monto</th></tr></thead><tbody>
+    ${S.pagosStripe.map(ps => { const pr = S.propuestas.find(x => x.id === ps.propuesta_id), cl = clientePorId(ps.client_id);
+      return `<tr><td class="nota">${esc(fHora(ps.created_at))}</td><td>${ps.tipo === 'anticipo' ? 'Anticipo' : 'Mensualidad'}</td>
+        <td>${esc((pr && pr.empresa) || (cl && cl.name) || ps.correo || '')}</td><td><b>${esc(dinero(ps.monto))}</b></td></tr>`; }).join('')}
+    </tbody></table></div>` : ''}
   <div class="titulo-sec">
     <h2>Facturas</h2>
     <div class="controles"><select class="campo-in" data-cambio="fac-filtro" aria-label="Filtrar facturas">${opt('pendiente', 'Por emitir')}${opt('emitida', 'Emitidas')}${opt('cancelada', 'Canceladas')}${opt('', 'Todas')}</select></div>
@@ -1511,12 +1550,97 @@ function vistaPagos() {
     : `<div class="caja-vacia"><p>${S.facturas.length ? (f === 'pendiente' ? 'No hay facturas por emitir.' : 'Nada coincide con este filtro.') : 'Todavía nadie pide factura. Tus clientes la piden desde su portal, en la pestaña Pagos, y aquí te llega con todos sus datos fiscales.'}</p></div>`}`;
 }
 
+// Datos de EL PRESTADOR para el contrato, la firma y el pago con tarjeta
+function bloqueAjustes() {
+  const a = S.ajustes;
+  if (!a) return '';
+  const listo = contratoListo();
+  const fila = (k, v) => `<div class="pago-dato"><dt>${k}</dt><dd>${v}</dd></div>`;
+  const falta = '<span class="error-linea">Falta</span>';
+  return `<section class="rep">
+    <div class="rep-cab"><h2>Datos para el <span>contrato</span></h2><button class="btn btn-s${listo ? '' : ' btn-p'}" data-accion="ajustes">${listo ? 'Editar' : 'Llenar datos'}</button></div>
+    ${listo ? '' : '<p class="aviso-linea">Mientras falten estos datos, tus clientes no pueden firmar en línea: la propuesta les dice que les mandas el contrato.</p>'}
+    <dl class="pago-datos">
+      ${fila('Tu RFC', a.prestador_rfc ? esc(a.prestador_rfc) : falta)}
+      ${fila('Horas por jornada', a.horas_jornada ? esc(String(Number(a.horas_jornada))) + ' horas' : falta)}
+      ${fila('Día adicional', a.precio_dia_adicional ? esc(dinero(a.precio_dia_adicional)) + ' + IVA' : falta)}
+      ${fila('Días entre pago y 1.ª grabación', esc(a.margen_dias))}
+      <div class="pago-dato ancho"><dt>Tu domicilio</dt><dd>${a.prestador_domicilio ? esc(a.prestador_domicilio) : falta}</dd></div>
+      ${fila('Tu firma', a.firma_prestador ? `<img class="firma-img" src="${esc(a.firma_prestador)}" alt="Tu firma">` : '<span class="nota">Sin firma: la necesitas para firmar los contratos</span>')}
+      ${fila('Pago con tarjeta', a.stripe_activo ? '<span class="sol-int sol-ok">Activo</span>' : '<span class="sol-int">Apagado</span>')}
+    </dl>
+    ${a.stripe_activo ? '' : `<details class="pegar" style="margin-top:1rem"><summary>Cómo activar el pago con tarjeta (Stripe)</summary>
+      <ol class="pasos-stripe">
+        <li>En Stripe: <b>Developers → API keys</b>, copia tu <b>Secret key</b>. En Supabase → <b>SQL Editor</b>, pega esta línea con tu llave y dale Run:
+          <code class="codigo">select vault.create_secret('sk_live_TU_LLAVE', 'stripe_secret_key', 'Llave secreta de Stripe');</code></li>
+        <li>En Stripe: <b>Developers → Webhooks → Add endpoint</b>. URL: <code class="codigo">${PAGOS_URL}</code> Evento: <b>checkout.session.completed</b>. Copia el <b>Signing secret</b> (empieza con whsec_) y en el SQL Editor:
+          <code class="codigo">select vault.create_secret('whsec_TU_SECRETO', 'stripe_webhook_secret', 'Firma de los avisos de Stripe');</code></li>
+        <li>Aquí arriba, en <b>Editar</b>, enciende <b>Cobrar con tarjeta</b>.</li>
+      </ol>
+      <p class="nota">Las llaves nunca van en el chat ni en la página: solo en Vault. Para probar sin cobrar de verdad, usa primero las de prueba (sk_test_).</p></details>`}
+  </section>`;
+}
+
+// Recuadro de firma (admin): devuelve { vacio, borrar, png }
+function padFirma(cv, pista) {
+  const ctx = cv.getContext('2d');
+  let trazos = 0, dibujando = false, ultimo = null;
+  const r = cv.getBoundingClientRect(), dpr = Math.min(window.devicePixelRatio || 1, 2);
+  cv.width = Math.round(r.width * dpr); cv.height = Math.round(r.height * dpr);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = '#111'; ctx.lineWidth = 2.4;
+  const punto = e => { const b = cv.getBoundingClientRect(); return { x: e.clientX - b.left, y: e.clientY - b.top }; };
+  cv.addEventListener('pointerdown', e => { dibujando = true; ultimo = punto(e); pista.hidden = true; try { cv.setPointerCapture(e.pointerId); } catch (_) { /* igual dibuja */ } e.preventDefault(); });
+  cv.addEventListener('pointermove', e => { if (!dibujando) return; const p = punto(e); ctx.beginPath(); ctx.moveTo(ultimo.x, ultimo.y); ctx.lineTo(p.x, p.y); ctx.stroke(); ultimo = p; trazos++; });
+  ['pointerup', 'pointercancel'].forEach(t => cv.addEventListener(t, () => { dibujando = false; }));
+  return {
+    vacio: () => trazos < 12,
+    borrar: () => { ctx.clearRect(0, 0, cv.width, cv.height); trazos = 0; pista.hidden = false; },
+    png: () => cv.toDataURL('image/png')
+  };
+}
+let padAdmin = null;
+
+function modalAjustes() {
+  const a = S.ajustes || {};
+  const v = k => esc(a[k] ?? '');
+  abrirModal(`<form data-form="ajustes" novalidate>
+    <div class="d-cab"><div><h2 class="d-titulo">Datos para el contrato</h2><p class="d-sub">Van en las Declaraciones y el Anexo 1 de cada contrato que firmen tus clientes.</p></div></div>
+    <div class="fila-campos">
+      <div class="campo"><label for="aj-rfc">Tu RFC</label><input id="aj-rfc" name="prestador_rfc" maxlength="13" autocapitalize="characters" autocomplete="off" value="${v('prestador_rfc')}"></div>
+      <div class="campo"><label for="aj-margen">Días entre el pago y la 1.ª grabación</label><input id="aj-margen" name="margen_dias" type="number" min="0" max="60" value="${v('margen_dias') || 10}"></div>
+    </div>
+    <div class="campo"><label for="aj-dom">Tu domicilio</label><input id="aj-dom" name="prestador_domicilio" maxlength="300" value="${v('prestador_domicilio')}" placeholder="Calle, número, colonia, Guadalajara, Jalisco, CP"></div>
+    <div class="fila-campos">
+      <div class="campo"><label for="aj-correo">Correo para avisos</label><input id="aj-correo" name="prestador_correo" type="email" maxlength="200" value="${v('prestador_correo')}"></div>
+      <div class="campo"><label for="aj-wa">WhatsApp para avisos</label><input id="aj-wa" name="prestador_whatsapp" type="tel" maxlength="25" value="${v('prestador_whatsapp')}"></div>
+    </div>
+    <div class="fila-campos">
+      <div class="campo"><label for="aj-horas">Horas máximas por jornada</label><input id="aj-horas" name="horas_jornada" inputmode="decimal" value="${v('horas_jornada') ? Number(a.horas_jornada) : ''}" placeholder="4"></div>
+      <div class="campo"><label for="aj-dia">Precio del día adicional (MXN, + IVA)</label><input id="aj-dia" name="precio_dia_adicional" inputmode="decimal" value="${v('precio_dia_adicional')}" placeholder="2500"></div>
+    </div>
+    <div class="campo"><span class="lbl">Tu firma</span>
+      ${a.firma_prestador ? `<p class="ayuda">Firma guardada: <img class="firma-img" src="${esc(a.firma_prestador)}" alt="Tu firma" style="vertical-align:middle"> Dibuja otra solo si la quieres cambiar.</p>` : '<p class="ayuda">Se pone en cada contrato cuando lo firmas desde Propuestas.</p>'}
+      <div class="firma-pad"><canvas aria-label="Recuadro para tu firma"></canvas><span data-pista>Firma aquí</span></div>
+      <div><button type="button" class="btn btn-s btn-t" data-accion="ajustes-borrar-firma">Borrar trazo</button></div></div>
+    <div class="campo"><label class="interruptor"><input type="checkbox" name="stripe_activo"${a.stripe_activo ? ' checked' : ''}> Cobrar con tarjeta (Stripe)</label>
+      <p class="ayuda">Enciéndelo solo después de guardar tus llaves de Stripe en Vault (instrucciones en Pagos). Con esto aparece "Pagar con tarjeta" en las propuestas y en el portal de tus clientes.</p></div>
+    <div class="d-pie"><button type="button" class="btn" data-accion="cerrar">Cancelar</button><button type="submit" class="btn btn-p">Guardar</button></div>
+  </form>`, dlg => { padAdmin = padFirma(dlg.querySelector('canvas'), dlg.querySelector('[data-pista]')); }, () => { padAdmin = null; });
+}
+
 // Lo que ve el cliente en Pagos. G = { datos, facturas, fiscales } (client_pagos o pagosLocal)
 function vistaPagosCliente(G, P, previa) {
   if (!G) return `<div class="caja-vacia"><p>Esta sección no cargó. Toca “Revisar de nuevo”; si sigue igual, pídenos los datos por WhatsApp.</p><button class="btn" data-accion="actualizar">Revisar de nuevo</button></div>`;
   const d = G.datos, facs = G.facturas || [];
   const wa = CONFIG.WHATSAPP ? `https://wa.me/${CONFIG.WHATSAPP}?text=${encodeURIComponent(d ? `Hola, te mando el comprobante de pago de ${P.client.name}.` : `Hola, ¿me pasas los datos para transferir? Soy de ${P.client.name}.`)}` : '';
-  return `<p class="rep-intro">Aquí tienes los datos para transferir y puedes pedir la factura de cada pago.</p>
+  const tarjeta = G.stripe && G.mensualidad;
+  const totalMes = tarjeta ? (G.iva === 'mas_iva' ? Math.round(G.mensualidad * 116) / 100 : Number(G.mensualidad)) : 0;
+  return `<p class="rep-intro">${tarjeta ? 'Paga tu mensualidad con tarjeta o por transferencia,' : 'Aquí tienes los datos para transferir'} y pide la factura de cada pago.</p>
+  ${tarjeta ? `<section class="rep">
+    <div class="rep-cab"><h2>Paga con <span>tarjeta</span></h2></div>
+    <p class="rep-txt">Tu mensualidad: <b>${esc(dinero(totalMes))}</b>${G.iva === 'mas_iva' ? ` (${esc(dinero(G.mensualidad))} + IVA)` : ''}. Se abre el pago seguro de Stripe.</p>
+    <div class="pago-pie"><button class="btn btn-p" data-accion="pagar-mensualidad"${previa ? ' disabled' : ''}>Pagar mensualidad con tarjeta</button><span class="nota">Si tu empresa retiene impuestos, escríbenos antes de pagar.</span></div>
+  </section>` : ''}
   <section class="rep">
     <div class="rep-cab"><h2>Datos para <span>transferir</span></h2></div>
     ${d ? `${bloqueDatosPago(d)}
@@ -2058,6 +2182,11 @@ function modalCliente(id) {
     </div>
     <div class="campo"><label for="k-cwa">WhatsApp del contacto</label><input id="k-cwa" name="contact_phone" type="tel" inputmode="tel" maxlength="25" placeholder="33 1234 5678" value="${esc(cl ? cl.contact_phone || '' : '')}" style="max-width:14rem">
       <p class="ayuda">Para avisarle con un clic cuando le entregas videos o publicas su reporte.</p></div>
+    <div class="fila-campos">
+      <div class="campo"><label for="k-mens">Mensualidad (MXN) <span class="opc">(opcional)</span></label><input id="k-mens" name="mensualidad" inputmode="decimal" autocomplete="off" value="${esc(cl && cl.mensualidad ? cl.mensualidad : '')}" placeholder="14499"></div>
+      <div class="campo"><label for="k-iva">IVA</label><select id="k-iva" name="iva">${Object.entries({ mas_iva: 'Más IVA', incluido: 'IVA incluido', sin_iva: 'Sin IVA' }).map(([k, t]) => `<option value="${k}"${(cl ? cl.iva || 'mas_iva' : 'mas_iva') === k ? ' selected' : ''}>${t}</option>`).join('')}</select></div>
+    </div>
+    <p class="ayuda" style="margin:-.6rem 0 1rem">Con la mensualidad, el cliente puede pagar con tarjeta desde su portal (si lo activaste en Pagos).</p>
     <div class="campo"><label for="k-onb">Fecha de onboarding</label><input id="k-onb" name="onboarding_date" type="date" value="${esc(cl ? cl.onboarding_date || '' : aISO(hoy()))}" style="max-width:12rem">
       <p class="ayuda">A este correo le llegan los recordatorios de MailerLite: “Aparta tu día” (en su primer mes, 4 días después del onboarding; después, una semana antes del límite de guiones) y, solo si le faltan guiones, uno 2 días antes del límite. Si lo dejas vacío, se usa el correo con el que el cliente entra al portal.</p></div>
     <div class="campo"><label for="k-url">Carpeta compartida con el cliente (opcional)</label><input id="k-url" name="shared_url" type="url" inputmode="url" placeholder="https://drive.google.com/..." value="${esc(cl ? cl.shared_url || '' : '')}">
@@ -2109,6 +2238,13 @@ function modalPropuesta(id, desde) {
       <div class="campo"><label for="pr-nota">Junto al precio <span class="opc">(opcional)</span></label><input id="pr-nota" name="precio_nota" maxlength="120" value="${v('precio_nota')}" placeholder="al mes"></div>
       <div class="campo"><label for="pr-anticipo">Anticipo (MXN)</label><input id="pr-anticipo" name="anticipo" inputmode="decimal" autocomplete="off" value="${base && base.anticipo ? esc(base.anticipo) : ''}" placeholder="50% del precio"><p class="ayuda">Si lo dejas vacío, se pone el 50% del precio.</p></div>
     </div>
+    <div class="fila-campos" data-solo-mensual${tipo === 'mensual' ? '' : ' hidden'}>
+      <div class="campo"><label for="pr-videos">Videos por mes</label><input id="pr-videos" name="videos_ciclo" type="number" min="1" max="60" value="${esc(base ? base.videos_ciclo || 12 : 12)}"></div>
+      <div class="campo"><label for="pr-dias">Días de grabación al mes</label><input id="pr-dias" name="dias_grabacion" type="number" min="1" max="10" value="${esc(base ? base.dias_grabacion || 2 : 2)}"></div>
+    </div>
+    <div class="campo" data-solo-mensual${tipo === 'mensual' ? '' : ' hidden'}><label for="pr-plazo">Plazo mínimo</label>
+      <select id="pr-plazo" name="plazo_minimo" style="max-width:14rem">${[3, 9, 12].map(n => `<option value="${n}"${(base ? base.plazo_minimo || 3 : 3) === n ? ' selected' : ''}>${n} meses</option>`).join('')}</select>
+      <p class="ayuda">Videos, días y plazo van al Anexo 1 del contrato.</p></div>
     <div class="campo"><label for="pr-pago">Forma de pago</label><textarea id="pr-pago" name="forma_pago" maxlength="1500" style="min-height:5rem">${v('forma_pago')}</textarea></div>
     <div class="campo"><label for="pr-cond">Condiciones</label><textarea id="pr-cond" name="condiciones" maxlength="2500" style="min-height:7rem">${v('condiciones')}</textarea><p class="ayuda">Un punto por renglón.</p></div>
     <div class="fila-campos">
@@ -2129,6 +2265,7 @@ function modalPropuesta(id, desde) {
       const de = PROP_DEF[anterior], a = PROP_DEF[f.elements.tipo.value];
       CAMPOS.forEach(k => { const el = f.elements[k]; if (!el.value.trim() || el.value.trim() === String(de[k]).trim()) el.value = a[k]; });
       anterior = f.elements.tipo.value;
+      dlg.querySelectorAll('[data-solo-mensual]').forEach(el => { el.hidden = anterior !== 'mensual'; });
     });
   });
 }
@@ -2397,7 +2534,10 @@ const FORMS = {
     if (correo && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(correo)) { aviso('El correo de contacto no es válido.', true); return f.elements.contact_email.focus(); }
     const datos = { name: nombre, videos_per_cycle: n, shared_url: valor(f, 'shared_url') || null,
       contact_name: valor(f, 'contact_name') || null, contact_email: correo || null, onboarding_date: valor(f, 'onboarding_date') || null,
-      contact_phone: valor(f, 'contact_phone') || null };
+      contact_phone: valor(f, 'contact_phone') || null, iva: valor(f, 'iva') || 'mas_iva' };
+    const mens = (valor(f, 'mensualidad') || '').replace(/[$,\s]/g, '');
+    datos.mensualidad = mens === '' ? null : Number(mens);
+    if (datos.mensualidad !== null && !(datos.mensualidad > 0)) { aviso('Revisa la mensualidad: solo números, por ejemplo 14499.', true); return f.elements.mensualidad.focus(); }
     if (datos.contact_phone && !/^\d{10,15}$/.test(datos.contact_phone.replace(/\D/g, ''))) { aviso('El WhatsApp debe tener de 10 a 15 dígitos.', true); return f.elements.contact_phone.focus(); }
     if (f.elements.active) datos.active = f.elements.active.checked;
     try {
@@ -2415,8 +2555,11 @@ const FORMS = {
       tipo: valor(f, 'tipo'), titulo: valor(f, 'titulo'), diagnostico: valor(f, 'diagnostico') || null, incluye: valor(f, 'incluye') || null,
       precio: num('precio'), iva: valor(f, 'iva'), precio_nota: valor(f, 'precio_nota') || null, anticipo: num('anticipo'),
       forma_pago: valor(f, 'forma_pago') || null, condiciones: valor(f, 'condiciones') || null,
-      ejemplo_url: valor(f, 'ejemplo_url') || null, vigencia: valor(f, 'vigencia'), notas: valor(f, 'notas') || null
+      ejemplo_url: valor(f, 'ejemplo_url') || null, vigencia: valor(f, 'vigencia'), notas: valor(f, 'notas') || null,
+      videos_ciclo: Math.round(num('videos_ciclo') || 12), dias_grabacion: Math.round(num('dias_grabacion') || 2), plazo_minimo: Number(valor(f, 'plazo_minimo') || 3)
     };
+    if (!(d.videos_ciclo >= 1 && d.videos_ciclo <= 60)) { aviso('Los videos por mes van de 1 a 60.', true); return f.elements.videos_ciclo.focus(); }
+    if (!(d.dias_grabacion >= 1 && d.dias_grabacion <= 10)) { aviso('Los días de grabación van de 1 a 10.', true); return f.elements.dias_grabacion.focus(); }
     if (!d.nombre || d.nombre.length < 2) { aviso('Escribe el nombre de la persona.', true); return f.elements.nombre.focus(); }
     if (!d.empresa) { aviso('Escribe la empresa o marca.', true); return f.elements.empresa.focus(); }
     if (d.whatsapp && !/^\d{10,15}$/.test(d.whatsapp.replace(/\D/g, ''))) { aviso('El WhatsApp debe tener de 10 a 15 dígitos.', true); return f.elements.whatsapp.focus(); }
@@ -2441,6 +2584,29 @@ const FORMS = {
         if (!S.propuestas.some(pr => pr.id === nueva.id)) S.propuestas.unshift(nueva);
         modalPropuestaLista(S.propuestas.find(pr => pr.id === nueva.id));
       }
+    } catch (e) { aviso(humano(e), true); }
+  },
+  async ajustes(f) {
+    const num = n => { const t = (valor(f, n) || '').replace(/[$,\s]/g, ''); return t === '' ? null : Number(t); };
+    const d = {
+      prestador_rfc: (valor(f, 'prestador_rfc') || '').toUpperCase().replace(/[\s-]/g, '') || null,
+      prestador_domicilio: valor(f, 'prestador_domicilio') || null,
+      prestador_correo: valor(f, 'prestador_correo'), prestador_whatsapp: valor(f, 'prestador_whatsapp'),
+      horas_jornada: num('horas_jornada'), precio_dia_adicional: num('precio_dia_adicional'),
+      margen_dias: Math.round(num('margen_dias') ?? 10), stripe_activo: f.elements.stripe_activo.checked
+    };
+    if (d.prestador_rfc && !RFC_OK.test(d.prestador_rfc)) { aviso('Revisa tu RFC.', true); return f.elements.prestador_rfc.focus(); }
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(d.prestador_correo || '')) { aviso('Revisa el correo para avisos.', true); return f.elements.prestador_correo.focus(); }
+    if (!/^\d{10,15}$/.test((d.prestador_whatsapp || '').replace(/\D/g, ''))) { aviso('Revisa el WhatsApp para avisos.', true); return f.elements.prestador_whatsapp.focus(); }
+    if (d.horas_jornada !== null && !(d.horas_jornada > 0 && d.horas_jornada <= 24)) { aviso('Las horas por jornada van de 1 a 24.', true); return f.elements.horas_jornada.focus(); }
+    if (d.precio_dia_adicional !== null && !(d.precio_dia_adicional > 0)) { aviso('Revisa el precio del día adicional.', true); return f.elements.precio_dia_adicional.focus(); }
+    if (!(d.margen_dias >= 0 && d.margen_dias <= 60)) { aviso('Los días entre el pago y la grabación van de 0 a 60.', true); return f.elements.margen_dias.focus(); }
+    if (padAdmin && !padAdmin.vacio()) d.firma_prestador = padAdmin.png();
+    try {
+      await q(sb.from('ajustes').update(d).eq('id', 1));
+      cerrarModal();
+      aviso('Datos del contrato guardados');
+      await recargar();
     } catch (e) { aviso(humano(e), true); }
   },
   async 'pago-datos'(f) {
@@ -2670,6 +2836,42 @@ const ACC = {
     catch (e) { aviso(humano(e), true); }
   },
   'pago-datos'() { modalPagoDatos(); },
+  ajustes() { modalAjustes(); },
+  'ajustes-borrar-firma'() { if (padAdmin) padAdmin.borrar(); },
+  async 'contrato-firmar'(el, id) {
+    const ct = S.contratos.find(c => c.id === id); if (!ct) return;
+    const firma = S.ajustes && S.ajustes.firma_prestador;
+    if (!firma) { aviso('Primero dibuja tu firma en Pagos → Datos para el contrato.', true); S.vista = 'pagos'; render(); return; }
+    if (!await confirmar(`¿Firmar el contrato de ${ct.razon_social}?`, 'Se pone tu firma guardada con la fecha y hora de hoy. Antes, revísalo con "Ver contrato".', 'Firmar')) return;
+    try {
+      await q(sb.from('contratos').update({ firma_prestador: firma, firma_prestador_at: new Date().toISOString() }).eq('id', id));
+      await recargar();
+      const pr = S.propuestas.find(x => x.id === ct.propuesta_id);
+      if (pr) {
+        const pila = String(pr.nombre || '').split(/\s+/)[0];
+        abrirModal(`<div class="d-cab"><div><h2 class="d-titulo">Contrato firmado</h2><p class="d-sub">Avísale a ${esc(pr.empresa)} que ya está firmado por los dos.</p></div></div>
+          <div class="campo"><label for="wa-texto">Mensaje</label><textarea id="wa-texto" maxlength="1500">${esc(`Hola ${pila}, ya firmé el contrato. Aquí lo puedes ver y descargar: ${PORTAL_URL}/propuesta/?contrato#${pr.token}`)}</textarea></div>
+          <div class="d-pie"><button class="btn" data-accion="cerrar">Ahora no</button><button class="btn btn-p" data-accion="wa-abrir" data-id="${esc(waDe(pr.whatsapp))}">Abrir WhatsApp</button></div>`);
+      } else aviso('Contrato firmado');
+    } catch (e) { aviso(humano(e), true); }
+  },
+  async 'prop-pagada'(el, id) {
+    const x = S.propuestas.find(pr => pr.id === id); if (!x) return;
+    if (!await confirmar(`¿${x.empresa} ya pagó el anticipo por transferencia?`, 'Su propuesta muestra el anticipo como pagado y le pide agendar la sesión de arranque.', 'Sí, ya pagó')) return;
+    try { await q(sb.from('propuestas').update({ pagada_at: new Date().toISOString(), pago_metodo: 'transferencia' }).eq('id', id)); aviso('Anticipo marcado como pagado'); await recargar(); }
+    catch (e) { aviso(humano(e), true); }
+  },
+  async 'pagar-mensualidad'(el) {
+    if (S.vista === 'previa') return aviso('En la vista previa no se paga.');
+    el.disabled = true;
+    try {
+      const { data } = await sb.auth.getSession();
+      const r = await fetch(PAGOS_URL, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + ((data.session || {}).access_token || '') }, body: JSON.stringify({ accion: 'mensualidad' }) });
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok || !d.url) throw new Error(d.error || 'No se pudo iniciar el pago.');
+      location.href = d.url;
+    } catch (e) { el.disabled = false; aviso(String(e.message || e) + ' También puedes pagar por transferencia.', true); }
+  },
   'prop-nueva'(el, id) {
     const sol = id ? S.solicitudes.find(x => x.id === id) : null;
     modalPropuesta(null, sol ? { solicitud: sol } : {});
@@ -2700,12 +2902,16 @@ const ACC = {
   },
   async 'prop-cliente'(el, id) {
     const x = S.propuestas.find(pr => pr.id === id); if (!x) return;
-    if (!await confirmar(`¿Dar de alta a ${x.empresa} como cliente?`, 'Se crea el cliente con su contacto. Después le creas su primer mes en Clientes.', 'Dar de alta')) return;
+    const ctx = contratoDe(x);
+    if (!await confirmar(`¿Dar de alta a ${x.empresa} como cliente?`, `Se crea el cliente con su contacto${x.tipo === 'mensual' ? ' y su mensualidad (para que pueda pagar con tarjeta)' : ''}. Después le creas su primer mes en Clientes${ctx && ctx.primer_ciclo ? `: según el contrato, se graba del ${fCorta(ctx.primer_ciclo.inicio)} al ${fCorta(ctx.primer_ciclo.fin)}` : ''}.${ctx ? ` Su cuenta de Google para el portal: ${ctx.correo_google}.` : ''}`, 'Dar de alta')) return;
     try {
-      const datos = { name: x.empresa, contact_name: x.nombre || null, contact_email: x.correo || null, contact_phone: x.whatsapp || null,
-        onboarding_date: aISO(hoy()), videos_per_cycle: 12 };
+      const ct = contratoDe(x);
+      const datos = { name: x.empresa, contact_name: x.nombre || null, contact_email: (ct && ct.correo) || x.correo || null,
+        contact_phone: (ct && ct.whatsapp) || x.whatsapp || null, onboarding_date: aISO(hoy()), videos_per_cycle: x.videos_ciclo || 12,
+        mensualidad: x.tipo === 'mensual' ? x.precio : null, iva: x.iva };
       const cl = await q(sb.from('clients').insert(datos).select('id').single());
       await q(sb.from('propuestas').update({ client_id: cl.id }).eq('id', x.id));
+      if (ct) await q(sb.from('contratos').update({ client_id: cl.id }).eq('id', ct.id));
       await recargar();
       const pila = String(x.nombre || '').split(/\s+/)[0];
       abrirModal(`<div class="d-cab"><div><h2 class="d-titulo">${esc(x.empresa)} ya es cliente</h2><p class="d-sub">Mándale la página de bienvenida: qué sigue, qué necesitas de él y cómo funciona cada mes.</p></div></div>
@@ -2844,7 +3050,9 @@ async function _arrancar() {
       return pintar(pantallaPendiente(email));
     }
     if (S.perfil.role !== 'admin') S.vista = 'produccion';
+    if (PAGO_OK && S.perfil.role === 'cliente') S.pestanaCli = 'pagos';
     await recargar();
+    if (PAGO_OK && S.perfil.role === 'cliente') aviso('¡Gracias! Recibimos tu pago con tarjeta. En unos segundos se confirma.');
   } catch (e) {
     pintar(pantallaSimple('No cargó', humano(e), 'Reintentar', 'reintentar'));
   }
