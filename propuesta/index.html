@@ -355,7 +355,7 @@ const MOTIVOS = { precio: 'El precio', tiempos: 'Los tiempos no me cuadran', otr
 // Cómo trabajamos, según el tipo de propuesta
 const ETAPAS = {
   mensual: [
-    ['Semana 1', 'Arranque', 'Sesión de estrategia, tu acceso al portal y la guía para escribir tus guiones.'],
+    ['Semana 1', 'Cita presencial', 'Nos vemos en persona: estrategia, tu acceso al portal y la guía para escribir tus guiones.'],
     ['Antes de grabar', 'Guiones', 'Tú decides los temas y los escribes; yo reviso cada guion antes de grabar.'],
     ['Cada mes', 'Grabación', 'Grabamos en tu negocio, con dirección en cada toma.'],
     ['Día 1 o 15', 'Entrega', 'Edito cada video y lo reviso antes de que llegue a ti. Tienes 3 días hábiles para ajustes.'],
@@ -417,7 +417,7 @@ function bloqueFechas() {
       <div class="fila"><div><small>Grabamos</small><b>${esc(rangoVentana(x))}</b></div><div><small>Recibes tus videos</small><b>${esc(fCorta(x.entrega))}</b></div></div></div>`;
   return `<section class="seccion">
     <div class="cab r"><div><span>Fechas</span><h2>Cuándo arrancamos</h2></div>
-      <p>Cada mes se graba en la misma mitad del mes: si grabamos del 1 al 15, te entrego el día 1 del mes siguiente; si grabamos del 16 en adelante, el día 15. Entre tu pago y la primera grabación dejo ${esc(P.margen_dias)} días para la sesión de arranque y tus guiones.</p></div>
+      <p>Cada mes se graba en la misma mitad del mes: si grabamos del 1 al 15, te entrego el día 1 del mes siguiente; si grabamos del 16 en adelante, el día 15. Entre tu pago y la primera grabación hay ${esc(P.margen_dias)} días para nuestra cita presencial y tus guiones.</p></div>
     <div class="fechas-ini">${caja(v, et, true)}${sig ? caja(sig, 'Si no, arrancamos en la siguiente', false) : ''}</div>
   </section>`;
 }
@@ -431,7 +431,7 @@ function bloqueDecision() {
   const pila = String(P.nombre || '').split(/\s+/)[0];
   const dudas = `<a class="btn" href="${esc(wa(`Hola Manuel, tengo una duda sobre la propuesta para ${P.empresa}.`))}" target="_blank" rel="noopener">${WA_ICONO} Tengo dudas</a>`;
 
-  // Ya aceptada: firmar el contrato, pagar el anticipo y agendar la sesión de arranque
+  // Ya aceptada: firmar el contrato, pagar el anticipo y agendar la cita presencial
   if (P.aceptada_at) {
     const mensual = P.tipo === 'mensual', firmado = !!P.contrato, pagado = !!P.pagada_at;
     const puedePagar = !mensual || firmado || !P.contrato_listo;
@@ -466,17 +466,17 @@ function bloqueDecision() {
         ? paso('espera', `Anticipo${monto ? ': ' + monto : ''}`, 'En cuanto firmes, aquí mismo pagas tu anticipo con tarjeta o por transferencia.')
         : paso('', `Anticipo${monto ? ': ' + monto : ''}`, P.anticipo ? 'Con este pago apartamos tus fechas.' : 'El monto te lo confirmo con el contrato.', opcionesPago);
     const msjArranque = pagado
-      ? `Hola Manuel, ya ${mensual ? 'firmé y ' : ''}pagué el anticipo de ${P.empresa}. ¿Qué día hacemos la sesión de arranque?`
-      : `Hola Manuel, ya ${mensual && firmado ? 'firmé el contrato de' : 'acepté la propuesta para'} ${P.empresa}. ¿Qué día hacemos la sesión de arranque?`;
-    const p3 = paso(pagado ? '' : 'espera', mensual ? 'Agenda tu sesión de arranque' : 'Arrancamos',
+      ? `Hola Manuel, ya ${mensual ? 'firmé y ' : ''}pagué el anticipo de ${P.empresa}. ¿Qué día hacemos nuestra cita presencial?`
+      : `Hola Manuel, ya ${mensual && firmado ? 'firmé el contrato de' : 'acepté la propuesta para'} ${P.empresa}. ¿Qué día hacemos nuestra cita presencial?`;
+    const p3 = paso(pagado ? '' : 'espera', mensual ? 'Agenda tu cita presencial' : 'Arrancamos',
       mensual ? 'Es en persona: estrategia, tu portal y cómo escribir tus guiones. Escríbeme para elegir el día. <a href="/bienvenida/">Mira cómo arrancamos</a>.'
               : 'Con el anticipo apartamos las fechas de grabación y arrancamos el guion.',
-      `<div class="acciones"><a class="btn${pagado ? ' btn-v' : ''}" href="${esc(wa(msjArranque))}" target="_blank" rel="noopener">${WA_ICONO} ${mensual ? 'Agendar por WhatsApp' : 'Escribirme'}</a></div>`);
+      `<div class="acciones"><a class="btn${pagado ? ' btn-v' : ''}" href="${esc(wa(msjArranque))}" target="_blank" rel="noopener">${WA_ICONO} ${mensual ? 'Agendar mi cita presencial' : 'Escribirme'}</a></div>`);
 
     return `<div class="decision r" id="decision">
       <span class="listo-marca">${CHECK.replace('<svg', '<svg width="16" height="16"')} Propuesta aceptada</span>
       <h2>Gracias, <em>${esc(String(P.aceptada_por || pila).split(/\s+/)[0])}.</em></h2>
-      <p class="txt">${pagado ? 'Ya quedó todo. Solo falta agendar tu sesión de arranque.' : 'Esto es lo que sigue, en orden:'}</p>
+      <p class="txt">${pagado ? 'Ya quedó todo. Solo falta agendar tu cita presencial.' : 'Esto es lo que sigue, en orden:'}</p>
       ${pagoVuelta && !pagado ? '<p class="listo-marca" data-confirmando style="margin:0 0 1rem">Confirmando tu pago con el banco…</p>' : ''}
       <ol class="pasos-sig">${p1}${p2}${p3}</ol>
     </div>`;

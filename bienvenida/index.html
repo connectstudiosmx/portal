@@ -74,6 +74,25 @@ h1 em{font-style:normal;color:var(--verde)}
 .pasos{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.9rem;counter-reset:p}
 .paso{position:relative;display:flex;flex-direction:column;align-items:flex-start;background:var(--panel);border:1px solid var(--linea);border-radius:16px;padding:1.5rem 1.4rem;transition:transform .35s var(--suave),border-color .35s}
 .paso:hover{transform:translateY(-4px);border-color:var(--linea-2)}
+/* El paso 3, la cita presencial, es el que más importa */
+.paso.destacado{border:1.5px solid var(--verde);background:radial-gradient(120% 120% at 100% 0%,rgba(57,255,136,.22),transparent 60%),#07120c;box-shadow:0 24px 60px -30px rgba(57,255,136,.55)}
+.paso.destacado:hover{border-color:var(--verde)}
+.paso.destacado .n{color:var(--verde)}
+.paso.destacado h3{font-size:1.3rem}
+.paso.destacado p{color:var(--crema)}
+.etiqueta-top{position:absolute;top:1.1rem;right:1.1rem;padding:.3rem .7rem;border-radius:999px;background:var(--verde);color:#000;font-size:.7rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.paso .btn{margin:.2rem 0 1rem}
+/* Botón de la cita en la portada */
+.hero-cita{display:flex;flex-wrap:wrap;align-items:center;gap:.8rem 1.2rem;margin-top:1.8rem}
+.hero-cita span{color:var(--crema-2);font-size:.95rem;max-width:22rem}
+.btn-grande{min-height:3.3rem;padding:0 1.6rem;font-size:1rem}
+/* 3 días al mes */
+.tres{display:flex;align-items:center;gap:1rem 1.6rem;flex-wrap:wrap;margin:0 0 2.6rem;padding:1.4rem 1.6rem;border:1px solid rgba(57,255,136,.4);border-radius:20px;background:radial-gradient(120% 140% at 0% 0%,rgba(57,255,136,.14),transparent 55%),var(--panel)}
+.tres b{font-family:var(--display);font-weight:400;font-size:clamp(5rem,12vw,8rem);line-height:.8;color:var(--verde)}
+.tres strong{display:block;font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:clamp(1.8rem,4vw,2.6rem);line-height:.95}
+.tres span{display:block;color:var(--crema-2);margin-top:.5rem;max-width:30rem}
+.etapa .dias{display:inline-block;margin-top:.7rem;padding:.25rem .65rem;border-radius:999px;font-size:.74rem;font-weight:700;background:rgba(57,255,136,.12);color:var(--verde)}
+.etapa .dias.cero{background:rgba(242,239,233,.08);color:var(--crema-2)}
 .paso .n{font-family:var(--display);font-size:3rem;line-height:.9;color:transparent;-webkit-text-stroke:1.5px var(--verde);transition:color .7s var(--suave) .2s}
 .paso.visto .n{color:var(--verde)}
 .paso h3{font-size:1.12rem;font-weight:700;margin:1rem 0 .45rem}
@@ -83,8 +102,9 @@ h1 em{font-style:normal;color:var(--verde)}
 /* Qué necesito */
 .necesito{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,22rem);gap:clamp(2rem,5vw,4rem);align-items:start}
 .lista{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.7rem}
-.lista li{display:grid;grid-template-columns:1.6rem minmax(0,1fr);gap:.7rem;background:var(--panel);border:1px solid var(--linea);border-radius:12px;padding:1rem 1.05rem}
-.lista svg{width:1.3rem;height:1.3rem;color:var(--verde);margin-top:.1rem}
+.lista li{display:grid;grid-template-columns:2.6rem minmax(0,1fr);gap:.85rem;align-items:start;background:var(--panel);border:1px solid var(--linea);border-radius:12px;padding:1rem 1.05rem}
+.lista .icono{display:grid;place-items:center;width:2.6rem;height:2.6rem;border-radius:12px;background:rgba(57,255,136,.12);box-shadow:inset 0 0 0 1px rgba(57,255,136,.3)}
+.lista svg{width:1.35rem;height:1.35rem;color:var(--verde)}
 .lista b{display:block;font-weight:700;font-size:.98rem}
 .lista small{display:block;color:var(--crema-3);font-size:.86rem;margin-top:.15rem;line-height:1.45}
 .mandar{display:flex;flex-wrap:wrap;align-items:center;gap:.7rem 1.2rem;margin-top:1.4rem}
@@ -186,7 +206,7 @@ h1 em{font-style:normal;color:var(--verde)}
   <div class="aviso-pago-in">
     <span class="aviso-pago-icono" aria-hidden="true">✓</span>
     <p data-aviso-txt>Recibimos tu pago.</p>
-    <a class="btn" data-aviso-wa href="https://wa.me/523323362662" target="_blank" rel="noopener">Agendar mi sesión de arranque</a>
+    <a class="btn" data-aviso-wa href="https://wa.me/523323362662" target="_blank" rel="noopener">Agendar mi cita presencial</a>
   </div>
 </div>
 <header class="portada">
@@ -202,7 +222,11 @@ h1 em{font-style:normal;color:var(--verde)}
     <div class="portada-txt">
       <p class="ceja entra" style="animation-delay:.1s">Bienvenido</p>
       <h1 class="entra" style="animation-delay:.18s">Ya somos<br><em>equipo.</em></h1>
-      <p class="bajada entra" style="animation-delay:.3s">Aquí está todo lo que necesitas saber para arrancar: qué sigue, qué necesito de ti y cómo funciona cada mes. Guárdala; la vas a querer tener a la mano.</p>
+      <p class="bajada entra" style="animation-delay:.3s">Lo primero es nuestra cita presencial: ahí arrancamos todo. Abajo está qué sigue, qué necesito de ti y cómo funciona cada mes. Guarda esta página; la vas a querer tener a la mano.</p>
+      <div class="hero-cita entra" style="animation-delay:.42s">
+        <a class="btn btn-v btn-grande" data-cita href="https://wa.me/523323362662?text=Hola%20Manuel%2C%20ya%20soy%20parte%20de%20Connect%20Studios.%20%C2%BFQu%C3%A9%20d%C3%ADa%20hacemos%20nuestra%20cita%20presencial%3F" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.8-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.3 2.2 2.2 0 0 0 .2-1.3c-.1-.1-.3-.2-.5-.3Z"/></svg> Agendar mi cita presencial</a>
+        <span>Agéndala en cuanto pagues: tenemos 10 días antes de tu primera grabación.</span>
+      </div>
     </div>
   </div>
 </header>
@@ -216,7 +240,9 @@ h1 em{font-style:normal;color:var(--verde)}
     <div class="pasos">
       <div class="paso r"><div class="n">01</div><h3>Entra al portal</h3><p>Con tu cuenta de Google. Ahí vas a ver tus videos del mes, del guion a la entrega.</p><span class="cuando">Vigencia: Hoy</span></div>
       <div class="paso r d1"><div class="n">02</div><h3>Mándame lo de la lista</h3><p>Logo, contacto y lo demás que viene abajo. Con eso preparo tu primer mes.</p><span class="cuando">Vigencia: Esta semana</span></div>
-      <div class="paso r d2"><div class="n">03</div><h3>Sesión de arranque</h3><p>En persona: definimos objetivos, a quién le hablamos y qué tiene que lograr el contenido, y te enseño a usar el portal y a escribir tus guiones.</p><span class="cuando">Vigencia: Antes de grabar</span></div>
+      <div class="paso destacado r d2"><span class="etiqueta-top">Lo más importante</span><div class="n">03</div><h3>Cita presencial</h3><p>Nos vemos en persona: definimos objetivos, a quién le hablamos y qué tiene que lograr tu contenido, y te enseño a usar el portal y a escribir tus guiones.</p>
+        <a class="btn btn-v" data-cita href="https://wa.me/523323362662?text=Hola%20Manuel%2C%20ya%20soy%20parte%20de%20Connect%20Studios.%20%C2%BFQu%C3%A9%20d%C3%ADa%20hacemos%20nuestra%20cita%20presencial%3F" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.8-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.3 2.2 2.2 0 0 0 .2-1.3c-.1-.1-.3-.2-.5-.3Z"/></svg> Agendar mi cita presencial</a>
+        <span class="cuando">Vigencia: 10 días tras tu pago</span></div>
     </div>
   </section>
 
@@ -228,12 +254,12 @@ h1 em{font-style:normal;color:var(--verde)}
     <div class="necesito">
       <div>
       <ul class="lista">
-        <li class="r"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span><b>Logo y colores</b><small>En la mejor calidad que tengas. Si hay manual de marca, también.</small></span></li>
-        <li class="r d1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span><b>Una persona de contacto</b><small>Quién aprueba guiones y videos, con su WhatsApp.</small></span></li>
-        <li class="r"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span><b>Correo de Google</b><small>El Gmail (o cuenta de Google) con el que vas a entrar al portal.</small></span></li>
-        <li class="r d1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span><b>Lugar de grabación</b><small>Dirección, horarios en que se puede grabar y si hace falta algún permiso.</small></span></li>
-        <li class="r"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span><b>Qué quieres vender más</b><small>Tus productos o servicios prioritarios y a qué cliente quieres atraer.</small></span></li>
-        <li class="r d1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span><b>Tus redes</b><small>Links de tus cuentas y, si quieres, 2 o 3 marcas cuyo contenido te guste.</small></span></li>
+        <li class="r"><span class="icono"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="13.5" cy="6.5" r="1"/><circle cx="17.5" cy="10.5" r="1"/><circle cx="8.5" cy="7.5" r="1"/><circle cx="6.5" cy="12.5" r="1"/><path d="M12 2a10 10 0 0 0 0 20c.9 0 1.6-.7 1.6-1.6 0-.4-.2-.8-.4-1.1-.3-.3-.4-.7-.4-1.1 0-.9.7-1.6 1.6-1.6H16a6 6 0 0 0 6-6c0-4.9-4.5-8.6-10-8.6Z"/></svg></span><span><b>Logo y colores</b><small>En la mejor calidad que tengas. Si hay manual de marca, también.</small></span></li>
+        <li class="r d1"><span class="icono"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span><span><b>Una persona de contacto</b><small>Quién aprueba guiones y videos, con su WhatsApp.</small></span></li>
+        <li class="r"><span class="icono"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg></span><span><b>Correo de Google</b><small>El Gmail (o cuenta de Google) con el que vas a entrar al portal.</small></span></li>
+        <li class="r d1"><span class="icono"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11Z"/><circle cx="12" cy="10" r="2.5"/></svg></span><span><b>Lugar de grabación</b><small>Dirección, horarios en que se puede grabar y si hace falta algún permiso.</small></span></li>
+        <li class="r"><span class="icono"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.2"/></svg></span><span><b>Qué quieres vender más</b><small>Tus productos o servicios prioritarios y a qué cliente quieres atraer.</small></span></li>
+        <li class="r d1"><span class="icono"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 9h14M5 15h14M10 4 8 20M16 4l-2 16"/></svg></span><span><b>Tus redes</b><small>Links de tus cuentas y, si quieres, 2 o 3 marcas cuyo contenido te guste.</small></span></li>
       </ul>
       <div class="mandar r">
         <a class="btn btn-v" href="https://wa.me/523323362662?text=Hola%20Manuel%2C%20aqu%C3%AD%20va%20lo%20que%20necesitas%20para%20arrancar%3A%0A%0A1.%20Logo%20y%20colores%3A%20te%20los%20mando%20como%20archivo%0A2.%20Persona%20de%20contacto%20y%20su%20WhatsApp%3A%20%0A3.%20Correo%20de%20Google%20para%20el%20portal%3A%20%0A4.%20Lugar%20de%20grabaci%C3%B3n%20%28direcci%C3%B3n%2C%20horarios%20y%20permisos%29%3A%20%0A5.%20Lo%20que%20quiero%20vender%20m%C3%A1s%3A%20%0A6.%20Mis%20redes%20y%20marcas%20que%20me%20gustan%3A%20" target="_blank" rel="noopener">
@@ -253,12 +279,13 @@ h1 em{font-style:normal;color:var(--verde)}
   <section class="seccion">
     <div class="cab r">
       <div><span>Cada mes</span><h2>Cómo funciona</h2></div>
-      <p>Tres pasos, el mismo ciclo todos los meses.</p>
+      <p>Tú te dedicas a tu negocio. Lo demás corre por mi cuenta.</p>
     </div>
+    <div class="tres r"><b>3</b><div><strong>días al mes</strong><span>Es todo lo que necesito de tu tiempo: uno para tus guiones y dos para grabar. La edición, la publicación y los reportes los hago yo.</span></div></div>
     <div class="linea-t r">
-      <div class="etapa"><small>Paso 1</small><h3>Guiones</h3><p>Escribes tus guiones con la guía que te doy y los subes al portal antes del día de grabación. Yo los reviso.</p></div>
-      <div class="etapa"><small>Paso 2</small><h3>Grabación</h3><p>Vamos a tu negocio y grabamos todo el mes en uno o dos días.</p></div>
-      <div class="etapa"><small>Paso 3</small><h3>Entrega</h3><p>Edito y reviso cada video, y te llegan listos para publicar: el día 1 o el 15 del mes siguiente, según cuándo grabamos.</p></div>
+      <div class="etapa"><small>Paso 1</small><h3>Guiones</h3><p>Escribes tus guiones con la guía que te doy y los subes al portal. Yo los reviso.</p><span class="dias">1 día de tu tiempo</span></div>
+      <div class="etapa"><small>Paso 2</small><h3>Grabación</h3><p>Voy a tu negocio y grabamos todo el mes.</p><span class="dias">2 días de tu tiempo</span></div>
+      <div class="etapa"><small>Paso 3</small><h3>Entrega</h3><p>Edito, reviso y te entrego tus videos listos para publicar, el día 1 o el 15 del mes siguiente.</p><span class="dias cero">0 días: lo hago yo</span></div>
     </div>
     <p class="nota r">Las fechas exactas de cada mes las ves siempre en el portal.</p>
   </section>
@@ -310,17 +337,19 @@ h1 em{font-style:normal;color:var(--verde)}
 
 <script>
 // Llegó desde Stripe después de pagar el anticipo (?pago=ok#código-de-la-propuesta):
-// confirma el pago con la base y ofrece agendar la sesión de arranque por WhatsApp.
+// confirma el pago con la base y ofrece agendar la cita presencial por WhatsApp.
 (function () {
   if (new URLSearchParams(location.search).get('pago') !== 'ok') return;
   const caja = document.getElementById('aviso-pago'), txt = caja.querySelector('[data-aviso-txt]'), wa = caja.querySelector('[data-aviso-wa]');
   let crudo = location.hash.replace(/^#/, '');
   try { crudo = decodeURIComponent(crudo); } catch (e) { /* tal cual */ }
   const token = (crudo.match(/[A-Za-z0-9_-]{10,40}/) || [''])[0];
-  const enlaceWA = empresa => 'https://wa.me/523323362662?text=' + encodeURIComponent('Hola Manuel, ya firmé y pagué el anticipo' + (empresa ? ' de ' + empresa : '') + '. ¿Qué día hacemos la sesión de arranque?');
+  const enlaceWA = empresa => 'https://wa.me/523323362662?text=' + encodeURIComponent('Hola Manuel, ya firmé y pagué el anticipo' + (empresa ? ' de ' + empresa : '') + '. ¿Qué día hacemos nuestra cita presencial?');
+  const ponerCita = url => document.querySelectorAll('[data-cita]').forEach(a => { a.href = url; });
   caja.hidden = false;
   wa.href = enlaceWA('');
-  txt.textContent = token ? 'Confirmando tu pago con el banco…' : '¡Listo! Recibimos tu pago. Agenda tu sesión de arranque.';
+  ponerCita(enlaceWA(''));
+  txt.textContent = token ? 'Confirmando tu pago con el banco…' : '¡Listo! Recibimos tu pago. Agenda tu cita presencial.';
   history.replaceState(null, '', location.pathname);   // al recargar ya no se repite
   if (!token) return;
   let intentos = 0;
@@ -332,13 +361,13 @@ h1 em{font-style:normal;color:var(--verde)}
       });
       const d = await r.json();
       if (d) {
-        wa.href = enlaceWA(d.empresa);
+        wa.href = enlaceWA(d.empresa); ponerCita(enlaceWA(d.empresa));
         const pila = String(d.aceptada_por || d.nombre || '').split(/\s+/)[0];
-        if (d.pagada_at) { txt.textContent = '¡Listo' + (pila ? ', ' + pila : '') + '! Recibimos tu anticipo' + (d.empresa ? ' de ' + d.empresa : '') + '. Ya somos equipo: agenda tu sesión de arranque.'; return; }
+        if (d.pagada_at) { txt.textContent = '¡Listo' + (pila ? ', ' + pila : '') + '! Recibimos tu anticipo' + (d.empresa ? ' de ' + d.empresa : '') + '. Ya somos equipo: agenda tu cita presencial.'; return; }
       }
     } catch (e) { /* se vuelve a intentar */ }
     if (++intentos < 10) setTimeout(revisar, 3000);
-    else txt.textContent = 'Tu pago se está procesando: en cuanto el banco lo confirme te aviso. Mientras, agendemos tu sesión de arranque.';
+    else txt.textContent = 'Tu pago se está procesando: en cuanto el banco lo confirme te aviso. Mientras, agendemos tu cita presencial.';
   };
   revisar();
 })();

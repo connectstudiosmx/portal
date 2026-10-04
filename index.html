@@ -2857,7 +2857,7 @@ const ACC = {
   },
   async 'prop-pagada'(el, id) {
     const x = S.propuestas.find(pr => pr.id === id); if (!x) return;
-    if (!await confirmar(`¿${x.empresa} ya pagó el anticipo por transferencia?`, 'Su propuesta muestra el anticipo como pagado y le pide agendar la sesión de arranque.', 'Sí, ya pagó')) return;
+    if (!await confirmar(`¿${x.empresa} ya pagó el anticipo por transferencia?`, 'Su propuesta muestra el anticipo como pagado y le pide agendar su cita presencial.', 'Sí, ya pagó')) return;
     try { await q(sb.from('propuestas').update({ pagada_at: new Date().toISOString(), pago_metodo: 'transferencia' }).eq('id', id)); aviso('Anticipo marcado como pagado'); await recargar(); }
     catch (e) { aviso(humano(e), true); }
   },
