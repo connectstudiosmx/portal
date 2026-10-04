@@ -1336,6 +1336,7 @@ function vistaPropuestas() {
           <span>${esc(x.titulo)}</span>
           <span><b>${esc(dinero(x.precio))}</b> ${esc([IVA_PROP[x.iva], x.precio_nota].filter(Boolean).join(' '))}</span>
           <span>Vigente hasta el ${esc(fCorta(x.vigencia))}</span>
+          ${x.tipo === 'mensual' && x.dia_pago ? `<span>Paga el <b>día ${esc(x.dia_pago)}</b> de cada mes</span>` : ''}
         </div>
         ${x.aceptada_at ? `<p class="sol-msg">Aceptó <b>${esc(x.aceptada_por || x.nombre)}</b> el ${esc(fHora(x.aceptada_at))}. Siguiente: mándale el contrato y confirma el anticipo.</p>` : ''}
         ${x.rechazada_at && !x.aceptada_at ? `<p class="sol-msg"><b>Motivo:</b> ${esc(MOTIVOS_PROP[x.motivo] || 'Otro')}${x.comentario ? ` · ${esc(x.comentario)}` : ''}</p>` : ''}

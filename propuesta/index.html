@@ -280,6 +280,29 @@ h1{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size
 .fija b{font-family:var(--display);font-weight:400;font-size:1.25rem;color:var(--verde);margin-left:.3rem}
 .fija .btn{min-height:2.6rem;flex:none}
 
+/* Elegir el día de pago (1 o 15) */
+.dias-pago{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(.7rem,2vw,1.1rem)}
+.dia-op{position:relative;display:flex;flex-direction:column;align-items:stretch;text-align:left;font:inherit;color:inherit;cursor:pointer;background:var(--panel);border:1.5px solid var(--linea-2);border-radius:20px;padding:clamp(1.2rem,3vw,1.7rem);transition:border-color .3s,box-shadow .3s,transform .3s var(--suave)}
+.dia-op:hover:not(:disabled){border-color:var(--crema-3);transform:translateY(-3px)}
+.dia-op:disabled{cursor:default}
+.dia-op.elegido{border-color:var(--verde);background:radial-gradient(120% 140% at 0% 0%,rgba(57,255,136,.16),transparent 60%),#07120c;box-shadow:0 24px 60px -36px rgba(57,255,136,.6)}
+.dia-top{display:flex;align-items:center;gap:.6rem}
+.dia-top .et{font-size:.74rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--crema-3)}
+.dia-op.elegido .dia-top .et{color:var(--verde)}
+.antes{padding:.22rem .6rem;border-radius:999px;background:var(--verde-t);box-shadow:inset 0 0 0 1px rgba(57,255,136,.35);color:var(--verde);font-size:.7rem;font-weight:700;letter-spacing:.06em}
+.dia-top .marca{margin-left:auto;width:1.7rem;height:1.7rem;border-radius:50%;display:grid;place-items:center;border:1.5px solid var(--linea-2);color:transparent;transition:background .25s,border-color .25s,color .25s}
+.dia-top .marca svg{width:1rem;height:1rem}
+.dia-op.elegido .marca{background:var(--verde);border-color:var(--verde);color:#000}
+.dia-num{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:clamp(2.8rem,6vw,4rem);line-height:.9;margin:.7rem 0 .1rem;padding-top:.1em}
+.dia-op.elegido .dia-num{color:var(--verde)}
+.dia-sub{color:var(--crema-2);font-weight:600}
+.dia-op .fila{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1.2rem 0 1rem;padding-top:1rem;border-top:1px solid var(--linea)}
+.dia-op small{display:block;font-size:.78rem;color:var(--crema-3);font-weight:600}
+.dia-op strong{display:block;font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:clamp(1.2rem,2.4vw,1.55rem);line-height:1;margin-top:.3rem}
+.dia-op .limite{margin-top:auto;color:var(--crema-2);font-size:.88rem}
+.dia-op.elegido .limite{color:var(--crema)}
+.dia-nota{color:var(--crema-3);font-size:.88rem;margin:.9rem 0 0}
+
 /* Garantía, precio por video y tu tiempo */
 .sin-riesgo{display:inline-flex;align-items:center;gap:.45rem;margin:1.1rem 0 0;font-size:.86rem;font-weight:600;color:var(--crema-2)}
 .sin-riesgo svg{width:1.15rem;height:1.15rem;color:var(--verde)}
@@ -371,7 +394,7 @@ h1{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size
   .recibes{grid-template-columns:1fr}
   .item:not(.item-cta){flex-direction:row;align-items:flex-start;gap:1rem;padding:1.1rem 1.15rem}
   .item .ico{flex:none}
-  .fecha-caja .fila{grid-template-columns:1fr}
+  .fecha-caja .fila,.dias-pago{grid-template-columns:1fr}
   .logo{width:108px}
   .meta{gap:.9rem 1.6rem}
   .pasos-sig > li{padding-left:1.2rem;padding-top:3.2rem}
@@ -433,6 +456,9 @@ const WA_ICONO = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true
 const fCorta = s => { const [, m, d] = String(s).slice(0, 10).split('-').map(Number); return `${d} de ${MESES[m - 1]}`; };
 const rangoVentana = v => { const [, m1, d1] = v.inicio.split('-').map(Number), [, m2, d2] = v.fin.split('-').map(Number);
   return m1 === m2 ? `del ${d1} al ${d2} de ${MESES[m2 - 1]}` : `del ${fCorta(v.inicio)} al ${fCorta(v.fin)}`; };
+// Día de pago de una ventana: si se graba del 1 al 15 se paga el día 1; si del 16 en adelante, el 15
+const diaDe = v => Number(String(v.inicio).slice(8, 10)) === 1 ? 1 : 15;
+const ventanaDe = dia => (P.ventanas || []).find(v => diaDe(v) === dia) || null;
 const fechaHora = iso => new Date(iso).toLocaleString('es-MX', { timeZone: 'America/Mexico_City', day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 const PLATAFORMAS = ['Instagram', 'Facebook', 'TikTok', 'LinkedIn', 'YouTube'];
 const RFC_OK = /^[A-ZÑ&]{3,4}\d{6}[A-Z0-9]{3}$/;
@@ -613,20 +639,63 @@ function bloquePreguntas(ceja) {
   </section>`;
 }
 
-// Fechas del primer mes (solo contenido mensual): la ventana que alcanza con el margen de días
+// Fechas (solo contenido mensual). Cada mes se entrega y se paga el mismo día, así que el
+// cliente elige su día de pago (1 o 15) y con eso la mitad del mes en que grabamos.
+// Se puede cambiar hasta firmar el contrato; con contrato, ya es su primer mes.
 function bloqueFechas(ceja) {
   if (P.tipo !== 'mensual') return '';
   const c = P.contrato && P.contrato.primer_ciclo;
-  const v = c || (P.ventanas || [])[0], sig = !c && (P.ventanas || [])[1];
-  if (!v) return '';
-  const et = P.pagada_at ? 'Tu primer mes' : `Si ${c ? 'tu anticipo llega' : 'firmas y pagas'} a más tardar el ${fCorta(v.limite)}`;
-  const caja = (x, titulo, principal) => `<div class="fecha-caja${principal ? ' principal' : ''} r"><span class="et">${esc(titulo)}</span>
-      <div class="fila"><div><small>Grabamos</small><b>${esc(rangoVentana(x))}</b></div><div><small>Recibes tus videos</small><b>${esc(fCorta(x.entrega))}</b></div></div></div>`;
-  return `<section class="seccion">
-    <div class="cab r"><div>${ceja('Fechas')}<h2>Cuándo arrancamos</h2></div>
-      <p>Cada mes se graba en la misma mitad del mes: si grabamos del 1 al 15, te entrego el día 1 del mes siguiente; si grabamos del 16 en adelante, el día 15. Entre tu pago y la primera grabación hay ${esc(P.margen_dias)} días para nuestra cita presencial y tus guiones.</p></div>
-    <div class="fechas-ini">${caja(v, et, true)}${sig ? caja(sig, 'Si no, arrancamos en la siguiente', false) : ''}</div>
+  if (c) {
+    const dia = diaDe(c);
+    return `<section class="seccion" id="fechas">
+      <div class="cab r"><div>${ceja('Fechas')}<h2>Tu primer mes</h2></div><p>Pagas el día ${dia} de cada mes, el mismo día que recibes tus videos.</p></div>
+      <div class="fechas-ini"><div class="fecha-caja principal r"><span class="et">Pagas el día ${dia} de cada mes</span>
+        <div class="fila"><div><small>Grabamos</small><b>${esc(rangoVentana(c))}</b></div><div><small>Recibes tus videos y pagas</small><b>${esc(fCorta(c.entrega))}</b></div></div></div></div>
+    </section>`;
+  }
+  const opciones = [1, 15].map(ventanaDe).filter(Boolean);
+  if (!opciones.length) return '';
+  const primera = P.ventanas[0];
+  return `<section class="seccion" id="fechas">
+    <div class="cab r"><div>${ceja('Fechas')}<h2>Elige tu día de pago</h2></div>
+      <p>Cada mes recibes tus videos y pagas tu mensualidad el mismo día: el 1 o el 15, según la mitad del mes en que grabemos. Entre tu anticipo y la primera grabación hay ${esc(P.margen_dias)} días para nuestra cita presencial y tus guiones.</p></div>
+    <div class="dias-pago" role="radiogroup" aria-label="Tu día de pago">
+      ${opciones.map(v => { const d = diaDe(v), sel = P.dia_pago === d; return `<button type="button" class="dia-op r${sel ? ' elegido' : ''}" role="radio" aria-checked="${sel}" data-accion="dia-pago" data-dia="${d}"${P.vencida ? ' disabled' : ''}>
+        <span class="dia-top"><span class="et">${sel ? 'Elegiste pagar el' : 'Pagas el'}</span>${v === primera ? '<span class="antes">Arrancas antes</span>' : ''}<span class="marca">${CHECK}</span></span>
+        <span class="dia-num">Día ${d}</span><span class="dia-sub">de cada mes</span>
+        <span class="fila"><span><small>Grabamos</small><strong>${esc(rangoVentana(v))}</strong></span><span><small>Recibes tus videos y pagas</small><strong>${esc(fCorta(v.entrega))}</strong></span></span>
+        <span class="limite">Para arrancar así, firma y paga tu anticipo a más tardar el ${esc(fCorta(v.limite))}.</span>
+      </button>`; }).join('')}
+    </div>
+    <p class="dia-nota">${P.dia_pago ? 'Lo puedes cambiar hasta que firmes tu contrato.' : 'Toca el que te acomode mejor. Lo puedes cambiar hasta que firmes tu contrato.'}</p>
+    <p class="error" data-error-dia hidden></p>
   </section>`;
+}
+
+// Al elegir: se ve al instante y se guarda (en la vista previa no se guarda)
+async function elegirDia(dia) {
+  if (P.dia_pago === dia) return;
+  const antes = P.dia_pago;
+  P.dia_pago = dia;
+  repintarFechas();
+  if (previa) return repintarDecision(false);
+  try {
+    P = await rpc('propuesta_dia_pago', { p_token: token, p_dia: dia });
+  } catch (e) {
+    P.dia_pago = antes;
+    repintarFechas();
+    const err = document.querySelector('[data-error-dia]');
+    if (err) { err.textContent = /contrato_firmado/.test(String(e.message)) ? 'Tu contrato ya está firmado con tu día de pago.' : 'No se pudo guardar. Inténtalo de nuevo.'; err.hidden = false; }
+    return;
+  }
+  repintarDecision(false);
+}
+function repintarFechas() {
+  const sec = document.getElementById('fechas');
+  if (!sec) return;
+  const span = sec.querySelector('.cab span').outerHTML;   // conserva su número de sección
+  sec.outerHTML = bloqueFechas(() => span);
+  document.querySelectorAll('#fechas .r').forEach(e => e.classList.add('visto'));
 }
 
 function totalAnticipo() {
@@ -701,12 +770,14 @@ function bloqueDecision() {
 
   const dijoQueNo = P.rechazada_at && !panel;
   // Las fechas van antes de la inversión; aquí se repite el límite para no perderlo al decidir
-  const v1 = P.tipo === 'mensual' && (P.ventanas || [])[0];
+  const v1 = P.tipo === 'mensual' && (ventanaDe(P.dia_pago) || (P.ventanas || [])[0]);
   const limite = v1 ? ` Para grabar ${rangoVentana(v1)}, firma y paga a más tardar el ${fCorta(v1.limite)}.` : '';
   let abajo = '';
   if (panel === 'aceptar') {
     abajo = `<form class="panel" data-form="aceptar" novalidate>
       <div class="campo"><label for="a-nombre">Tu nombre</label><input id="a-nombre" name="nombre" maxlength="120" autocomplete="name" value="${esc(P.nombre)}" required></div>
+      ${P.tipo === 'mensual' && (P.ventanas || []).length ? `<div class="campo"><span class="lbl">Tu día de pago</span>
+        <div class="motivos">${[1, 15].map(ventanaDe).filter(Boolean).map(v => `<label><input type="radio" name="dia_pago" value="${diaDe(v)}"${P.dia_pago === diaDe(v) ? ' checked' : ''}> Día ${diaDe(v)} · grabamos ${esc(rangoVentana(v))}</label>`).join('')}</div></div>` : ''}
       <p class="legal">Al aceptar confirmas esta propuesta tal como está. Después te mando el contrato para firmar en línea${P.tipo === 'mensual' ? '; las condiciones completas están en los <a href="https://connectstudios.mx/terminos/" target="_blank" rel="noopener">términos del servicio</a>' : ''}.</p>
       <div class="acciones"><button class="btn btn-v btn-grande" type="submit"${previa ? ' disabled' : ''}>Confirmar y aceptar</button><button class="enlace" type="button" data-accion="cerrar-panel">Cancelar</button></div>
       <p class="error" data-error hidden></p>
@@ -1082,6 +1153,7 @@ document.addEventListener('click', async ev => {
     const caja = el.closest('[data-yt]');
     caja.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${caja.dataset.yt}?autoplay=1&rel=0" title="Ejemplo de video" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`;
   }
+  else if (a === 'dia-pago') { elegirDia(Number(el.dataset.dia)); }
   else if (a === 'ver-reel') {
     const marco = el.closest('.marco');
     const v = document.createElement('video');
@@ -1114,7 +1186,10 @@ document.addEventListener('submit', async ev => {
     if (f.dataset.form === 'aceptar') {
       const nombre = f.elements.nombre.value.trim();
       if (nombre.length < 2) { decir('Escribe tu nombre para aceptar.'); return f.elements.nombre.focus(); }
+      const opDia = f.querySelector('input[name=dia_pago]:checked');
+      if (f.querySelector('input[name=dia_pago]') && !opDia) { decir('Elige tu día de pago: el 1 o el 15 de cada mes.'); return; }
       boton.disabled = true; boton.textContent = 'Aceptando…';
+      if (opDia && Number(opDia.value) !== P.dia_pago) P = await rpc('propuesta_dia_pago', { p_token: token, p_dia: Number(opDia.value) });
       P = await rpc('propuesta_aceptar', { p_token: token, p_nombre: nombre });
       panel = '';
       pintar();
