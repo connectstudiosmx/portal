@@ -725,7 +725,7 @@ function pantallaPendiente(email) {
   const wa = CONFIG.WHATSAPP ? `https://wa.me/${encodeURIComponent(CONFIG.WHATSAPP)}?text=${encodeURIComponent('Hola, ya entré al portal con ' + email + '. ¿Me activan el acceso?')}` : '';
   return `<main class="entrada">
     <h1 class="marca-xl m">Falta tu acceso</h1>
-    <p>Entraste como <strong>${esc(email)}</strong>. Si es la cuenta de Google de tu contrato, tu acceso se activa solo en cuanto quede registrada tu cuenta: toca “Revisar de nuevo” en un rato. Si entraste con otra, toca “Usar otra cuenta”. ¿Eres del equipo? Avísale a Connect Studios.</p>
+    <p>Entraste como <strong>${esc(email)}</strong>. Si es la cuenta de Google de tu contrato, tu acceso se activa solo en cuanto se confirma tu pago: toca “Revisar de nuevo” en un rato. Si entraste con otra, toca “Usar otra cuenta”. ¿Eres del equipo? Avísale a Connect Studios.</p>
     <div class="controles">
       <button class="btn btn-p" data-accion="reintentar">Revisar de nuevo</button>
       ${wa ? `<a class="btn" href="${esc(wa)}" target="_blank" rel="noopener noreferrer">Avisar por WhatsApp</a>` : ''}
@@ -1361,6 +1361,14 @@ function vistaPropuestas() {
     </article>`;
   }).join('')}</div>`
     : `<div class="caja-vacia"><p>${todas.length ? 'Nada en este filtro.' : 'Todavía no hay propuestas. Hazla desde una solicitud (botón "Hacer propuesta") o empieza una aquí.'}</p>${todas.length ? '' : '<button class="btn btn-p" data-accion="prop-nueva">Nueva propuesta</button>'}</div>`}`;
+}
+
+// Ya es cliente (alta manual o automática al pagar): ofrece mandarle la bienvenida
+function modalYaCliente(x) {
+  const pila = String(x.nombre || '').split(/\s+/)[0];
+  abrirModal(`<div class="d-cab"><div><h2 class="d-titulo">${esc(x.empresa)} ya es cliente</h2><p class="d-sub">Mándale la página de bienvenida: qué sigue, qué necesitas de él y cómo funciona cada mes. Después créale su primer mes en Clientes.</p></div></div>
+    <div class="campo"><label for="wa-texto">Mensaje</label><textarea id="wa-texto" maxlength="1500">${esc(`Hola ${pila}, ¡qué gusto que arranquemos! Aquí está todo lo que sigue: ${PORTAL_URL}/bienvenida/\n\nCualquier duda me dices por aquí.`)}</textarea></div>
+    <div class="d-pie"><button class="btn" data-accion="cerrar">Ahora no</button><button class="btn btn-p" data-accion="wa-abrir" data-id="${esc(waDe(x.whatsapp))}">Abrir WhatsApp</button></div>`);
 }
 
 // Mensaje de WhatsApp para mandar el link
@@ -2857,9 +2865,14 @@ const ACC = {
   },
   async 'prop-pagada'(el, id) {
     const x = S.propuestas.find(pr => pr.id === id); if (!x) return;
-    if (!await confirmar(`¿${x.empresa} ya pagó el anticipo por transferencia?`, 'Su propuesta muestra el anticipo como pagado y le pide agendar su cita presencial.', 'Sí, ya pagó')) return;
-    try { await q(sb.from('propuestas').update({ pagada_at: new Date().toISOString(), pago_metodo: 'transferencia' }).eq('id', id)); aviso('Anticipo marcado como pagado'); await recargar(); }
-    catch (e) { aviso(humano(e), true); }
+    const alta = x.tipo === 'mensual' && !x.client_id;
+    if (!await confirmar(`¿${x.empresa} ya pagó el anticipo por transferencia?`, `Su propuesta muestra el anticipo como pagado y le pide agendar su cita presencial.${alta ? ' Además queda dado de alta como cliente y, si firmó el contrato, su acceso al portal se activa solo.' : ''}`, 'Sí, ya pagó')) return;
+    try {
+      await q(sb.from('propuestas').update({ pagada_at: new Date().toISOString(), pago_metodo: 'transferencia' }).eq('id', id));
+      await recargar();
+      const y = S.propuestas.find(pr => pr.id === id);
+      if (alta && y && y.client_id) modalYaCliente(y); else aviso('Anticipo marcado como pagado');
+    } catch (e) { aviso(humano(e), true); }
   },
   async 'pagar-mensualidad'(el) {
     if (S.vista === 'previa') return aviso('En la vista previa no se paga.');
@@ -2913,10 +2926,7 @@ const ACC = {
       await q(sb.from('propuestas').update({ client_id: cl.id }).eq('id', x.id));
       if (ct) await q(sb.from('contratos').update({ client_id: cl.id }).eq('id', ct.id));
       await recargar();
-      const pila = String(x.nombre || '').split(/\s+/)[0];
-      abrirModal(`<div class="d-cab"><div><h2 class="d-titulo">${esc(x.empresa)} ya es cliente</h2><p class="d-sub">Mándale la página de bienvenida: qué sigue, qué necesitas de él y cómo funciona cada mes.</p></div></div>
-        <div class="campo"><label for="wa-texto">Mensaje</label><textarea id="wa-texto" maxlength="1500">${esc(`Hola ${pila}, ¡qué gusto que arranquemos! Aquí está todo lo que sigue: ${PORTAL_URL}/bienvenida/\n\nCualquier duda me dices por aquí.`)}</textarea></div>
-        <div class="d-pie"><button class="btn" data-accion="cerrar">Ahora no</button><button class="btn btn-p" data-accion="wa-abrir" data-id="${esc(waDe(x.whatsapp))}">Abrir WhatsApp</button></div>`);
+      modalYaCliente(x);
     } catch (e) { aviso(humano(e), true); }
   },
   async 'borrar-acceso'(el, id) {
