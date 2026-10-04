@@ -9,7 +9,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23000'/%3E%3Crect x='14' y='10' width='36' height='44' rx='4' fill='none' stroke='%23F3E7C8' stroke-width='5'/%3E%3Crect x='14' y='44' width='36' height='10' fill='%23E3B23C'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400..700&family=Archivo+Black&family=Bebas+Neue&family=Montserrat:wght@900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400..700&family=Bangers&family=Pacifico&family=Permanent+Marker&family=Playfair+Display:wght@900&family=Poppins:wght@800&family=Righteous&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
 <style>
 :root{
   --negro:#000;
@@ -504,12 +504,12 @@ main.app{max-width:var(--ancho);margin:0 auto;padding:1.75rem 1.25rem 5rem}
 .tel{position:relative;aspect-ratio:9/16;border-radius:14px;overflow:hidden;background:#111;border:1px solid var(--linea-2)}
 .tel>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .tel canvas{display:block;width:100%;height:100%}
-.tel .sub{position:absolute;left:8%;right:8%;top:62%;text-align:center;font-family:var(--fs);font-weight:var(--fw);text-transform:uppercase;font-size:.95rem;line-height:1.15}
+.tel .sub{position:absolute;left:8%;right:8%;top:62%;text-align:center;font-family:var(--fs);font-weight:var(--fw);text-transform:var(--tt,uppercase);font-size:.95rem;line-height:1.15}
 .tel .sub-resaltada{color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.8)}
 .tel .sub-resaltada em{font-style:normal;color:var(--c)}
-.tel .sub-caja{text-transform:none;font-family:var(--texto);font-weight:800;font-size:.78rem}
+.tel .sub-caja{font-size:.8rem}
 .tel .sub-caja span{background:#fff;color:#000;padding:.1rem .35rem;border-radius:4px;-webkit-box-decoration-break:clone;box-decoration-break:clone}
-.tel .sub-limpio{text-transform:none;font-family:var(--texto);font-weight:700;font-size:.8rem;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.9)}
+.tel .sub-limpio{font-size:.82rem;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.9)}
 .tel-logo{position:absolute;right:7%;top:5%;max-width:30%;max-height:9%;object-fit:contain}
 .tel-logo-txt{font-size:.6rem;font-weight:800;padding:.15rem .35rem;border:1px dashed rgba(255,255,255,.7);border-radius:4px;color:#fff}
 .tel-nota{position:absolute;left:0;right:0;bottom:4%;text-align:center;font-size:.6rem;font-weight:700;color:rgba(255,255,255,.85)}
@@ -1977,18 +1977,24 @@ function confirmar(titulo, texto, ok, peligro) {
 // ---------- Estilo visual del cliente y portadas -------------------------
 // El cliente elige su estilo entre estas opciones; al confirmarlo queda bloqueado
 // (solo el admin lo reabre). El editor lo ve en cada video y la portada sale con él.
+// escala: las letras anchas van más chicas; alto: separación de renglones; mayus: si se escribe en mayúsculas
 const FUENTES = {
-  anton: { nombre: 'Anton', css: "'Anton', Impact, sans-serif", peso: 400, escala: 1 },
-  bebas: { nombre: 'Bebas Neue', css: "'Bebas Neue', Impact, sans-serif", peso: 400, escala: 1.18 },
-  montserrat: { nombre: 'Montserrat', css: "'Montserrat', sans-serif", peso: 900, escala: 0.8 },
-  archivo: { nombre: 'Archivo Black', css: "'Archivo Black', sans-serif", peso: 400, escala: 0.82 }
+  anton: { nombre: 'Anton', tipo: 'Condensada', css: "'Anton', Impact, sans-serif", peso: 400, escala: 1, alto: 0.98, mayus: true },
+  poppins: { nombre: 'Poppins', tipo: 'Moderna', css: "'Poppins', sans-serif", peso: 800, escala: 0.78, alto: 1.04, mayus: true },
+  playfair: { nombre: 'Playfair', tipo: 'Elegante', css: "'Playfair Display', Georgia, serif", peso: 900, escala: 0.88, alto: 1.06, mayus: false },
+  grotesk: { nombre: 'Space Grotesk', tipo: 'Tecnológica', css: "'Space Grotesk', sans-serif", peso: 700, escala: 0.86, alto: 1.02, mayus: false },
+  righteous: { nombre: 'Righteous', tipo: 'Retro', css: "'Righteous', sans-serif", peso: 400, escala: 0.84, alto: 1.04, mayus: true },
+  bangers: { nombre: 'Bangers', tipo: 'Cómic', css: "'Bangers', Impact, sans-serif", peso: 400, escala: 1.06, alto: 1.02, mayus: true },
+  marker: { nombre: 'Permanent Marker', tipo: 'Marcador', css: "'Permanent Marker', sans-serif", peso: 400, escala: 0.8, alto: 1.1, mayus: true },
+  pacifico: { nombre: 'Pacifico', tipo: 'Cursiva', css: "'Pacifico', cursive", peso: 400, escala: 0.74, alto: 1.34, mayus: false }
 };
-const ESTILO_DEF = { color: '#39FF88', fuente: 'anton', subtitulos: 'resaltada', portada: 'abajo', logo_uso: 'final', logo_url: null, ritmo: 'dinamico', musica: 'energia', notas: null, confirmado_at: null, confirmado_por: null };
+const ESTILO_DEF = { color: '#39FF88', fuente: 'anton', subtitulos: 'resaltada', portada: 'abajo', logo_uso: 'final', logo_url: null, ritmo: 'dinamico', broll: [], musica: 'energia', notas: null, confirmado_at: null, confirmado_por: null };
 const OPCIONES_ESTILO = [
   ['subtitulos', 'Subtítulos', 'Cómo aparece en pantalla lo que dices.', { resaltada: ['Palabra resaltada', 'La palabra que dices se ilumina en tu color.'], caja: ['Frase en caja', 'Cada frase en una caja blanca, muy legible.'], limpio: ['Limpio', 'Letra blanca con sombra, sin adornos.'] }],
-  ['portada', 'Portada', 'Cómo se ve cada video en tu perfil.', { abajo: ['Título abajo', 'Título grande sobre un degradado oscuro.'], caja: ['Caja al centro', 'Título en cajas al centro de la imagen.'] }],
+  ['portada', 'Portada', 'Cómo se ve cada video en tu perfil.', { abajo: ['Título abajo', 'Título grande sobre un degradado oscuro.'], caja: ['Caja al centro', 'Título en cajas al centro de la imagen.'], franja: ['Franja de color', 'El título en una franja de tu color, de lado a lado.'] }],
   ['logo_uso', 'Tu logo', 'Dónde aparece tu logo en los videos.', { esquina: ['En la esquina', 'Pequeño, durante todo el video.'], final: ['Solo al final', 'Cierra cada video.'], sin: ['Sin logo', 'Tu marca la dice tu voz.'] }],
   ['ritmo', 'Ritmo de edición', 'Qué tan movidos se sienten tus videos.', { dinamico: ['Dinámico', 'Cortes rápidos, zooms y efectos de sonido.'], natural: ['Natural', 'Cortes limpios, sin efectos.'] }],
+  ['broll', 'Tomas de apoyo (B-roll)', 'Imágenes que se ven mientras hablas. Puedes elegir varias.', { sin: ['Sin B-roll', 'Solo tú a cámara.'], negocio: ['De tu negocio', 'Tu producto, tu equipo y tu local, grabados contigo.'], stock: ['De banco', 'Imágenes de stock para ilustrar ideas.'], graficos: ['Gráficos animados', 'Textos, íconos y datos en movimiento.'] }],
   ['musica', 'Música', 'Lo que suena de fondo.', { energia: ['Con energía', 'Empuja el ritmo y ayuda a retener.'], tranquila: ['Tranquila', 'De fondo, sin robar atención.'], sin: ['Sin música', 'Solo tu voz.'] }]
 ];
 const COLORES = ['#39FF88', '#FF5A36', '#FFD23F', '#2F80FF', '#A855F7', '#FF4D9D', '#FFFFFF'];
@@ -1996,6 +2002,7 @@ const MUESTRA_PORTADA = 'img/muestra-portada.webp';
 const estiloFila = id => (S.estilos || []).find(e => e.client_id === id) || null;
 const conDefecto = e => Object.assign({}, ESTILO_DEF, e || {});
 const nombreOpcion = (campo, val) => { const o = OPCIONES_ESTILO.find(x => x[0] === campo); return o && o[3][val] ? o[3][val][0] : val; };
+const nombreBroll = b => (b && b.length ? b.map(x => nombreOpcion('broll', x)).join(', ') : 'Sin B-roll');
 const imagenes = {};
 function imagen(url) {
   if (!url) return Promise.resolve(null);
@@ -2009,7 +2016,7 @@ const PORTADA = { w: 1080, h: 1920, arriba: 240, abajo: 1680 };
 function partesTitulo(t) {
   // Lo que va entre *asteriscos* sale en el color del cliente; si no marcó nada, el último tercio
   const tokens = []; let r = false;
-  String(t || '').split(/(\*)/).forEach(seg => { if (seg === '*') { r = !r; return; } seg.split(/\s+/).filter(Boolean).forEach(w => tokens.push({ w: w.toUpperCase(), r })); });
+  String(t || '').split(/(\*)/).forEach(seg => { if (seg === '*') { r = !r; return; } seg.split(/\s+/).filter(Boolean).forEach(w => tokens.push({ w, r })); });
   if (tokens.length && !String(t).includes('*')) tokens.slice(-Math.max(1, Math.ceil(tokens.length / 3))).forEach(x => { x.r = true; });
   return tokens;
 }
@@ -2028,14 +2035,14 @@ async function dibujarPortada(cv, { fuente: src, titulo, estilo, logo }) {
   ctx.fillStyle = '#0b0b0c'; ctx.fillRect(0, 0, W, H);
   const sw = src && (src.videoWidth || src.naturalWidth), sh = src && (src.videoHeight || src.naturalHeight);
   if (sw && sh) { const k = Math.max(W / sw, H / sh); ctx.drawImage(src, (W - sw * k) / 2, (H - sh * k) / 2, sw * k, sh * k); }
-  const tokens = partesTitulo(titulo), color = estilo.color || ESTILO_DEF.color;
+  const tokens = partesTitulo(titulo).map(x => f.mayus ? { w: x.w.toUpperCase(), r: x.r } : x), color = estilo.color || ESTILO_DEF.color;
   const fuente = tam => { ctx.font = `${f.peso} ${Math.round(tam * f.escala)}px ${f.css}`; };   // las letras anchas van más chicas
   if (estilo.portada === 'caja') {
     const tramos = tokens.reduce((t, tk) => { const u = t[t.length - 1]; if (u && u[0].r === tk.r) u.push(tk); else t.push([tk]); return t; }, []);
     const acomodar = () => tramos.flatMap(t => partirLineas(ctx, t, 860));
-    let tam = 96; fuente(tam); let ls = acomodar();
+    let tam = 106; fuente(tam); let ls = acomodar();
     while (ls.length > 5 && tam > 60) { tam -= 6; fuente(tam); ls = acomodar(); }
-    const alto = tam * f.escala * 1.34, y0 = H / 2 - (ls.length * alto) / 2;
+    const alto = tam * f.escala * (f.alto + 0.36), y0 = H / 2 - (ls.length * alto) / 2;
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ls.forEach((l, i) => {
       const txt = l.map(x => x.w).join(' '), w = ctx.measureText(txt).width, y = y0 + i * alto + alto / 2, res = l.some(x => x.r);
@@ -2044,13 +2051,23 @@ async function dibujarPortada(cv, { fuente: src, titulo, estilo, logo }) {
       ctx.fillStyle = res ? tintaSobre(color) : '#000';
       ctx.fillText(txt, W / 2, y + tam * f.escala * 0.05);
     });
+  } else if (estilo.portada === 'franja') {
+    let tam = 124; fuente(tam); let ls = partirLineas(ctx, tokens, 860);
+    while (ls.length > 4 && tam > 64) { tam -= 6; fuente(tam); ls = partirLineas(ctx, tokens, 860); }
+    const alto = tam * f.escala * f.alto, banda = ls.length * alto + 96, cy = PORTADA.abajo - 170 - banda / 2;
+    ctx.save(); ctx.translate(W / 2, cy); ctx.rotate(-0.045);
+    ctx.fillStyle = 'rgba(0,0,0,.35)'; ctx.fillRect(-W / 2 - 80, -banda / 2 + 14, W + 160, banda);
+    ctx.fillStyle = color; ctx.fillRect(-W / 2 - 80, -banda / 2, W + 160, banda);
+    ctx.fillStyle = tintaSobre(color); ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ls.forEach((l, i) => ctx.fillText(l.map(x => x.w).join(' '), 0, -banda / 2 + 48 + alto * i + alto / 2));
+    ctx.restore();
   } else {
     const g = ctx.createLinearGradient(0, H * 0.4, 0, H * 0.82);
     g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,.86)');
     ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
     let tam = 134; fuente(tam); let ls = partirLineas(ctx, tokens, 920);
     while (ls.length > 4 && tam > 80) { tam -= 8; fuente(tam); ls = partirLineas(ctx, tokens, 920); }
-    const alto = tam * f.escala * 0.98, base = PORTADA.abajo - 80;
+    const alto = tam * f.escala * f.alto, base = PORTADA.abajo - 80;
     ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
     ls.forEach((l, i) => {
       let x = 80; const y = base - (ls.length - 1 - i) * alto;
@@ -2070,7 +2087,7 @@ function muestraVideo(e) {
     : e.subtitulos === 'limpio' ? '<p class="sub sub-limpio">Esto es lo que nadie te dice</p>'
     : '<p class="sub sub-resaltada">Esto es lo que <em>nadie</em> te dice</p>';
   const logo = e.logo_uso === 'esquina' ? (urlSegura(e.logo_url) ? `<img class="tel-logo" src="${esc(e.logo_url)}" alt="">` : '<span class="tel-logo tel-logo-txt">TU LOGO</span>') : '';
-  return `<div class="tel" style="--c:${esc(e.color)};--fs:${esc(f.css)};--fw:${f.peso}"><img src="${MUESTRA_PORTADA}" alt="">${logo}${sub}${e.logo_uso === 'final' ? '<span class="tel-nota">Tu logo cierra cada video</span>' : ''}</div>`;
+  return `<div class="tel" style="--c:${esc(e.color)};--fs:${esc(f.css)};--fw:${f.peso};--tt:${f.mayus ? 'uppercase' : 'none'}"><img src="${MUESTRA_PORTADA}" alt="">${logo}${sub}${e.logo_uso === 'final' ? '<span class="tel-nota">Tu logo cierra cada video</span>' : ''}</div>`;
 }
 let turnoMuestra = 0;
 async function pintarMuestras() {
@@ -2088,7 +2105,7 @@ function vistaEstilo(fila, modo, idCliente) {
   const edita = modo === 'admin' || (modo === 'cliente' && !bloq);
   S.estiloMuestra = e;
   const color = String(e.color).toUpperCase();
-  const op = (campo, val, cont, clase = '') => `<button type="button" class="op${clase}" data-accion="estilo-op" data-campo="${campo}" data-valor="${esc(val)}" aria-pressed="${String(campo === 'color' ? color === val : e[campo] === val)}"${edita ? '' : ' disabled'}>${cont}</button>`;
+  const op = (campo, val, cont, clase = '') => `<button type="button" class="op${clase}" data-accion="estilo-op" data-campo="${campo}" data-valor="${esc(val)}" aria-pressed="${String(campo === 'color' ? color === val : campo === 'broll' ? (val === 'sin' ? !(e.broll || []).length : (e.broll || []).includes(val)) : e[campo] === val)}"${edita ? '' : ' disabled'}>${cont}</button>`;
   let n = 0;
   const bloque = (titulo, sub, cuerpo) => `<section class="est-bloque"><div class="est-cab"><span class="est-n">${String(++n).padStart(2, '0')}</span><div><h3>${titulo}</h3>${sub ? `<p>${sub}</p>` : ''}</div></div>${cuerpo}</section>`;
   const subirLogo = `<div class="logo-subir">${urlSegura(e.logo_url) ? `<img src="${esc(e.logo_url)}" alt="Tu logo">` : '<span class="logo-vacio">Todavía sin logo</span>'}
@@ -2097,7 +2114,7 @@ function vistaEstilo(fila, modo, idCliente) {
     bloque('El color de tu marca', 'Va en tus portadas y en lo que resalta en pantalla.', `<div class="swatches">
       ${COLORES.map(c => op('color', c, `<span style="background:${c}"></span>`, ' sw')).join('')}
       <label class="sw-libre${COLORES.includes(color) ? '' : ' activo'}"><input type="color" value="${esc(e.color)}" data-cambio="estilo-color"${edita ? '' : ' disabled'} aria-label="Otro color"><span>${COLORES.includes(color) ? 'Otro' : esc(color)}</span></label></div>`),
-    bloque('La letra de tus títulos', 'En tus portadas, subtítulos y textos en pantalla.', `<div class="op-grid" style="--n:4">${Object.entries(FUENTES).map(([k, f]) => op('fuente', k, `<b class="op-letra" style="font-family:${esc(f.css)};font-weight:${f.peso}">Título</b><span>${esc(f.nombre)}</span>`)).join('')}</div>`),
+    bloque('La letra de tus títulos', 'En tus portadas, subtítulos y textos en pantalla.', `<div class="op-grid" style="--n:4">${Object.entries(FUENTES).map(([k, f]) => op('fuente', k, `<b class="op-letra" style="font-family:${esc(f.css)};font-weight:${f.peso};text-transform:${f.mayus ? 'uppercase' : 'none'}">Título</b><span>${esc(f.tipo)} · ${esc(f.nombre)}</span>`)).join('')}</div>`),
     ...OPCIONES_ESTILO.map(([campo, titulo, sub, ops]) => bloque(titulo, sub, `${campo === 'logo_uso' ? subirLogo : ''}<div class="op-grid" style="--n:${Object.keys(ops).length}">${Object.entries(ops).map(([k, [t, d]]) => op(campo, k, `<b>${esc(t)}</b><span>${esc(d)}</span>`)).join('')}</div>`)),
     bloque('¿Algo más?', 'Colores que no quieres, cuentas que te gustan o cualquier detalle.', `<div class="campo" style="margin:0"><textarea data-cambio="estilo-notas" maxlength="1000" placeholder="Ej. Nada de rosa; me gusta cómo edita @cuenta"${edita ? '' : ' disabled'}>${esc(e.notas || '')}</textarea></div>`)
   ];
@@ -2172,6 +2189,7 @@ function resumenEstilo(fila) {
     <span class="chip"><i style="background:${esc(e.color)}"></i>${esc(String(e.color).toUpperCase())}</span>
     <span class="chip" style="font-family:${esc(f.css)};font-weight:${f.peso}">${esc(f.nombre)}</span>
     ${['subtitulos', 'portada', 'logo_uso', 'ritmo', 'musica'].map(k => `<span class="chip">${esc(OPCIONES_ESTILO.find(o => o[0] === k)[1])}: ${esc(nombreOpcion(k, e[k]))}</span>`).join('')}
+    <span class="chip">B-roll: ${esc(nombreBroll(e.broll))}</span>
   </div>${e.notas ? `<p class="ayuda" style="margin:.4rem 0 0">Notas del cliente: ${esc(e.notas)}</p>` : ''}${e.confirmado_at ? '' : '<p class="ayuda" style="margin:.4rem 0 0">Todavía no lo confirma: puede cambiar.</p>'}`;
 }
 function bloquePortadaVideo(v, c) {
@@ -2206,7 +2224,7 @@ function modalPortada(id) {
           <input id="gen-tiempo" type="range" min="0" max="1" step="0.04" value="0"></div>
         <div class="campo"><label for="gen-titulo">Título</label><input id="gen-titulo" maxlength="140" value="${esc(gen.titulo)}">
           <p class="ayuda">Corto y que enganche. Lo que pongas entre *asteriscos* sale en el color del cliente.</p></div>
-        <div class="campo"><span class="lbl">Estilo</span><div class="seg" role="group" aria-label="Estilo de portada">${['abajo', 'caja'].map(k => `<button type="button" data-gen-estilo="${k}" aria-pressed="${gen.estilo.portada === k}">${esc(nombreOpcion('portada', k))}</button>`).join('')}</div></div>
+        <div class="campo"><span class="lbl">Estilo</span><div class="seg" role="group" aria-label="Estilo de portada">${['abajo', 'caja', 'franja'].map(k => `<button type="button" data-gen-estilo="${k}" aria-pressed="${gen.estilo.portada === k}">${esc(nombreOpcion('portada', k))}</button>`).join('')}</div></div>
         <div class="gen-perfil"><canvas id="gen-grid" width="360" height="480" aria-label="Así se ve en el perfil"></canvas><span class="nota">Así se ve en el perfil de Instagram (recorte 3:4).</span></div>
       </div>
     </div>
@@ -3119,7 +3137,12 @@ const ACC = {
   'conf-no'() { cerrarModal(); },
   'abrir-video'(el, id) { modalVideo(id); },
   'abrir-guion'(el, id) { modalGuion(id); },
-  'estilo-op'(el) { if (el.dataset.campo) cambiarEstilo({ [el.dataset.campo]: el.dataset.valor }); },
+  'estilo-op'(el) {
+    const campo = el.dataset.campo, val = el.dataset.valor; if (!campo) return;
+    if (campo !== 'broll') return cambiarEstilo({ [campo]: val });
+    const ctx = S.estiloCtx, actual = ((ctx && ctx.modo === 'admin' ? estiloFila(ctx.id) : S.portal && S.portal.estilo) || {}).broll || [];
+    cambiarEstilo({ broll: val === 'sin' ? [] : actual.includes(val) ? actual.filter(x => x !== val) : actual.concat(val) });
+  },
   'estilo-cliente'(el, id) { modalEstilo(id); },
   async 'estilo-confirmar'() {
     if (S.vista === 'previa' || !S.portal) return;
