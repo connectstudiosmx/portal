@@ -230,8 +230,8 @@ h1{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size
 .hoja th,.hoja td{border:1px solid #d9d4ca;padding:.45rem .6rem;text-align:left;vertical-align:top}
 .hoja th{width:38%;font-family:var(--texto);font-weight:600;background:#f1eee7}
 .hoja .anexo{margin-top:2rem;padding-top:1rem;border-top:2px solid #1b1a18}
-.hoja mark{background:#e8f9ee;color:inherit;padding:0 .15rem;border-radius:3px}
-.hoja mark.falta{background:#fde9e4;color:#9b2c1a;font-style:italic}
+.hoja mark{background:#ffe066;color:#1b1a18;font-weight:600;padding:.05rem .25rem;border-radius:3px;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+.hoja mark.falta{background:#ffcfc4;color:#a3180a;font-style:italic}
 .firmas{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin:1.8rem 0 1rem;font-family:var(--texto)}
 .firma-col{display:grid;gap:.15rem;align-content:end;text-align:center}
 .firma-col span{font-size:.75rem;font-weight:700;letter-spacing:.1em}
@@ -678,7 +678,7 @@ function abrirFirma() {
         <div class="campo"><span class="lbl">Redes donde publicamos <span style="font-weight:400;color:var(--crema-3)">(hasta 4)</span></span>
           <div class="plataformas">${PLATAFORMAS.map(x => `<label><input type="checkbox" name="plataforma" value="${x}"${['Instagram', 'Facebook'].includes(x) ? ' checked' : ''}> ${x}</label>`).join('')}</div></div>
       </div>
-      <div class="bloque-firma"><h3>2. Lee tu contrato</h3><p>Lo que está en verde son tus datos y los de esta propuesta.</p>
+      <div class="bloque-firma"><h3>2. Lee tu contrato</h3><p>Lo resaltado en amarillo son los datos que escribiste arriba; lo que esté en rojo todavía falta.</p>
         <div class="hoja-scroll"><div class="hoja" data-vista></div></div>
       </div>
       <div class="bloque-firma"><h3>3. Firma</h3><p>Con el dedo o el mouse, dentro del recuadro.</p>
