@@ -725,7 +725,7 @@ function pantallaPendiente(email) {
   const wa = CONFIG.WHATSAPP ? `https://wa.me/${encodeURIComponent(CONFIG.WHATSAPP)}?text=${encodeURIComponent('Hola, ya entré al portal con ' + email + '. ¿Me activan el acceso?')}` : '';
   return `<main class="entrada">
     <h1 class="marca-xl m">Falta tu acceso</h1>
-    <p>Entraste como <strong>${esc(email)}</strong>. Avísale a Connect Studios para que activen tu cuenta. Cuando lo hagan, toca “Revisar de nuevo”.</p>
+    <p>Entraste como <strong>${esc(email)}</strong>. Si es la cuenta de Google de tu contrato, tu acceso se activa solo en cuanto quede registrada tu cuenta: toca “Revisar de nuevo” en un rato. Si entraste con otra, toca “Usar otra cuenta”. ¿Eres del equipo? Avísale a Connect Studios.</p>
     <div class="controles">
       <button class="btn btn-p" data-accion="reintentar">Revisar de nuevo</button>
       ${wa ? `<a class="btn" href="${esc(wa)}" target="_blank" rel="noopener noreferrer">Avisar por WhatsApp</a>` : ''}

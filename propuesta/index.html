@@ -674,7 +674,7 @@ function abrirFirma() {
           <div class="campo"><label for="c-correo">Correo para avisos</label><input id="c-correo" name="correo" type="email" maxlength="200" autocomplete="email" value="${esc(P.correo || '')}"></div>
           <div class="campo"><label for="c-wa">WhatsApp para avisos</label><input id="c-wa" name="whatsapp" type="tel" maxlength="25" autocomplete="tel" value="${esc(P.whatsapp || '')}"></div>
         </div>
-        <div class="campo"><label for="c-google">Cuenta de Google para el portal</label><input id="c-google" name="correo_google" type="email" maxlength="200" value="${esc(gmail)}" placeholder="tucorreo@gmail.com"><p class="ayuda">Con esa cuenta vas a entrar a tu portal.</p></div>
+        <div class="campo"><label for="c-google">Cuenta de Google para el portal</label><input id="c-google" name="correo_google" type="email" maxlength="200" value="${esc(gmail)}" placeholder="tucorreo@gmail.com"><p class="ayuda">Con esa cuenta entras a tu portal: tu acceso se activa solo.</p></div>
         <div class="campo"><span class="lbl">Redes donde publicamos <span style="font-weight:400;color:var(--crema-3)">(hasta 4)</span></span>
           <div class="plataformas">${PLATAFORMAS.map(x => `<label><input type="checkbox" name="plataforma" value="${x}"${['Instagram', 'Facebook'].includes(x) ? ' checked' : ''}> ${x}</label>`).join('')}</div></div>
       </div>
