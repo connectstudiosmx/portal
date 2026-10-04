@@ -317,7 +317,15 @@ const CONFIG = {
   WHATSAPP: '523323362662',
   PAGOS: 'https://ypguioklwhyixacfuksu.supabase.co/functions/v1/stripe-pagos'   // Stripe (Edge Function)
 };
-const token = decodeURIComponent(location.hash.replace(/^#/, '')).trim();
+// El código va después del #. Se toma aunque el link llegue con caracteres de más
+// (asteriscos, puntos o paréntesis que se pegan al copiarlo de un chat) o como ?t=
+const leerToken = () => {
+  let crudo = location.hash.replace(/^#/, '');
+  try { crudo = decodeURIComponent(crudo); } catch (e) { /* se queda como venía */ }
+  crudo += ' ' + (new URLSearchParams(location.search).get('t') || '');
+  return (crudo.match(/[A-Za-z0-9_-]{10,40}/) || [''])[0];
+};
+const token = leerToken();
 const previa = new URLSearchParams(location.search).has('previa');
 const app = document.getElementById('app');
 let P = null;          // la propuesta
@@ -950,9 +958,9 @@ async function arrancar() {
   confirmarPago(10);
 }
 window.addEventListener('hashchange', () => {
-  const nuevo = decodeURIComponent(location.hash.replace(/^#/, '')).trim();
-  if (/^[A-Za-z0-9_-]{10,40}$/.test(nuevo) && nuevo !== token) location.reload();
-  else if (nuevo !== token) history.replaceState(null, '', location.pathname + location.search + '#' + token);
+  const nuevo = leerToken();
+  if (nuevo && nuevo !== token) location.reload();
+  else if (location.hash !== '#' + token) history.replaceState(null, '', location.pathname + location.search + '#' + token);
 });
 arrancar();
 </script>
