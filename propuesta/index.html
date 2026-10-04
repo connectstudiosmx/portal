@@ -545,8 +545,8 @@ function pintar() {
           <div class="m-precio"><dt>Inversión</dt><dd>${esc(dinero(P.precio))}<small>${esc(nota)}</small></dd></div>
         </dl>
         <div class="acciones entra" style="animation-delay:.48s">
-          <a class="btn btn-v" href="#decision">${P.aceptada_at ? 'Ver lo que sigue' : 'Ir a aceptar'}</a>
-          <a class="btn" href="#propuesta">Ver la propuesta</a>
+          <button class="btn btn-v" type="button" data-accion="ir" data-id="decision">${P.aceptada_at ? 'Ver lo que sigue' : 'Ir a aceptar'}</button>
+          <button class="btn" type="button" data-accion="ir" data-id="propuesta">Ver la propuesta</button>
         </div>
       </div>
     </div>
@@ -838,6 +838,7 @@ document.addEventListener('click', async ev => {
   const el = ev.target.closest('[data-accion]');
   if (!el) return;
   const a = el.dataset.accion;
+  if (a === 'ir') { const d = document.getElementById(el.dataset.id); if (d) d.scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
   if (a === 'abrir-aceptar' || a === 'ir-aceptar') { panel = 'aceptar'; repintarDecision(true); }
   else if (a === 'abrir-rechazar') { panel = 'rechazar'; repintarDecision(true); }
   else if (a === 'cerrar-panel') { panel = ''; repintarDecision(false); }
@@ -948,7 +949,11 @@ async function arrancar() {
   if (new URLSearchParams(location.search).has('contrato') && P.contrato) verContrato();
   confirmarPago(10);
 }
-window.addEventListener('hashchange', () => location.reload());
+window.addEventListener('hashchange', () => {
+  const nuevo = decodeURIComponent(location.hash.replace(/^#/, '')).trim();
+  if (/^[A-Za-z0-9_-]{10,40}$/.test(nuevo) && nuevo !== token) location.reload();
+  else if (nuevo !== token) history.replaceState(null, '', location.pathname + location.search + '#' + token);
+});
 arrancar();
 </script>
 </body>
