@@ -37,6 +37,14 @@ img{display:block;max-width:100%}
 :focus-visible{outline:2px solid var(--verde);outline-offset:3px}
 .envoltura{max-width:72rem;margin:0 auto;padding:0 clamp(1rem,4vw,2.5rem)}
 
+/* Aviso al llegar después de pagar el anticipo con tarjeta */
+.aviso-pago{position:relative;z-index:5;background:var(--verde);color:#000}
+.aviso-pago-in{display:flex;align-items:center;flex-wrap:wrap;gap:.7rem 1.2rem;max-width:72rem;margin:0 auto;padding:.9rem clamp(1rem,4vw,2.5rem)}
+.aviso-pago-icono{flex:none;display:grid;place-items:center;width:2rem;height:2rem;border-radius:50%;background:#000;color:var(--verde);font-weight:800}
+.aviso-pago p{flex:1 1 18rem;margin:0;font-weight:700;font-size:1rem;line-height:1.4}
+.aviso-pago .btn{background:#000;color:var(--verde);border-color:#000}
+.aviso-pago .btn:hover{background:#111;border-color:#111}
+
 /* Portada */
 .portada{position:relative;overflow:hidden;isolation:isolate;min-height:88vh;min-height:88svh;display:flex;flex-direction:column}
 .fondo{position:absolute;inset:0;z-index:-2;background:url(https://connectstudios.mx/assets/img/bts/bts-4.webp) center 35%/cover no-repeat;filter:saturate(.7) brightness(.45);transform:scale(1.06)}
@@ -174,6 +182,13 @@ h1 em{font-style:normal;color:var(--verde)}
 </style>
 </head>
 <body>
+<div class="aviso-pago" id="aviso-pago" role="status" aria-live="polite" hidden>
+  <div class="aviso-pago-in">
+    <span class="aviso-pago-icono" aria-hidden="true">✓</span>
+    <p data-aviso-txt>Recibimos tu pago.</p>
+    <a class="btn" data-aviso-wa href="https://wa.me/523323362662" target="_blank" rel="noopener">Agendar mi sesión de arranque</a>
+  </div>
+</div>
 <header class="portada">
   <div class="fondo" aria-hidden="true"></div>
   <div class="envoltura" style="width:100%;flex:1;display:flex;flex-direction:column">
@@ -294,6 +309,40 @@ h1 em{font-style:normal;color:var(--verde)}
 <footer class="pie">Connect Studios · Guadalajara · <a href="/privacidad.html">Aviso de privacidad</a></footer>
 
 <script>
+// Llegó desde Stripe después de pagar el anticipo (?pago=ok#código-de-la-propuesta):
+// confirma el pago con la base y ofrece agendar la sesión de arranque por WhatsApp.
+(function () {
+  if (new URLSearchParams(location.search).get('pago') !== 'ok') return;
+  const caja = document.getElementById('aviso-pago'), txt = caja.querySelector('[data-aviso-txt]'), wa = caja.querySelector('[data-aviso-wa]');
+  let crudo = location.hash.replace(/^#/, '');
+  try { crudo = decodeURIComponent(crudo); } catch (e) { /* tal cual */ }
+  const token = (crudo.match(/[A-Za-z0-9_-]{10,40}/) || [''])[0];
+  const enlaceWA = empresa => 'https://wa.me/523323362662?text=' + encodeURIComponent('Hola Manuel, ya firmé y pagué el anticipo' + (empresa ? ' de ' + empresa : '') + '. ¿Qué día hacemos la sesión de arranque?');
+  caja.hidden = false;
+  wa.href = enlaceWA('');
+  txt.textContent = token ? 'Confirmando tu pago con el banco…' : '¡Listo! Recibimos tu pago. Agenda tu sesión de arranque.';
+  history.replaceState(null, '', location.pathname);   // al recargar ya no se repite
+  if (!token) return;
+  let intentos = 0;
+  const revisar = async () => {
+    try {
+      const r = await fetch('https://ypguioklwhyixacfuksu.supabase.co/rest/v1/rpc/propuesta_ver', {
+        method: 'POST', headers: { 'Content-Type': 'application/json', apikey: 'sb_publishable_qjTIY_M5HJ9R653m_uOmXw_bBbVTibS' },
+        body: JSON.stringify({ p_token: token, p_registrar: false })
+      });
+      const d = await r.json();
+      if (d) {
+        wa.href = enlaceWA(d.empresa);
+        const pila = String(d.aceptada_por || d.nombre || '').split(/\s+/)[0];
+        if (d.pagada_at) { txt.textContent = '¡Listo' + (pila ? ', ' + pila : '') + '! Recibimos tu anticipo' + (d.empresa ? ' de ' + d.empresa : '') + '. Ya somos equipo: agenda tu sesión de arranque.'; return; }
+      }
+    } catch (e) { /* se vuelve a intentar */ }
+    if (++intentos < 10) setTimeout(revisar, 3000);
+    else txt.textContent = 'Tu pago se está procesando: en cuanto el banco lo confirme te aviso. Mientras, agendemos tu sesión de arranque.';
+  };
+  revisar();
+})();
+
 (function () {
   const PENDIENTES = '.r:not(.visto), .foto:not(.visto), .paso:not(.visto)';
   const obs = 'IntersectionObserver' in window ? new IntersectionObserver(es => es.forEach(e => {
