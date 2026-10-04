@@ -9,7 +9,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23000'/%3E%3Crect x='14' y='10' width='36' height='44' rx='4' fill='none' stroke='%23F3E7C8' stroke-width='5'/%3E%3Crect x='14' y='44' width='36' height='10' fill='%23E3B23C'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400..700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400..700&family=Archivo+Black&family=Bebas+Neue&family=Montserrat:wght@900&display=swap" rel="stylesheet">
 <style>
 :root{
   --negro:#000;
@@ -470,6 +470,83 @@ main.app{max-width:var(--ancho);margin:0 auto;padding:1.75rem 1.25rem 5rem}
 /* Aviso flotante */
 .aviso{position:fixed;left:50%;bottom:calc(1.25rem + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:60;background:var(--crema);color:#000;font-weight:600;padding:.7rem 1.1rem;border-radius:var(--r2);max-width:min(92vw,540px);box-shadow:0 12px 32px rgba(0,0,0,.55)}
 .aviso.error{background:var(--rojo)}
+
+/* Estilo visual del cliente */
+.est{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:2rem;align-items:start}
+.est-intro h2{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:clamp(2rem,5vw,2.8rem);line-height:.95;margin:0 0 .5rem}
+.est-intro p{color:var(--crema-2);margin:0 0 1.4rem;max-width:40rem}
+.est-ok{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;padding:.8rem 1rem;border:1px solid rgba(57,255,136,.4);border-radius:12px;background:var(--verde-t);margin:0 0 1.4rem;font-weight:600}
+.est-bloque{padding:1.3rem 0;border-top:1px solid var(--linea)}
+.est-cab{display:flex;gap:.8rem;align-items:baseline;margin-bottom:.9rem}
+.est-n{font-family:var(--display);color:var(--verde);font-size:1.1rem}
+.est-cab h3{margin:0;font-size:1.05rem}
+.est-cab p{margin:.15rem 0 0;color:var(--crema-3);font-size:.86rem}
+.op-grid{display:grid;grid-template-columns:repeat(var(--n,3),minmax(0,1fr));gap:.6rem}
+.op{display:flex;flex-direction:column;align-items:flex-start;gap:.25rem;text-align:left;padding:.9rem 1rem;border:1.5px solid var(--linea-2);border-radius:12px;background:var(--panel);cursor:pointer;transition:border-color .2s,background .2s}
+.op:hover:not(:disabled){border-color:var(--crema-3)}
+.op[aria-pressed="true"]{border-color:var(--verde);background:radial-gradient(120% 140% at 0% 0%,rgba(57,255,136,.14),transparent 60%),var(--panel)}
+.op:disabled{cursor:default}
+.op:disabled:not([aria-pressed="true"]){opacity:.45}
+.op b{font-size:.95rem}
+.op span{font-size:.82rem;color:var(--crema-3);line-height:1.35}
+.op .op-letra{font-size:1.55rem;line-height:1.05;text-transform:uppercase;letter-spacing:.01em;white-space:nowrap}
+.swatches{display:flex;flex-wrap:wrap;gap:.55rem;align-items:center}
+.op.sw{padding:4px;border-radius:50%;width:2.9rem;height:2.9rem}
+.op.sw span{display:block;width:100%;height:100%;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(255,255,255,.15)}
+.sw-libre{display:inline-flex;align-items:center;gap:.45rem;padding:.35rem .8rem .35rem .4rem;border:1.5px solid var(--linea-2);border-radius:999px;cursor:pointer;font-size:.85rem;font-weight:600}
+.sw-libre.activo{border-color:var(--verde)}
+.sw-libre input{width:2rem;height:2rem;padding:0;border:0;border-radius:50%;background:none;cursor:pointer}
+.logo-subir{display:flex;align-items:center;gap:.8rem;flex-wrap:wrap;margin-bottom:.9rem}
+.logo-subir img{height:3.2rem;max-width:9rem;object-fit:contain;padding:.35rem .6rem;border-radius:8px;background:repeating-conic-gradient(#2a2a2e 0 25%,#1c1c1f 0 50%) 0 0/14px 14px}
+.logo-vacio{font-size:.85rem;color:var(--crema-3)}
+.est-muestra{position:sticky;top:5rem}
+.muestras{display:grid;grid-template-columns:1fr 1fr;gap:.6rem}
+.tel{position:relative;aspect-ratio:9/16;border-radius:14px;overflow:hidden;background:#111;border:1px solid var(--linea-2)}
+.tel>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.tel canvas{display:block;width:100%;height:100%}
+.tel .sub{position:absolute;left:8%;right:8%;top:62%;text-align:center;font-family:var(--fs);font-weight:var(--fw);text-transform:uppercase;font-size:.95rem;line-height:1.15}
+.tel .sub-resaltada{color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.8)}
+.tel .sub-resaltada em{font-style:normal;color:var(--c)}
+.tel .sub-caja{text-transform:none;font-family:var(--texto);font-weight:800;font-size:.78rem}
+.tel .sub-caja span{background:#fff;color:#000;padding:.1rem .35rem;border-radius:4px;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+.tel .sub-limpio{text-transform:none;font-family:var(--texto);font-weight:700;font-size:.8rem;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.9)}
+.tel-logo{position:absolute;right:7%;top:5%;max-width:30%;max-height:9%;object-fit:contain}
+.tel-logo-txt{font-size:.6rem;font-weight:800;padding:.15rem .35rem;border:1px dashed rgba(255,255,255,.7);border-radius:4px;color:#fff}
+.tel-nota{position:absolute;left:0;right:0;bottom:4%;text-align:center;font-size:.6rem;font-weight:700;color:rgba(255,255,255,.85)}
+.muestras-et{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin:.4rem 0 1rem;font-size:.75rem;color:var(--crema-3);text-align:center}
+.est-acciones{display:grid;gap:.5rem}
+.est-acciones .btn{width:100%}
+.est-chips{display:flex;flex-wrap:wrap;gap:.35rem}
+.chip{display:inline-flex;align-items:center;gap:.35rem;padding:.2rem .55rem;border:1px solid var(--linea-2);border-radius:999px;font-size:.78rem;color:var(--crema-2)}
+.chip i{width:.8rem;height:.8rem;border-radius:50%}
+.dialogo:has(.est-modal),.dialogo:has(.gen){max-width:1020px}
+
+/* Portada y texto de publicación */
+.portada-fila{display:flex;gap:.9rem;align-items:center}
+.portada-mini{width:4.6rem;aspect-ratio:9/16;object-fit:cover;border-radius:8px;border:1px solid var(--linea-2);background:var(--negro)}
+.portada-mini.vacia{display:grid;place-items:center;font-size:.7rem;color:var(--crema-3);text-align:center;padding:.3rem}
+.portada-fila>div{display:flex;gap:.4rem;flex-wrap:wrap}
+.copy-txt{margin:0;white-space:pre-wrap;color:var(--crema-2);font-size:.92rem;background:var(--negro);border:1px solid var(--linea);border-radius:8px;padding:.7rem .8rem}
+.gen-cuerpo{display:grid;grid-template-columns:minmax(0,320px) minmax(0,1fr);gap:1.4rem;align-items:start}
+.gen-vista canvas{display:block;width:100%;aspect-ratio:9/16;border-radius:12px;border:1px solid var(--linea-2);background:#0b0b0c}
+.seg{display:inline-flex;gap:4px;padding:4px;border:1px solid var(--linea-2);border-radius:999px}
+.seg button{border:0;background:none;border-radius:999px;padding:.4rem .9rem;font-weight:600;font-size:.86rem;color:var(--crema-2);cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--crema);color:#000}
+.gen-perfil{display:flex;align-items:flex-end;gap:.8rem}
+.gen-perfil canvas{width:120px;height:160px;border-radius:4px;border:1px solid var(--linea-2)}
+.entrega-extra{display:grid;grid-template-columns:auto minmax(0,1fr);gap:1rem;align-items:start;margin:0 0 1rem}
+.portada-cli{width:7rem;aspect-ratio:9/16;object-fit:cover;border-radius:10px;border:1px solid var(--linea-2)}
+.copy-cli{display:grid;gap:.5rem;justify-items:start}
+@media (max-width:860px){
+  .est{grid-template-columns:1fr}
+  .est-muestra{position:static;order:-1;max-width:360px}
+  .gen-cuerpo{grid-template-columns:1fr}
+  .gen-vista{max-width:280px}
+}
+@media (max-width:560px){
+  .op-grid{grid-template-columns:1fr 1fr}
+  .entrega-extra{grid-template-columns:1fr}
+}
 </style>
 </head>
 <body>
@@ -651,6 +728,8 @@ async function cargarEquipo() {
   S.perfiles = perfiles || [];
   S.asignaciones = asignaciones || [];
   S.videos = (videos || []).map(v => { const x = Object.assign({}, v); delete x.cycles; return x; });
+  const est = await sb.from('estilos').select('*');
+  S.estilos = est.error ? [] : est.data || [];
   if (S.perfil.role === 'admin') {
     try { S.solicitudes = await q(sb.from('solicitudes').select('*').order('created_at', { ascending: false }).limit(300)) || []; }
     catch (e) { S.solicitudes = []; }
@@ -788,6 +867,7 @@ function render() {
   else if (S.vista === 'pagos' && S.perfil.role === 'admin') cuerpo = vistaPagos();
   else cuerpo = vistaProduccion();
   pintar(barra() + `<main class="app">${cuerpo}</main>`);
+  pintarMuestras();
 }
 
 // ---------- Producción (admin y editores) ---------------------------
@@ -1105,8 +1185,10 @@ function bloqueCliente(cl) {
           ${cl.videos_per_cycle} videos por mes${cl.active ? '' : ', en pausa'}. ${usuarios.length ? `Con acceso: ${usuarios.map(u => esc(nombreDe(u))).join(', ')}.` : 'Nadie de este cliente tiene acceso todavía.'}
           ${editores.length ? `Editores: ${editores.map(u => esc(nombreDe(u))).join(', ')}.` : 'Sin editor asignado (se asigna en Accesos).'}</p>
         ${lineaMailerlite(cl)}
+        <p class="cli-meta">${(e => e && e.confirmado_at ? `Estilo visual confirmado el ${esc(fCorta(e.confirmado_at))}.` : e ? 'Estilo visual en proceso: todavía no lo confirma.' : 'Estilo visual: todavía no lo elige.')(estiloFila(cl.id))}</p>
       </div>
       <div class="controles">
+        <button class="btn btn-s btn-t" data-accion="estilo-cliente" data-id="${cl.id}">Estilo</button>
         ${cs.length ? `<button class="btn btn-s btn-t" data-accion="previa" data-id="${cl.id}">Ver como cliente</button>` : ''}
         <button class="btn btn-s" data-accion="editar-cliente" data-id="${cl.id}">Editar</button>
         <button class="btn btn-s btn-p" data-accion="nuevo-ciclo" data-id="${cl.id}">Nuevo mes</button>
@@ -1732,8 +1814,12 @@ function vistaCliente(P, previa) {
   const pest = S.pestanaCli;
   const tab = (id, txt) => `<button role="tab" aria-selected="${pest === id}" data-accion="cli-pestana" data-id="${id}">${txt}</button>`;
   const pestanas = `<div class="cli-tabs" role="tablist" aria-label="Secciones">
-      ${tab('videos', 'Mis videos')}${tab('resultados', 'Resultados' + (nuevo ? ' <span class="cli-nuevo">Nuevo</span>' : ''))}${tab('pagos', 'Pagos')}
+      ${tab('videos', 'Mis videos')}${tab('estilo', 'Mi estilo' + (P.estilo && P.estilo.confirmado_at ? '' : ' <span class="cli-nuevo">Por definir</span>'))}${tab('resultados', 'Resultados' + (nuevo ? ' <span class="cli-nuevo">Nuevo</span>' : ''))}${tab('pagos', 'Pagos')}
     </div>`;
+  if (pest === 'estilo') {
+    S.estiloCtx = { modo: previa ? 'previa' : 'cliente' };
+    return `${pestanas}<div class="cli-panel" role="tabpanel">${vistaEstilo(P.estilo, previa ? 'previa' : 'cliente', P.client.id)}</div>`;
+  }
   if (pest === 'pagos') {
     return `${pestanas}<div class="cli-panel" role="tabpanel">${vistaPagosCliente(previa ? pagosLocal(S.previa) : S.pagosCli, P, previa)}</div>`;
   }
@@ -1756,6 +1842,7 @@ function vistaCliente(P, previa) {
   else if (conGuion < vs.length) mensaje = `Llevas ${conGuion} de ${vs.length} guiones. Súbelos a más tardar el ${fLarga(c.script_due || c.record_start)}.`;
   else mensaje = `Tus ${vs.length} guiones están listos para grabar.`;
   return `${pestanas}<div class="cli-panel" role="tabpanel">
+    ${!(P.estilo && P.estilo.confirmado_at) ? `<p class="aviso-linea">Elige tu estilo visual para que tus videos salgan como te gustan. <button class="f-ver" data-accion="cli-pestana" data-id="estilo">Elegir mi estilo</button></p>` : ''}
     ${ciclos.length > 1 ? `<div class="mes-tabs" role="group" aria-label="Meses">${ciclos.map(x => `<button data-accion="ver-mes" data-id="${x.id}" aria-pressed="${x.id === c.id}">${esc(x.name)}</button>`).join('')}</div>` : ''}
     <section class="hero-cli">
       <p class="cli-empresa">${esc(P.client.name)}</p>
@@ -1837,12 +1924,14 @@ function portalLocal(idCliente) {
       videos: S.videos.filter(v => v.cycle_id === c.id).sort((a, b) => a.number - b.number).map(v => ({
         id: v.id, number: v.number, title: v.title, script_url: v.script_url, script_text: v.script_text,
         status: ['edicion', 'revision', 'listo'].includes(v.status) ? 'produccion' : v.status,
-        final_url: v.status === 'entregado' ? v.final_url : null
+        final_url: v.status === 'entregado' ? v.final_url : null,
+        copy: v.status === 'entregado' ? v.copy : null,
+        portada_url: v.status === 'entregado' ? v.portada_url : null
       })),
       // A diferencia de client_portal, aquí se ve también el borrador para revisarlo antes de publicarlo
       report: (r => r ? Object.assign({}, r, { borrador: !r.publicado }) : null)(S.reportes.find(r => r.cycle_id === c.id))
     })).filter(c => c.videos.length);
-  return { client: cl ? { id: cl.id, name: cl.name, shared_url: cl.shared_url } : null, cycles };
+  return { client: cl ? { id: cl.id, name: cl.name, shared_url: cl.shared_url } : null, estilo: estiloFila(idCliente), cycles };
 }
 
 function vistaPrevia() {
@@ -1883,6 +1972,281 @@ function confirmar(titulo, texto, ok, peligro) {
       <div class="d-pie"><button class="btn" data-accion="conf-no">Cancelar</button><button class="btn ${peligro ? 'btn-peligro' : 'btn-p'}" data-accion="conf-si">${esc(ok || 'Confirmar')}</button></div>`,
       null, () => { if (resolverConfirmacion) { resolverConfirmacion(false); resolverConfirmacion = null; } });
   });
+}
+
+// ---------- Estilo visual del cliente y portadas -------------------------
+// El cliente elige su estilo entre estas opciones; al confirmarlo queda bloqueado
+// (solo el admin lo reabre). El editor lo ve en cada video y la portada sale con él.
+const FUENTES = {
+  anton: { nombre: 'Anton', css: "'Anton', Impact, sans-serif", peso: 400, escala: 1 },
+  bebas: { nombre: 'Bebas Neue', css: "'Bebas Neue', Impact, sans-serif", peso: 400, escala: 1.18 },
+  montserrat: { nombre: 'Montserrat', css: "'Montserrat', sans-serif", peso: 900, escala: 0.8 },
+  archivo: { nombre: 'Archivo Black', css: "'Archivo Black', sans-serif", peso: 400, escala: 0.82 }
+};
+const ESTILO_DEF = { color: '#39FF88', fuente: 'anton', subtitulos: 'resaltada', portada: 'abajo', logo_uso: 'final', logo_url: null, ritmo: 'dinamico', musica: 'energia', notas: null, confirmado_at: null, confirmado_por: null };
+const OPCIONES_ESTILO = [
+  ['subtitulos', 'Subtítulos', 'Cómo aparece en pantalla lo que dices.', { resaltada: ['Palabra resaltada', 'La palabra que dices se ilumina en tu color.'], caja: ['Frase en caja', 'Cada frase en una caja blanca, muy legible.'], limpio: ['Limpio', 'Letra blanca con sombra, sin adornos.'] }],
+  ['portada', 'Portada', 'Cómo se ve cada video en tu perfil.', { abajo: ['Título abajo', 'Título grande sobre un degradado oscuro.'], caja: ['Caja al centro', 'Título en cajas al centro de la imagen.'] }],
+  ['logo_uso', 'Tu logo', 'Dónde aparece tu logo en los videos.', { esquina: ['En la esquina', 'Pequeño, durante todo el video.'], final: ['Solo al final', 'Cierra cada video.'], sin: ['Sin logo', 'Tu marca la dice tu voz.'] }],
+  ['ritmo', 'Ritmo de edición', 'Qué tan movidos se sienten tus videos.', { dinamico: ['Dinámico', 'Cortes rápidos, zooms y efectos de sonido.'], natural: ['Natural', 'Cortes limpios, sin efectos.'] }],
+  ['musica', 'Música', 'Lo que suena de fondo.', { energia: ['Con energía', 'Empuja el ritmo y ayuda a retener.'], tranquila: ['Tranquila', 'De fondo, sin robar atención.'], sin: ['Sin música', 'Solo tu voz.'] }]
+];
+const COLORES = ['#39FF88', '#FF5A36', '#FFD23F', '#2F80FF', '#A855F7', '#FF4D9D', '#FFFFFF'];
+const MUESTRA_PORTADA = 'img/muestra-portada.webp';
+const estiloFila = id => (S.estilos || []).find(e => e.client_id === id) || null;
+const conDefecto = e => Object.assign({}, ESTILO_DEF, e || {});
+const nombreOpcion = (campo, val) => { const o = OPCIONES_ESTILO.find(x => x[0] === campo); return o && o[3][val] ? o[3][val][0] : val; };
+const imagenes = {};
+function imagen(url) {
+  if (!url) return Promise.resolve(null);
+  if (!imagenes[url]) imagenes[url] = new Promise(res => { const i = new Image(); i.crossOrigin = 'anonymous'; i.onload = () => res(i); i.onerror = () => res(null); i.src = url; });
+  return imagenes[url];
+}
+
+// Portada de 1080×1920 con la letra y el color del cliente. El título queda dentro de la
+// zona que Instagram muestra en el perfil (3:4: de y=240 a y=1680) para que se lea completo.
+const PORTADA = { w: 1080, h: 1920, arriba: 240, abajo: 1680 };
+function partesTitulo(t) {
+  // Lo que va entre *asteriscos* sale en el color del cliente; si no marcó nada, el último tercio
+  const tokens = []; let r = false;
+  String(t || '').split(/(\*)/).forEach(seg => { if (seg === '*') { r = !r; return; } seg.split(/\s+/).filter(Boolean).forEach(w => tokens.push({ w: w.toUpperCase(), r })); });
+  if (tokens.length && !String(t).includes('*')) tokens.slice(-Math.max(1, Math.ceil(tokens.length / 3))).forEach(x => { x.r = true; });
+  return tokens;
+}
+function partirLineas(ctx, tokens, ancho) {
+  const res = []; let fila = [];
+  tokens.forEach(tk => { const prueba = fila.concat(tk); if (fila.length && ctx.measureText(prueba.map(x => x.w).join(' ')).width > ancho) { res.push(fila); fila = [tk]; } else fila = prueba; });
+  if (fila.length) res.push(fila);
+  return res;
+}
+const tintaSobre = hex => { const n = parseInt(String(hex).slice(1), 16); return (0.299 * (n >> 16) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)) > 150 ? '#000' : '#fff'; };
+async function dibujarPortada(cv, { fuente: src, titulo, estilo, logo }) {
+  const W = PORTADA.w, H = PORTADA.h, ctx = cv.getContext('2d');
+  cv.width = W; cv.height = H;
+  const f = FUENTES[estilo.fuente] || FUENTES.anton, familia = f.css.split(',')[0];
+  try { await document.fonts.load(`${f.peso} 100px ${familia}`); } catch (e) { /* se usa la de respaldo */ }
+  ctx.fillStyle = '#0b0b0c'; ctx.fillRect(0, 0, W, H);
+  const sw = src && (src.videoWidth || src.naturalWidth), sh = src && (src.videoHeight || src.naturalHeight);
+  if (sw && sh) { const k = Math.max(W / sw, H / sh); ctx.drawImage(src, (W - sw * k) / 2, (H - sh * k) / 2, sw * k, sh * k); }
+  const tokens = partesTitulo(titulo), color = estilo.color || ESTILO_DEF.color;
+  const fuente = tam => { ctx.font = `${f.peso} ${Math.round(tam * f.escala)}px ${f.css}`; };   // las letras anchas van más chicas
+  if (estilo.portada === 'caja') {
+    const tramos = tokens.reduce((t, tk) => { const u = t[t.length - 1]; if (u && u[0].r === tk.r) u.push(tk); else t.push([tk]); return t; }, []);
+    const acomodar = () => tramos.flatMap(t => partirLineas(ctx, t, 860));
+    let tam = 96; fuente(tam); let ls = acomodar();
+    while (ls.length > 5 && tam > 60) { tam -= 6; fuente(tam); ls = acomodar(); }
+    const alto = tam * f.escala * 1.34, y0 = H / 2 - (ls.length * alto) / 2;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ls.forEach((l, i) => {
+      const txt = l.map(x => x.w).join(' '), w = ctx.measureText(txt).width, y = y0 + i * alto + alto / 2, res = l.some(x => x.r);
+      ctx.fillStyle = res ? color : '#fff';
+      ctx.fillRect(W / 2 - w / 2 - 28, y - alto / 2 + 7, w + 56, alto - 14);
+      ctx.fillStyle = res ? tintaSobre(color) : '#000';
+      ctx.fillText(txt, W / 2, y + tam * f.escala * 0.05);
+    });
+  } else {
+    const g = ctx.createLinearGradient(0, H * 0.4, 0, H * 0.82);
+    g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,.86)');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    let tam = 134; fuente(tam); let ls = partirLineas(ctx, tokens, 920);
+    while (ls.length > 4 && tam > 80) { tam -= 8; fuente(tam); ls = partirLineas(ctx, tokens, 920); }
+    const alto = tam * f.escala * 0.98, base = PORTADA.abajo - 80;
+    ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+    ls.forEach((l, i) => {
+      let x = 80; const y = base - (ls.length - 1 - i) * alto;
+      l.forEach((tk, j) => { const t = tk.w + (j < l.length - 1 ? ' ' : ''); ctx.fillStyle = tk.r ? color : '#fff'; ctx.fillText(t, x, y); x += ctx.measureText(t).width; });
+    });
+  }
+  if (logo && estilo.logo_uso !== 'sin' && logo.naturalWidth) {
+    const k = Math.min(300 / logo.naturalWidth, 120 / logo.naturalHeight);
+    ctx.drawImage(logo, (W - logo.naturalWidth * k) / 2, PORTADA.arriba + 70, logo.naturalWidth * k, logo.naturalHeight * k);
+  }
+}
+
+// La muestra del estilo: un cuadro de video con sus subtítulos y su portada
+function muestraVideo(e) {
+  const f = FUENTES[e.fuente] || FUENTES.anton;
+  const sub = e.subtitulos === 'caja' ? '<p class="sub sub-caja"><span>Esto es lo que nadie te dice</span></p>'
+    : e.subtitulos === 'limpio' ? '<p class="sub sub-limpio">Esto es lo que nadie te dice</p>'
+    : '<p class="sub sub-resaltada">Esto es lo que <em>nadie</em> te dice</p>';
+  const logo = e.logo_uso === 'esquina' ? (urlSegura(e.logo_url) ? `<img class="tel-logo" src="${esc(e.logo_url)}" alt="">` : '<span class="tel-logo tel-logo-txt">TU LOGO</span>') : '';
+  return `<div class="tel" style="--c:${esc(e.color)};--fs:${esc(f.css)};--fw:${f.peso}"><img src="${MUESTRA_PORTADA}" alt="">${logo}${sub}${e.logo_uso === 'final' ? '<span class="tel-nota">Tu logo cierra cada video</span>' : ''}</div>`;
+}
+let turnoMuestra = 0;
+async function pintarMuestras() {
+  if (!document.querySelector('canvas[data-portada-muestra]') || !S.estiloMuestra) return;
+  const mio = ++turnoMuestra, e = S.estiloMuestra, tmp = document.createElement('canvas');
+  const [fondo, logo] = await Promise.all([imagen(MUESTRA_PORTADA), imagen(urlSegura(e.logo_url))]);
+  await dibujarPortada(tmp, { fuente: fondo, titulo: 'Esto es lo que *nadie te dice*', estilo: e, logo });
+  if (mio !== turnoMuestra) return;
+  document.querySelectorAll('canvas[data-portada-muestra]').forEach(cv => { cv.width = tmp.width; cv.height = tmp.height; cv.getContext('2d').drawImage(tmp, 0, 0); });
+}
+
+// Pestaña "Mi estilo" (cliente), su vista previa (admin) y la ventana del admin
+function vistaEstilo(fila, modo, idCliente) {
+  const e = conDefecto(fila), bloq = !!e.confirmado_at;
+  const edita = modo === 'admin' || (modo === 'cliente' && !bloq);
+  S.estiloMuestra = e;
+  const color = String(e.color).toUpperCase();
+  const op = (campo, val, cont, clase = '') => `<button type="button" class="op${clase}" data-accion="estilo-op" data-campo="${campo}" data-valor="${esc(val)}" aria-pressed="${String(campo === 'color' ? color === val : e[campo] === val)}"${edita ? '' : ' disabled'}>${cont}</button>`;
+  let n = 0;
+  const bloque = (titulo, sub, cuerpo) => `<section class="est-bloque"><div class="est-cab"><span class="est-n">${String(++n).padStart(2, '0')}</span><div><h3>${titulo}</h3>${sub ? `<p>${sub}</p>` : ''}</div></div>${cuerpo}</section>`;
+  const subirLogo = `<div class="logo-subir">${urlSegura(e.logo_url) ? `<img src="${esc(e.logo_url)}" alt="Tu logo">` : '<span class="logo-vacio">Todavía sin logo</span>'}
+    ${edita ? `<label class="btn btn-s">${e.logo_url ? 'Cambiar logo' : 'Subir logo'}<input type="file" accept="image/png,image/jpeg" data-cambio="estilo-logo" hidden></label><span class="nota">PNG con fondo transparente, de preferencia.</span>` : ''}</div>`;
+  const bloques = [
+    bloque('El color de tu marca', 'Va en tus portadas y en lo que resalta en pantalla.', `<div class="swatches">
+      ${COLORES.map(c => op('color', c, `<span style="background:${c}"></span>`, ' sw')).join('')}
+      <label class="sw-libre${COLORES.includes(color) ? '' : ' activo'}"><input type="color" value="${esc(e.color)}" data-cambio="estilo-color"${edita ? '' : ' disabled'} aria-label="Otro color"><span>${COLORES.includes(color) ? 'Otro' : esc(color)}</span></label></div>`),
+    bloque('La letra de tus títulos', 'En tus portadas, subtítulos y textos en pantalla.', `<div class="op-grid" style="--n:4">${Object.entries(FUENTES).map(([k, f]) => op('fuente', k, `<b class="op-letra" style="font-family:${esc(f.css)};font-weight:${f.peso}">Título</b><span>${esc(f.nombre)}</span>`)).join('')}</div>`),
+    ...OPCIONES_ESTILO.map(([campo, titulo, sub, ops]) => bloque(titulo, sub, `${campo === 'logo_uso' ? subirLogo : ''}<div class="op-grid" style="--n:${Object.keys(ops).length}">${Object.entries(ops).map(([k, [t, d]]) => op(campo, k, `<b>${esc(t)}</b><span>${esc(d)}</span>`)).join('')}</div>`)),
+    bloque('¿Algo más?', 'Colores que no quieres, cuentas que te gustan o cualquier detalle.', `<div class="campo" style="margin:0"><textarea data-cambio="estilo-notas" maxlength="1000" placeholder="Ej. Nada de rosa; me gusta cómo edita @cuenta"${edita ? '' : ' disabled'}>${esc(e.notas || '')}</textarea></div>`)
+  ];
+  const wa = CONFIG.WHATSAPP ? `https://wa.me/${encodeURIComponent(CONFIG.WHATSAPP)}?text=${encodeURIComponent('Hola, quiero cambiar algo de mi estilo visual.')}` : '';
+  const intro = modo === 'admin' ? ''
+    : bloq ? `<div class="est-intro"><h2>Tu estilo visual</h2><p>Así se editan todos tus videos. Si quieres cambiar algo, escríbenos y lo vemos juntos.</p></div>`
+    : `<div class="est-intro"><h2>Tu estilo visual</h2><p>Elige cómo se van a ver tus videos. Tu editor lo sigue en cada uno; cuando lo tengas, confírmalo y así no hay sorpresas.</p></div>`;
+  const ok = bloq ? `<div class="est-ok">✓ Confirmado el ${esc(fCorta(e.confirmado_at))}${e.confirmado_por ? ` por ${esc(e.confirmado_por)}` : ''}.${modo === 'cliente' && wa ? ` <a class="btn btn-s" href="${esc(wa)}" target="_blank" rel="noopener noreferrer">Quiero cambiar algo</a>` : ''}</div>` : '';
+  const acciones = modo === 'cliente' && !bloq ? `<button class="btn btn-p btn-grande" data-accion="estilo-confirmar">Confirmar mi estilo</button><p class="nota">Al confirmarlo queda fijo para tu editor. Si después quieres cambiar algo, lo vemos juntos.</p>`
+    : modo === 'admin' && bloq ? `<button class="btn" data-accion="estilo-desbloquear" data-id="${esc(idCliente)}">Desbloquear para que lo cambie</button><p class="nota">Tú lo puedes ajustar aunque esté confirmado.</p>`
+    : modo === 'admin' ? '<p class="nota">El cliente todavía no lo confirma. Lo que cambies aquí lo ve en su portal.</p>' : '';
+  return `${intro}${ok}<div class="est">
+    <div>${bloques.join('')}</div>
+    <aside class="est-muestra"><p class="rep-et">Así se ve</p>
+      <div class="muestras">${muestraVideo(e)}<div class="tel"><canvas data-portada-muestra aria-label="Muestra de tu portada"></canvas></div></div>
+      <div class="muestras-et"><span>Tu video</span><span>Tu portada</span></div>
+      <div class="est-acciones">${acciones}</div></aside>
+  </div>`;
+}
+
+function modalEstilo(id) {
+  const cl = clientePorId(id); if (!cl) return;
+  S.estiloCtx = { modo: 'admin', id };
+  abrirModal(`<div class="est-modal">
+    <div class="d-cab"><div><h2 class="d-titulo">Estilo visual de ${esc(cl.name)}</h2><p class="d-sub">Lo elige el cliente en su portal, en “Mi estilo”. El editor lo ve en cada video.</p></div></div>
+    <div id="est-cuerpo">${vistaEstilo(estiloFila(id), 'admin', id)}</div>
+    <div class="d-pie"><button class="btn" data-accion="cerrar">Cerrar</button></div></div>`, () => pintarMuestras(), () => { S.estiloCtx = null; });
+}
+function refrescarModalEstilo() {
+  const c = document.getElementById('est-cuerpo');
+  if (c && S.estiloCtx && S.estiloCtx.modo === 'admin') { c.innerHTML = vistaEstilo(estiloFila(S.estiloCtx.id), 'admin', S.estiloCtx.id); pintarMuestras(); }
+}
+
+// Guardar un cambio de estilo: se ve al instante y luego se guarda
+async function cambiarEstilo(cambios) {
+  const ctx = S.estiloCtx; if (!ctx) return;
+  try {
+    if (ctx.modo === 'cliente') {
+      S.portal.estilo = Object.assign(conDefecto(S.portal.estilo), cambios);
+      render();
+      S.portal.estilo = await q(sb.rpc('client_estilo_guardar', { p: cambios }));
+      render();
+    } else if (ctx.modo === 'admin') {
+      const fila = await q(sb.from('estilos').upsert(Object.assign({ client_id: ctx.id }, cambios, { updated_at: new Date().toISOString() })).select().single());
+      S.estilos = (S.estilos || []).filter(e => e.client_id !== ctx.id).concat(fila);
+      refrescarModalEstilo();
+    }
+  } catch (e) {
+    aviso(/estilo_confirmado/.test(String(e && e.message)) ? 'Tu estilo ya está confirmado. Escríbenos si quieres cambiar algo.' : humano(e), true);
+    if (ctx.modo === 'cliente') recargar();
+  }
+}
+async function subirLogo(input) {
+  const file = input.files && input.files[0]; if (!file || !S.estiloCtx) return;
+  if (!/^image\/(png|jpeg)$/.test(file.type)) return aviso('Sube tu logo en PNG o JPG.', true);
+  if (file.size > 5 * 1024 * 1024) return aviso('El logo pesa más de 5 MB.', true);
+  const idCliente = S.estiloCtx.modo === 'admin' ? S.estiloCtx.id : (S.portal && S.portal.client && S.portal.client.id);
+  if (!idCliente) return;
+  const ruta = `logos/${idCliente}/logo-${Date.now()}.${file.type === 'image/png' ? 'png' : 'jpg'}`;
+  aviso('Subiendo el logo…');
+  const { error } = await sb.storage.from('portadas').upload(ruta, file, { contentType: file.type });
+  if (error) return aviso(humano(error), true);
+  await cambiarEstilo({ logo_url: sb.storage.from('portadas').getPublicUrl(ruta).data.publicUrl });
+  aviso('Logo listo');
+}
+
+// En la ficha del video: el estilo del cliente, la portada y el texto de publicación
+function resumenEstilo(fila) {
+  if (!fila) return '<p class="ayuda" style="margin:0">El cliente todavía no define su estilo. Mientras, se usa el de Connect.</p>';
+  const e = conDefecto(fila), f = FUENTES[e.fuente] || FUENTES.anton;
+  return `<div class="est-chips">
+    <span class="chip"><i style="background:${esc(e.color)}"></i>${esc(String(e.color).toUpperCase())}</span>
+    <span class="chip" style="font-family:${esc(f.css)};font-weight:${f.peso}">${esc(f.nombre)}</span>
+    ${['subtitulos', 'portada', 'logo_uso', 'ritmo', 'musica'].map(k => `<span class="chip">${esc(OPCIONES_ESTILO.find(o => o[0] === k)[1])}: ${esc(nombreOpcion(k, e[k]))}</span>`).join('')}
+  </div>${e.notas ? `<p class="ayuda" style="margin:.4rem 0 0">Notas del cliente: ${esc(e.notas)}</p>` : ''}${e.confirmado_at ? '' : '<p class="ayuda" style="margin:.4rem 0 0">Todavía no lo confirma: puede cambiar.</p>'}`;
+}
+function bloquePortadaVideo(v, c) {
+  const esAdmin = S.perfil.role === 'admin';
+  return `<div class="campo"><span class="lbl">Estilo del cliente</span>${resumenEstilo(c ? estiloFila(c.client_id) : null)}</div>
+    <div class="campo"><span class="lbl">Portada</span>
+      <div class="portada-fila">${urlSegura(v.portada_url) ? `<img class="portada-mini" src="${esc(v.portada_url)}" alt="Portada">` : '<span class="portada-mini vacia">Sin portada</span>'}
+        <div><button type="button" class="btn btn-s${v.portada_url ? '' : ' btn-p'}" data-accion="portada" data-id="${v.id}">${v.portada_url ? 'Cambiar portada' : 'Armar portada'}</button>
+        ${urlSegura(v.portada_url) ? `<a class="btn btn-s btn-t" href="${esc(v.portada_url)}" target="_blank" rel="noopener noreferrer">Abrir</a>` : ''}</div></div></div>
+    ${esAdmin ? `<div class="campo"><label for="f-copy">Texto de publicación</label>
+        <textarea id="f-copy" name="copy" maxlength="2200" placeholder="Te lo propone Claude a partir del guion; aquí lo ajustas">${esc(v.copy || '')}</textarea>
+        <p class="ayuda">El cliente lo ve cuando se entrega el video. Se publica con la portada en Metricool.</p></div>`
+      : v.copy ? `<div class="campo"><span class="lbl">Texto de publicación</span><p class="copy-txt">${esc(v.copy)}</p></div>` : ''}`;
+}
+
+// Armar la portada: el cuadro sale del video (se abre en la compu del editor, no se sube)
+function modalPortada(id) {
+  const v = S.videos.find(x => x.id === id); if (!v) return;
+  const c = S.ciclos.find(x => x.id === v.cycle_id); if (!c) return;
+  const cl = clientePorId(c.client_id), e = conDefecto(estiloFila(c.client_id));
+  const gen = S.gen = { id, cliente: c.client_id, src: null, video: null, url: null, titulo: v.portada_titulo || v.title || '', estilo: Object.assign({}, e) };
+  abrirModal(`<div class="gen">
+    <div class="d-cab"><span class="d-num">${pad(v.number)}</span><div><h2 class="d-titulo">Portada</h2>
+      <p class="d-sub">${esc(v.title || 'Sin título')} · con el estilo de ${esc(cl ? cl.name : 'el cliente')}${e.confirmado_at ? '' : ' (todavía no lo confirma)'}</p></div></div>
+    <div class="gen-cuerpo">
+      <div class="gen-vista"><canvas id="gen-cv" aria-label="Vista de la portada"></canvas></div>
+      <div>
+        <div class="campo"><label for="gen-archivo">Video terminado o un cuadro</label>
+          <input id="gen-archivo" type="file" accept="video/mp4,video/quicktime,video/webm,image/png,image/jpeg,image/webp">
+          <p class="ayuda">El video se abre en tu compu, no se sube. Busca un cuadro sin subtítulos.</p></div>
+        <div class="campo" id="gen-cuadro" hidden><label for="gen-tiempo">Cuadro del video <span class="opc" id="gen-seg">0.0 s</span></label>
+          <input id="gen-tiempo" type="range" min="0" max="1" step="0.04" value="0"></div>
+        <div class="campo"><label for="gen-titulo">Título</label><input id="gen-titulo" maxlength="140" value="${esc(gen.titulo)}">
+          <p class="ayuda">Corto y que enganche. Lo que pongas entre *asteriscos* sale en el color del cliente.</p></div>
+        <div class="campo"><span class="lbl">Estilo</span><div class="seg" role="group" aria-label="Estilo de portada">${['abajo', 'caja'].map(k => `<button type="button" data-gen-estilo="${k}" aria-pressed="${gen.estilo.portada === k}">${esc(nombreOpcion('portada', k))}</button>`).join('')}</div></div>
+        <div class="gen-perfil"><canvas id="gen-grid" width="360" height="480" aria-label="Así se ve en el perfil"></canvas><span class="nota">Así se ve en el perfil de Instagram (recorte 3:4).</span></div>
+      </div>
+    </div>
+    <div class="d-pie"><button type="button" class="btn" data-accion="abrir-video" data-id="${v.id}">Regresar</button><button type="button" class="btn btn-p" data-accion="portada-guardar" data-id="${v.id}">Guardar portada</button></div>
+  </div>`, montarGenerador, () => { if (gen.url) URL.revokeObjectURL(gen.url); if (S.gen === gen) S.gen = null; });
+}
+function montarGenerador(dlg) {
+  const gen = S.gen, $g = id => dlg.querySelector('#' + id);
+  let turno = 0;
+  const redibujar = async () => {
+    const mio = ++turno, tmp = document.createElement('canvas');
+    await dibujarPortada(tmp, { fuente: gen.src, titulo: gen.titulo, estilo: gen.estilo, logo: await imagen(urlSegura(gen.estilo.logo_url)) });
+    if (mio !== turno) return;   // ya hay un dibujo más nuevo
+    const cv = $g('gen-cv'); if (!cv) return;
+    cv.width = tmp.width; cv.height = tmp.height; cv.getContext('2d').drawImage(tmp, 0, 0);
+    $g('gen-grid').getContext('2d').drawImage(tmp, 0, PORTADA.arriba, PORTADA.w, PORTADA.abajo - PORTADA.arriba, 0, 0, 360, 480);
+  };
+  gen.redibujar = redibujar;
+  $g('gen-archivo').addEventListener('change', ev => {
+    const f = ev.target.files && ev.target.files[0]; if (!f) return;
+    if (gen.url) URL.revokeObjectURL(gen.url);
+    gen.url = URL.createObjectURL(f);
+    if (f.type.startsWith('image/')) {
+      const i = new Image(); i.onload = () => { gen.src = i; gen.video = null; $g('gen-cuadro').hidden = true; redibujar(); }; i.src = gen.url; return;
+    }
+    const v = document.createElement('video');
+    Object.assign(v, { muted: true, playsInline: true, preload: 'auto', src: gen.url });
+    gen.video = v;
+    v.addEventListener('loadedmetadata', () => { $g('gen-tiempo').max = String(v.duration || 1); $g('gen-cuadro').hidden = false; v.currentTime = Math.min(1, (v.duration || 2) / 2); });
+    v.addEventListener('seeked', () => { gen.src = v; $g('gen-tiempo').value = String(v.currentTime); $g('gen-seg').textContent = v.currentTime.toFixed(1) + ' s'; redibujar(); });
+    v.addEventListener('error', () => aviso('Ese video no se puede abrir aquí. Exporta un cuadro como imagen y súbelo.', true));
+  });
+  $g('gen-tiempo').addEventListener('input', ev => { if (gen.video) gen.video.currentTime = Number(ev.target.value); });
+  $g('gen-titulo').addEventListener('input', ev => { gen.titulo = ev.target.value; redibujar(); });
+  dlg.querySelectorAll('[data-gen-estilo]').forEach(b => b.addEventListener('click', () => {
+    gen.estilo.portada = b.dataset.genEstilo;
+    dlg.querySelectorAll('[data-gen-estilo]').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+    redibujar();
+  }));
+  redibujar();
 }
 
 // Ficha de un video (equipo)
@@ -1931,6 +2295,7 @@ function modalVideo(id) {
     <div class="campo"><label for="f-final">Link de este video (opcional si ya está en la carpeta del mes)</label>
       <input id="f-final" name="final_url" type="url" inputmode="url" placeholder="https://drive.google.com/..." value="${esc(v.final_url || '')}"${bloqueado || ajeno ? ' disabled' : ''}>
       <p class="ayuda">El cliente lo ve solo cuando el video se entrega. Revisa que el archivo de Drive esté compartido.</p></div>
+    ${bloquePortadaVideo(v, c)}
     <div class="campo"><label for="f-notas">Notas del equipo</label>
       <textarea id="f-notas" name="team_notes" maxlength="5000" placeholder="Música, cortes, cambios pedidos">${esc(v.team_notes || '')}</textarea>
       <p class="ayuda">El cliente no ve estas notas.</p></div>
@@ -1984,6 +2349,9 @@ function modalGuion(id) {
       ${v.status === 'entregado' && (urlSegura(v.final_url) || urlSegura(c.delivery_url)) ? `<p class="controles">
         ${urlSegura(v.final_url) ? `<a class="btn btn-p btn-grande" href="${esc(urlSegura(v.final_url))}" target="_blank" rel="noopener noreferrer">Ver este video</a>` : ''}
         ${urlSegura(c.delivery_url) ? `<a class="btn btn-grande${urlSegura(v.final_url) ? '' : ' btn-p'}" href="${esc(urlSegura(c.delivery_url))}" target="_blank" rel="noopener noreferrer">Abrir carpeta con tus videos</a>` : ''}</p>` : ''}
+      ${v.status === 'entregado' && (urlSegura(v.portada_url) || v.copy) ? `<div class="entrega-extra">
+        ${urlSegura(v.portada_url) ? `<a href="${esc(v.portada_url)}" target="_blank" rel="noopener noreferrer"><img class="portada-cli" src="${esc(v.portada_url)}" alt="Portada del video"></a>` : '<span></span>'}
+        ${v.copy ? `<div class="copy-cli"><span class="lbl">Texto de publicación</span><p class="copy-txt">${esc(v.copy)}</p><button class="btn btn-s" data-accion="copiar-texto" data-texto="${esc(v.copy)}">Copiar texto</button></div>` : ''}</div>` : ''}
       ${v.status !== 'entregado' ? '<p class="ayuda">Este video ya se grabó. Si necesitas un cambio, escríbenos directamente.</p>' : ''}
       ${v.script_url ? `<p>${enlace(v.script_url, 'Abrir guion')}</p>` : ''}
       ${v.script_text ? `<pre class="guion-texto">${esc(v.script_text)}</pre>` : ''}
@@ -2438,6 +2806,7 @@ const FORMS = {
       poner('script_text', valor(f, 'script_text'));
       poner('editor_id', valor(f, 'editor_id'));
       poner('change_request', valor(f, 'change_request'));
+      poner('copy', valor(f, 'copy'));
     }
     poner('status', valor(f, 'status'));
     poner('final_url', valor(f, 'final_url'));
@@ -2732,7 +3101,7 @@ const ACC = {
   previa(el, id) { S.previa = id; S.vista = 'previa'; S.cicloCliente = null; S.pestanaCli = 'videos'; elegirMesCliente(portalLocal(id)); render(); window.scrollTo(0, 0); },
   'ver-mes'(el, id) { S.cicloCliente = id; render(); },
   'cli-pestana'(el, id) {
-    S.pestanaCli = ['resultados', 'pagos'].includes(id) ? id : 'videos';
+    S.pestanaCli = ['resultados', 'pagos', 'estilo'].includes(id) ? id : 'videos';
     if (S.pestanaCli === 'resultados' && S.vista !== 'previa') {
       const u = ultimoReporte(S.portal && S.portal.cycles);
       if (u) marcarReporteVisto(u);
@@ -2750,6 +3119,44 @@ const ACC = {
   'conf-no'() { cerrarModal(); },
   'abrir-video'(el, id) { modalVideo(id); },
   'abrir-guion'(el, id) { modalGuion(id); },
+  'estilo-op'(el) { if (el.dataset.campo) cambiarEstilo({ [el.dataset.campo]: el.dataset.valor }); },
+  'estilo-cliente'(el, id) { modalEstilo(id); },
+  async 'estilo-confirmar'() {
+    if (S.vista === 'previa' || !S.portal) return;
+    if (!await confirmar('¿Confirmas tu estilo?', 'Así se van a editar todos tus videos y tus portadas. Si después quieres cambiar algo, lo vemos juntos.', 'Sí, confirmar')) return;
+    S.portal.estilo = await q(sb.rpc('client_estilo_confirmar'));
+    render();
+    aviso('Listo: tu estilo quedó confirmado');
+  },
+  async 'estilo-desbloquear'(el, id) {
+    if (!await confirmar('¿Desbloquear el estilo?', 'El cliente lo podrá cambiar en su portal y tendrá que confirmarlo de nuevo.', 'Desbloquear')) { modalEstilo(id); return; }
+    await q(sb.from('estilos').update({ confirmado_at: null, confirmado_por: null }).eq('client_id', id));
+    await recargar(true);
+    modalEstilo(id);
+    aviso('Desbloqueado: el cliente ya lo puede cambiar');
+  },
+  portada(el, id) { modalPortada(id); },
+  async 'portada-guardar'(el, id) {
+    const gen = S.gen; if (!gen || gen.id !== id) return;
+    if (!gen.src) return aviso('Primero elige el video o un cuadro.', true);
+    el.disabled = true; el.textContent = 'Guardando…';
+    try {
+      const cv = document.getElementById('gen-cv');
+      await dibujarPortada(cv, { fuente: gen.src, titulo: gen.titulo, estilo: gen.estilo, logo: await imagen(urlSegura(gen.estilo.logo_url)) });
+      const blob = await new Promise(res => cv.toBlob(res, 'image/jpeg', 0.9));
+      const ruta = `portadas/${gen.cliente}/${id}-${Date.now()}.jpg`;
+      const { error } = await sb.storage.from('portadas').upload(ruta, blob, { contentType: 'image/jpeg' });
+      if (error) throw error;
+      await q(sb.from('videos').update({ portada_url: sb.storage.from('portadas').getPublicUrl(ruta).data.publicUrl, portada_titulo: gen.titulo.trim().slice(0, 140) || null }).eq('id', id));
+      await recargar();
+      modalVideo(id);
+      aviso('Portada guardada');
+    } catch (e) { el.disabled = false; el.textContent = 'Guardar portada'; aviso(humano(e), true); }
+  },
+  async 'copiar-texto'(el) {
+    try { await navigator.clipboard.writeText(el.dataset.texto || ''); aviso('Texto copiado'); }
+    catch (e) { aviso('No se pudo copiar. Selecciónalo y cópialo a mano.', true); }
+  },
   termine(el, id) { modalTermine(id); },
   async empezar(el, id) {
     const v = S.videos.find(x => x.id === id); if (!v) return;
@@ -3026,7 +3433,10 @@ const CAMBIOS = {
     if (x && (x.nota || null) !== nota) guardarPostulacion(el.dataset.id, { nota }, false);
   },
   'fac-filtro'(el) { S.facFiltro = el.value; render(); },
-  'prop-filtro'(el) { S.propFiltro = el.value; render(); }
+  'prop-filtro'(el) { S.propFiltro = el.value; render(); },
+  'estilo-color'(el) { cambiarEstilo({ color: el.value.toUpperCase() }); },
+  'estilo-notas'(el) { cambiarEstilo({ notas: el.value.trim() }); },
+  'estilo-logo'(el) { subirLogo(el); }
 };
 
 document.addEventListener('click', ev => {
