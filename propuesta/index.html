@@ -479,7 +479,7 @@ const CLIENTES = [['tequila-carrera', 'Tequila Carrera'], ['cabb-arrenda', 'CABB
 
 // Lo que más preguntan del contenido mensual: mismas respuestas que connectstudios.mx/preguntas (y el contrato)
 const preguntas = () => [
-  ['¿Quién escribe los guiones?', 'Tú decides los temas y escribes los guiones, porque nadie conoce tu negocio como tú. Pero no lo haces solo: en nuestra cita presencial te enseño a escribirlos con una guía y una herramienta de apoyo, reviso cada guion y te sugiero cambios, y el día de grabación los afinamos juntos antes de grabar.'],
+  ['¿Quién escribe los guiones?', 'Tú decides los temas y escribes los guiones, porque nadie conoce tu negocio como tú. Pero no lo haces solo: en nuestra cita presencial te enseño a escribirlos con una guía y una herramienta de apoyo, les doy una checada antes de grabar y el día de grabación los revisamos juntos y ajustamos lo que haga falta.'],
   ['¿Y si no me gusta salir a cámara o me cuesta memorizar?', 'Les pasa a muchos. El día de grabación revisamos los guiones contigo y buscamos la forma de grabar con la que te sientas cómodo.'],
   ['¿Puedo pedir cambios a un video?', 'Sí. Cuando te aviso que los videos del mes están listos, tienes 3 días hábiles para pedirme, en un solo mensaje, una ronda de ajustes: cortes, textos en pantalla, subtítulos, música o el texto de publicación. Los errores de ortografía, de datos o de logotipo se corrigen siempre, sin costo. Lo que ya se grabó no se regraba ni cambia lo que dice.'],
   ['¿Y si el primer mes no me convence?', 'Te puedes salir sin pena: avisas por escrito dentro de los 5 días siguientes a tu primera entrega y solo pagas el 50% restante de ese mes.'],
@@ -492,7 +492,7 @@ const preguntas = () => [
 const ETAPAS = {
   mensual: [
     ['Semana 1', 'Cita presencial', 'Nos vemos en persona: estrategia, tu acceso al portal y la guía para escribir tus guiones.'],
-    ['Antes de grabar', 'Guiones', 'Tú decides los temas y los escribes; yo reviso cada guion antes de grabar.'],
+    ['Antes de grabar', 'Guiones', 'Tú decides los temas y los escribes; les doy una checada y antes de grabar los revisamos juntos.'],
     ['Cada mes', 'Grabación', 'Grabamos en tu negocio, con dirección en cada toma.'],
     ['Día 1 o 15', 'Entrega', 'Edito cada video y lo reviso antes de que llegue a ti. Tienes 3 días hábiles para ajustes.'],
     ['Cada mes', 'Resultados', 'Se publica en tus redes y cada mes vemos qué funcionó y ajustamos.']
@@ -542,7 +542,7 @@ function bloqueEjemplo() {
   </a>`;
 }
 
-// Así se ve: videos reales (mensual) o el ejemplo, testimonios y clientes
+// Así se ve: videos reales (mensual) o el ejemplo
 function bloqueTrabajo(ceja) {
   const mensual = P.tipo === 'mensual';
   const reels = `<div class="reels">${REELS.map(([id, tipo, titulo]) => `<figure class="reel r">
@@ -554,7 +554,13 @@ function bloqueTrabajo(ceja) {
     <div class="cab r"><div>${ceja('El trabajo')}<h2>Así se ve</h2></div>
       <p>${mensual ? 'Videos reales de Dorma, un cliente con contenido mensual. Tócalos para verlos con sonido.' : 'Cada proyecto empieza por definir qué tiene que lograr el video, antes de encender la cámara.'}</p></div>
     ${mensual ? reels + (P.ejemplo_url ? `<div style="margin-top:1.2rem">${bloqueEjemplo()}</div>` : '') : bloqueEjemplo()}
-    <p class="sub-cab r">Lo dicen ellos</p>
+  </section>`;
+}
+
+// Lo dicen ellos: testimonios y clientes, al final y antes de las preguntas
+function bloqueTestimonios(ceja) {
+  return `<section class="seccion">
+    <div class="cab r"><div>${ceja('Clientes')}<h2>Lo dicen ellos</h2></div><p>En sus propias palabras, tal como lo dijeron en video.</p></div>
     <div class="testimonios">${TESTIMONIOS.map(t => `<figure class="testimonio r">
       <blockquote>${t.texto.map(x => `<p>${esc(x)}</p>`).join('')}</blockquote>
       <figcaption><img class="foto" src="${SITIO}img/testimonios/${t.foto}.webp" alt="" loading="lazy" width="56" height="56"><span><b>${esc(t.nombre)}</b><small>${esc(t.cargo)}</small></span></figcaption>
@@ -694,6 +700,9 @@ function bloqueDecision() {
   }
 
   const dijoQueNo = P.rechazada_at && !panel;
+  // Las fechas van antes de la inversión; aquí se repite el límite para no perderlo al decidir
+  const v1 = P.tipo === 'mensual' && (P.ventanas || [])[0];
+  const limite = v1 ? ` Para grabar ${rangoVentana(v1)}, firma y paga a más tardar el ${fCorta(v1.limite)}.` : '';
   let abajo = '';
   if (panel === 'aceptar') {
     abajo = `<form class="panel" data-form="aceptar" novalidate>
@@ -716,7 +725,7 @@ function bloqueDecision() {
     <h2>${dijoQueNo ? 'Por ahora <em>no.</em>' : '<em>¿Arrancamos?</em>'}</h2>
     <p class="txt">${dijoQueNo
       ? `Me dijiste que por ahora no. Si cambias de opinión, puedes aceptarla aquí mismo hasta el ${esc(fecha(P.vigencia))}.`
-      : `Si todo te hace sentido, acéptala aquí y te mando el contrato. Si algo no te queda claro, escríbeme. Vigente hasta el ${esc(fecha(P.vigencia))}.`}</p>
+      : `Si todo te hace sentido, acéptala aquí y te mando el contrato.${esc(limite)} Si algo no te queda claro, escríbeme. Vigente hasta el ${esc(fecha(P.vigencia))}.`}</p>
     ${panel ? '' : `<div class="acciones">
       <button class="btn btn-v btn-grande" type="button" data-accion="abrir-aceptar">Aceptar la propuesta</button>
       ${dudas}
@@ -795,6 +804,8 @@ function pintar() {
 
     ${bloqueIncluye(ceja, incluye, diasTiempo)}
 
+    ${bloqueFechas(ceja)}
+
     <section class="seccion" id="inversion">
       <div class="cab r"><div>${ceja('Inversión')}<h2>Cuánto y cómo</h2></div></div>
       <div class="inversion">
@@ -813,9 +824,9 @@ function pintar() {
       </div>
     </section>
 
-    ${bloquePreguntas(ceja)}
+    ${bloqueTestimonios(ceja)}
 
-    ${bloqueFechas(ceja)}
+    ${bloquePreguntas(ceja)}
 
     <section class="seccion" style="border-top:0;padding-top:0">
       ${bloqueDecision()}
