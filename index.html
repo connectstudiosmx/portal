@@ -1602,19 +1602,19 @@ function bloqueAjustes() {
     </dl>
     ${a.stripe_activo ? '' : `<details class="pegar" style="margin-top:1rem"><summary>Cómo activar el pago con tarjeta (Stripe)</summary>
       <ol class="pasos-stripe">
-        <li>En Stripe: <b>Developers → API keys</b>, copia tu <b>Secret key</b>. En Supabase → <b>SQL Editor</b>, pega esta línea con tu llave y dale Run:
+        <li>En Stripe, abre <a href="https://dashboard.stripe.com/apikeys" target="_blank" rel="noopener">Claves de API</a> (abajo a la izquierda: <b>Desarrolladores</b>) y copia tu <b>Clave secreta</b>. En Supabase → <b>SQL Editor</b>, pega esta línea con tu llave y dale Run:
           <code class="codigo">select vault.create_secret('sk_live_TU_LLAVE', 'stripe_secret_key', 'Llave secreta de Stripe');</code></li>
-        <li>En Stripe: <b>Developers → Webhooks → Add endpoint</b>. URL: <code class="codigo">${PAGOS_URL}</code> Evento: <b>checkout.session.completed</b>. Copia el <b>Signing secret</b> (empieza con whsec_) y en el SQL Editor:
+        <li>En Stripe, abre <a href="https://dashboard.stripe.com/webhooks" target="_blank" rel="noopener">Webhooks</a> y agrega un destino. URL: <code class="codigo">${PAGOS_URL}</code> Evento: <b>checkout.session.completed</b>. Copia el <b>Signing secret</b> (empieza con whsec_) y en el SQL Editor:
           <code class="codigo">select vault.create_secret('whsec_TU_SECRETO', 'stripe_webhook_secret', 'Firma de los avisos de Stripe');</code></li>
         <li>Aquí arriba, en <b>Editar</b>, enciende <b>Cobrar con tarjeta</b>.</li>
       </ol>
       <p class="nota">Las llaves nunca van en el chat ni en la página: solo en Vault. Para probar sin cobrar de verdad, usa primero las de prueba (sk_test_).</p></details>`}
     ${S.stripeModo && S.stripeModo.modo === 'prueba' ? `<details class="pegar" style="margin-top:1rem"><summary>Cambiar a cobros reales</summary>
       <ol class="pasos-stripe">
-        <li>En Stripe apaga el <b>modo de prueba</b> (arriba a la derecha). Tu cuenta tiene que estar activada: datos de tu negocio y tu CLABE para recibir los depósitos.</li>
-        <li>En <b>Developers → API keys</b> copia tu <b>Secret key</b> (empieza con sk_live_). En Supabase → <b>SQL Editor</b>, pega esta línea con tu llave y dale Run:
+        <li>En Stripe, en el menú de tu cuenta (arriba a la izquierda), cambia del <b>Entorno de prueba</b> a tu cuenta real. Tu cuenta tiene que estar activada: datos de tu negocio y tu CLABE para recibir los depósitos.</li>
+        <li>Abre <a href="https://dashboard.stripe.com/apikeys" target="_blank" rel="noopener">Claves de API</a> (abajo a la izquierda: <b>Desarrolladores</b>) y copia tu <b>Clave secreta</b> (empieza con sk_live_; si ya no te la deja ver, toca <b>Crear clave secreta</b>). En Supabase → <b>SQL Editor</b>, pega esta línea con tu llave y dale Run:
           <code class="codigo">select vault.update_secret((select id from vault.secrets where name = 'stripe_secret_key'), 'sk_live_TU_LLAVE');</code></li>
-        <li>En <b>Developers → Webhooks → Add destination</b> (ya en modo real): evento <b>checkout.session.completed</b>, URL <code class="codigo">${PAGOS_URL}</code> Copia el <b>Signing secret</b> (whsec_) y en el SQL Editor:
+        <li>Abre <a href="https://dashboard.stripe.com/webhooks" target="_blank" rel="noopener">Webhooks</a> (ya en tu cuenta real) y agrega un destino: evento <b>checkout.session.completed</b>, URL <code class="codigo">${PAGOS_URL}</code> Copia el <b>Signing secret</b> (whsec_) y en el SQL Editor:
           <code class="codigo">select vault.update_secret((select id from vault.secrets where name = 'stripe_webhook_secret'), 'whsec_TU_SECRETO');</code></li>
         <li>Recarga esta página: aquí arriba tiene que decir <b>Cobros reales</b>.</li>
       </ol>
