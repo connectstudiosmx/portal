@@ -508,7 +508,7 @@ const S = {
   vista: 'produccion',
   clientes: [], ciclos: [], videos: [], perfiles: [], asignaciones: [], solicitudes: [], reportes: [], mlLog: [], verAtendidas: false, solFiltro: { ruta: '', califica: '', estado: '' },
   postulaciones: [], postFiltro: { rol: '', estado: 'activas', pais: '' }, facturas: [], pagoDatos: null, facFiltro: 'pendiente', faltaBase: false,
-  pagosCli: null, propuestas: [], propFiltro: 'activas', ajustes: null, contratos: [], pagosStripe: [],
+  pagosCli: null, propuestas: [], propFiltro: 'activas', ajustes: null, contratos: [], pagosStripe: [], stripeModo: null,
   portal: null, cicloCliente: null, previa: null, pestanaCli: 'videos',
   filtro: { cliente: 'todos', estado: 'todos', mios: false, entregados: false },
   calInicio: null, verTodos: {}, cargadoEn: 0
@@ -664,12 +664,14 @@ async function cargarEquipo() {
       sb.from('propuestas').select('*').order('created_at', { ascending: false }).limit(300)
     ]);
     S.propuestas = props.error ? [] : props.data || [];
-    const [aj, cts, ps] = await Promise.all([
+    const [aj, cts, ps, sm] = await Promise.all([
       sb.from('ajustes').select('*').eq('id', 1).maybeSingle(),
       sb.from('contratos').select('id,propuesta_id,client_id,razon_social,rfc,correo,whatsapp,correo_google,plataformas,firmado_por,firmado_at,firma_prestador_at,primer_ciclo').order('firmado_at', { ascending: false }).limit(300),
-      sb.from('pagos_stripe').select('*').order('created_at', { ascending: false }).limit(100)
+      sb.from('pagos_stripe').select('*').order('created_at', { ascending: false }).limit(100),
+      sb.rpc('stripe_modo')
     ]);
     S.ajustes = aj.error ? null : aj.data;
+    S.stripeModo = sm.error ? null : sm.data;
     S.contratos = cts.error ? [] : cts.data || [];
     S.pagosStripe = ps.error ? [] : ps.data || [];
     S.postulaciones = post.error ? [] : post.data || [];
@@ -1558,6 +1560,26 @@ function vistaPagos() {
     : `<div class="caja-vacia"><p>${S.facturas.length ? (f === 'pendiente' ? 'No hay facturas por emitir.' : 'Nada coincide con este filtro.') : 'Todavía nadie pide factura. Tus clientes la piden desde su portal, en la pestaña Pagos, y aquí te llega con todos sus datos fiscales.'}</p></div>`}`;
 }
 
+// Si Stripe cobra de verdad o está en prueba (la base solo dice el tipo de llave, nunca la llave)
+function modoStripe() {
+  const m = S.stripeModo;
+  if (!m) return '';
+  if (m.modo === 'real') return ' <span class="sol-int sol-ok">Cobros reales</span>';
+  if (m.modo === 'prueba') return ' <span class="sol-int">Modo de prueba: no cobra de verdad</span>';
+  return ' <span class="sol-int">Sin llave de Stripe</span>';
+}
+function avisoStripe() {
+  const m = S.stripeModo;
+  if (!m || !m.modo) return '';
+  const u = m.ultimo_aviso;
+  const txt = !m.webhook ? '<span class="error-linea">Falta el secreto del webhook</span>'
+    : !u ? '<span class="nota">Todavía no llega ninguno</span>'
+    : u.resultado === 'firma_invalida' || u.resultado === 'sin_secreto' ? `<span class="error-linea">Llegó el ${esc(fHora(u.at))} pero no coincide la firma: revisa el secreto del webhook</span>`
+    : u.resultado === 'error' ? `<span class="error-linea">Llegó el ${esc(fHora(u.at))} pero no se pudo registrar</span>`
+    : `<span class="sol-int sol-ok">Bien</span> <span class="nota">${esc(fHora(u.at))}</span>`;
+  return `<div class="pago-dato"><dt>Último aviso de Stripe</dt><dd>${txt}</dd></div>`;
+}
+
 // Datos de EL PRESTADOR para el contrato, la firma y el pago con tarjeta
 function bloqueAjustes() {
   const a = S.ajustes;
@@ -1575,7 +1597,8 @@ function bloqueAjustes() {
       ${fila('Días entre pago y 1.ª grabación', esc(a.margen_dias))}
       <div class="pago-dato ancho"><dt>Tu domicilio</dt><dd>${a.prestador_domicilio ? esc(a.prestador_domicilio) : falta}</dd></div>
       ${fila('Tu firma', a.firma_prestador ? `<img class="firma-img" src="${esc(a.firma_prestador)}" alt="Tu firma">` : '<span class="nota">Sin firma: la necesitas para firmar los contratos</span>')}
-      ${fila('Pago con tarjeta', a.stripe_activo ? '<span class="sol-int sol-ok">Activo</span>' : '<span class="sol-int">Apagado</span>')}
+      ${fila('Pago con tarjeta', (a.stripe_activo ? '<span class="sol-int sol-ok">Activo</span>' : '<span class="sol-int">Apagado</span>') + modoStripe())}
+      ${avisoStripe()}
     </dl>
     ${a.stripe_activo ? '' : `<details class="pegar" style="margin-top:1rem"><summary>Cómo activar el pago con tarjeta (Stripe)</summary>
       <ol class="pasos-stripe">
@@ -1586,6 +1609,16 @@ function bloqueAjustes() {
         <li>Aquí arriba, en <b>Editar</b>, enciende <b>Cobrar con tarjeta</b>.</li>
       </ol>
       <p class="nota">Las llaves nunca van en el chat ni en la página: solo en Vault. Para probar sin cobrar de verdad, usa primero las de prueba (sk_test_).</p></details>`}
+    ${S.stripeModo && S.stripeModo.modo === 'prueba' ? `<details class="pegar" style="margin-top:1rem"><summary>Cambiar a cobros reales</summary>
+      <ol class="pasos-stripe">
+        <li>En Stripe apaga el <b>modo de prueba</b> (arriba a la derecha). Tu cuenta tiene que estar activada: datos de tu negocio y tu CLABE para recibir los depósitos.</li>
+        <li>En <b>Developers → API keys</b> copia tu <b>Secret key</b> (empieza con sk_live_). En Supabase → <b>SQL Editor</b>, pega esta línea con tu llave y dale Run:
+          <code class="codigo">select vault.update_secret((select id from vault.secrets where name = 'stripe_secret_key'), 'sk_live_TU_LLAVE');</code></li>
+        <li>En <b>Developers → Webhooks → Add destination</b> (ya en modo real): evento <b>checkout.session.completed</b>, URL <code class="codigo">${PAGOS_URL}</code> Copia el <b>Signing secret</b> (whsec_) y en el SQL Editor:
+          <code class="codigo">select vault.update_secret((select id from vault.secrets where name = 'stripe_webhook_secret'), 'whsec_TU_SECRETO');</code></li>
+        <li>Recarga esta página: aquí arriba tiene que decir <b>Cobros reales</b>.</li>
+      </ol>
+      <p class="nota">Las llaves nunca van en el chat ni en la página: solo en Vault.</p></details>` : ''}
   </section>`;
 }
 
