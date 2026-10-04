@@ -547,6 +547,24 @@ main.app{max-width:var(--ancho);margin:0 auto;padding:1.75rem 1.25rem 5rem}
   .op-grid{grid-template-columns:1fr 1fr}
   .entrega-extra{grid-template-columns:1fr}
 }
+
+/* Pagos del cliente: elegir tarjeta o transferencia */
+.pago-monto{display:flex;align-items:baseline;gap:.4rem .8rem;flex-wrap:wrap;margin:0 0 .5rem}
+.pago-monto b{font-family:var(--display);font-weight:400;font-size:clamp(2.6rem,7vw,3.6rem);line-height:.9;color:var(--crema)}
+.pago-monto span{color:var(--crema-2);font-weight:600}
+.pago-prox{color:var(--crema-2)}
+.pago-preg{margin:1.4rem 0 .7rem;font-size:1rem}
+.pago-opciones{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:1.1rem}
+.pago-op{display:flex;gap:.8rem;align-items:flex-start;text-align:left;padding:1rem 1.1rem;border:1.5px solid var(--linea-2);border-radius:12px;background:#0A0A0B;cursor:pointer;color:inherit;font:inherit;transition:border-color .2s,background .2s}
+.pago-op:hover{border-color:var(--crema-3)}
+.pago-op[aria-checked="true"]{border-color:var(--verde);background:radial-gradient(120% 140% at 0% 0%,rgba(57,255,136,.14),transparent 60%),#0A0A0B}
+.pago-op>svg{width:1.6rem;height:1.6rem;flex:none;color:var(--verde);margin-top:.1rem}
+.pago-op b{display:block}
+.pago-op small{display:block;color:var(--crema-3);font-size:.84rem;margin-top:.15rem;line-height:1.35}
+.pago-panel{border-top:1px solid var(--linea);padding-top:1.1rem}
+.pago-panel>.nota{margin:.7rem 0 0;color:var(--crema-2);max-width:60ch}
+.btn .ico-btn{width:1.2rem;height:1.2rem}
+@media (max-width:560px){.pago-opciones{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -1753,24 +1771,49 @@ function modalAjustes() {
 }
 
 // Lo que ve el cliente en Pagos. G = { datos, facturas, fiscales } (client_pagos o pagosLocal)
+const ICONO_TARJETA = '<svg class="ico-btn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M2.5 10h19M6.5 15h4"/></svg>';
+const ICONO_BANCO = '<svg class="ico-btn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10h18M5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 20h18M12 3l9 5H3l9-5Z"/></svg>';
+// Pagos (cliente): su mensualidad, cuándo toca y cómo pagarla (tarjeta con Stripe o transferencia)
 function vistaPagosCliente(G, P, previa) {
   if (!G) return `<div class="caja-vacia"><p>Esta sección no cargó. Toca “Revisar de nuevo”; si sigue igual, pídenos los datos por WhatsApp.</p><button class="btn" data-accion="actualizar">Revisar de nuevo</button></div>`;
-  const d = G.datos, facs = G.facturas || [];
-  const wa = CONFIG.WHATSAPP ? `https://wa.me/${CONFIG.WHATSAPP}?text=${encodeURIComponent(d ? `Hola, te mando el comprobante de pago de ${P.client.name}.` : `Hola, ¿me pasas los datos para transferir? Soy de ${P.client.name}.`)}` : '';
-  const tarjeta = G.stripe && G.mensualidad;
-  const totalMes = tarjeta ? (G.iva === 'mas_iva' ? Math.round(G.mensualidad * 116) / 100 : Number(G.mensualidad)) : 0;
-  return `<p class="rep-intro">${tarjeta ? 'Paga tu mensualidad con tarjeta o por transferencia,' : 'Aquí tienes los datos para transferir'} y pide la factura de cada pago.</p>
-  ${tarjeta ? `<section class="rep">
-    <div class="rep-cab"><h2>Paga con <span>tarjeta</span></h2></div>
-    <p class="rep-txt">Tu mensualidad: <b>${esc(dinero(totalMes))}</b>${G.iva === 'mas_iva' ? ` (${esc(dinero(G.mensualidad))} + IVA)` : ''}. Se abre el pago seguro de Stripe.</p>
-    <div class="pago-pie"><button class="btn btn-p" data-accion="pagar-mensualidad"${previa ? ' disabled' : ''}>Pagar mensualidad con tarjeta</button><span class="nota">Si tu empresa retiene impuestos, escríbenos antes de pagar.</span></div>
-  </section>` : ''}
+  const d = G.datos, facs = G.facturas || [], pagos = G.pagos || [];
+  const wa = t => CONFIG.WHATSAPP ? `https://wa.me/${CONFIG.WHATSAPP}?text=${encodeURIComponent(t)}` : '';
+  const total = G.mensualidad ? (G.iva === 'mas_iva' ? Math.round(G.mensualidad * 116) / 100 : Number(G.mensualidad)) : 0;
+  const h = aISO(hoy());
+  const prox = (P.cycles || []).filter(c => c.delivery_date >= h).sort((x, y) => x.delivery_date.localeCompare(y.delivery_date))[0];
+  const metodo = G.stripe ? (S.metodoPago || 'tarjeta') : 'transferencia';
+  const op = (id, icono, titulo, txt) => `<button type="button" class="pago-op" role="radio" aria-checked="${metodo === id}" data-accion="pago-metodo" data-id="${id}">${icono}<span><b>${titulo}</b><small>${txt}</small></span></button>`;
+  const waMens = wa(`Hola, quiero pagar mi mensualidad con tarjeta. Soy de ${P.client.name}.`);
+  const panelTarjeta = G.mensualidad
+    ? `<div class="pago-panel"><button class="btn btn-p btn-grande" data-accion="pagar-mensualidad"${previa ? ' disabled' : ''}>${ICONO_TARJETA} Pagar ${esc(dinero(total))} con tarjeta</button>
+        <p class="nota">Se abre el pago seguro de Stripe con tu mensualidad completa, con débito o crédito. Al terminar regresas aquí y se confirma solo. Si tu empresa retiene impuestos, escríbenos antes de pagar.</p></div>`
+    : `<div class="pago-panel"><p class="rep-txt">Tu mensualidad todavía no está registrada para pagar con tarjeta. Escríbenos y la activamos, o paga por transferencia.</p>
+        ${waMens ? `<div class="pago-pie"><a class="btn" href="${esc(waMens)}" target="_blank" rel="noopener noreferrer">Escribir por WhatsApp</a></div>` : ''}</div>`;
+  const waComp = wa(`Hola, te mando el comprobante de pago de ${P.client.name}.`), waDatos = wa(`Hola, ¿me pasas los datos para transferir? Soy de ${P.client.name}.`);
+  const panelTransfer = d
+    ? `<div class="pago-panel">${bloqueDatosPago(d)}
+        <div class="pago-pie">${waComp ? `<a class="btn" href="${esc(waComp)}" target="_blank" rel="noopener noreferrer">Mandar comprobante por WhatsApp</a>` : ''}<span class="nota">Después de pagar, pide tu factura aquí abajo.</span></div></div>`
+    : `<div class="pago-panel"><p class="rep-txt">Pronto verás aquí los datos para transferir. Mientras, pídenoslos por WhatsApp.</p>
+        ${waDatos ? `<div class="pago-pie"><a class="btn" href="${esc(waDatos)}" target="_blank" rel="noopener noreferrer">Pedir datos por WhatsApp</a></div>` : ''}</div>`;
+  return `<p class="rep-intro">Tu mensualidad, cómo pagarla y tus facturas, en un solo lugar.</p>
   <section class="rep">
-    <div class="rep-cab"><h2>Datos para <span>transferir</span></h2></div>
-    ${d ? `${bloqueDatosPago(d)}
-      <div class="pago-pie">${wa ? `<a class="btn" href="${esc(wa)}" target="_blank" rel="noopener noreferrer">Mandar comprobante por WhatsApp</a>` : ''}<span class="nota">Después de pagar, pide tu factura aquí abajo.</span></div>`
-      : `<p class="rep-txt">Pronto verás aquí los datos para transferir. Mientras, pídenoslos por WhatsApp.</p>${wa ? `<div class="pago-pie"><a class="btn" href="${esc(wa)}" target="_blank" rel="noopener noreferrer">Pedir datos por WhatsApp</a></div>` : ''}`}
+    <div class="rep-cab"><h2>Tu <span>mensualidad</span></h2></div>
+    ${G.mensualidad ? `<div class="pago-monto"><b>${esc(dinero(total))}</b><span>${G.iva === 'mas_iva' ? `${esc(dinero(G.mensualidad))} + IVA` : G.iva === 'incluido' ? 'IVA incluido' : 'MXN'}</span></div>` : ''}
+    ${prox ? `<p class="rep-txt pago-prox">Tu próximo pago es el <b>${esc(fLarga(prox.delivery_date))}</b>, el día que recibes tus videos de ${esc(prox.name)}. Tienes 5 días de tolerancia.</p>` : ''}
+    <h3 class="pago-preg">${G.stripe ? '¿Cómo quieres pagar?' : 'Paga por transferencia'}</h3>
+    ${G.stripe ? `<div class="pago-opciones" role="radiogroup" aria-label="Cómo quieres pagar">
+      ${op('tarjeta', ICONO_TARJETA, 'Con tarjeta', 'Débito o crédito, con Stripe. Se confirma al instante.')}
+      ${op('transferencia', ICONO_BANCO, 'Por transferencia', 'A nuestra cuenta; luego nos mandas el comprobante.')}
+    </div>` : ''}
+    ${metodo === 'tarjeta' ? panelTarjeta : panelTransfer}
   </section>
+  ${pagos.length ? `<section class="rep">
+    <div class="rep-cab"><h2>Tus pagos con <span>tarjeta</span></h2></div>
+    <div class="fac-lista">${pagos.map(x => `<div class="fac"><div><div class="fac-tit">${x.tipo === 'anticipo' ? 'Anticipo' : 'Mensualidad'}</div>
+        <div class="fac-meta">${esc(fLarga(aISO(new Date(x.fecha))))}</div></div>
+      <div class="fac-der"><b>${esc(dinero(x.monto))}</b><span class="estado e-emitida">Pagado</span></div></div>`).join('')}</div>
+    <p class="nota" style="margin:.9rem 0 0">Aquí solo aparecen los pagos con tarjeta. De cualquier pago, pide tu factura aquí abajo.</p>
+  </section>` : ''}
   <section class="rep">
     <div class="rep-cab"><h2>Facturas</h2><button class="btn btn-p" data-accion="pedir-factura"${previa ? ' disabled title="En la vista previa no se piden facturas"' : ''}>Pedir factura</button></div>
     ${facs.length ? `<div class="fac-lista">${facs.map(x => {
@@ -1788,11 +1831,15 @@ function vistaPagosCliente(G, P, previa) {
 
 // Vista previa del admin: lo mismo que regresaría client_pagos para ese cliente
 function pagosLocal(idCliente) {
-  const d = S.pagoDatos, facs = S.facturas.filter(f => f.client_id === idCliente);
+  const d = S.pagoDatos, facs = S.facturas.filter(f => f.client_id === idCliente), cl = clientePorId(idCliente);
+  const props = new Set((S.propuestas || []).filter(x => x.client_id === idCliente).map(x => x.id));
   return {
     datos: d ? { banco: d.banco, titular: d.titular, clabe: d.clabe, cuenta: d.cuenta, rfc: d.rfc, concepto: d.concepto, notas: d.notas } : null,
     facturas: facs.map(f => Object.assign({}, f, { factura_url: f.estado === 'emitida' ? f.factura_url : null })),
-    fiscales: facs[0] || null
+    fiscales: facs[0] || null,
+    mensualidad: cl ? cl.mensualidad : null, iva: cl ? cl.iva : null,
+    stripe: !!(S.ajustes && S.ajustes.stripe_activo),
+    pagos: (S.pagosStripe || []).filter(x => x.client_id === idCliente || props.has(x.propuesta_id)).map(x => ({ fecha: x.created_at, tipo: x.tipo, monto: x.monto }))
   };
 }
 
@@ -3338,6 +3385,7 @@ const ACC = {
       if (alta && y && y.client_id) modalYaCliente(y); else aviso('Anticipo marcado como pagado');
     } catch (e) { aviso(humano(e), true); }
   },
+  'pago-metodo'(el, id) { S.metodoPago = id === 'transferencia' ? 'transferencia' : 'tarjeta'; render(); },
   async 'pagar-mensualidad'(el) {
     if (S.vista === 'previa') return aviso('En la vista previa no se paga.');
     el.disabled = true;
