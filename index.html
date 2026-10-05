@@ -506,19 +506,8 @@ main.app{max-width:var(--ancho);margin:0 auto;padding:1.75rem 1.25rem 5rem}
 .tel{position:relative;aspect-ratio:9/16;border-radius:14px;overflow:hidden;background:#111;border:1px solid var(--linea-2)}
 .tel>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .tel canvas{display:block;width:100%;height:100%}
-.tel .sub{position:absolute;left:8%;right:8%;top:62%;margin:0;text-align:center;font-family:var(--fs);font-weight:var(--fw);text-transform:var(--tt,uppercase);font-size:.95rem;line-height:var(--lh,1.2)}
-.tel .sub-resaltada{color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.8)}
-.tel .sub-resaltada span{display:inline-block;animation:resalta 3.15s infinite}
-@keyframes resalta{0%,13%{color:var(--c);transform:scale(1.1)}14%,100%{color:#fff;transform:none}}
-.tel .sub-limpio{font-size:.85rem;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.9)}
-.tel .sub-dinamico{top:54%;height:3em;font-size:1.45rem;color:#fff;text-shadow:0 3px 10px rgba(0,0,0,.85)}
-.tel .sub-dinamico span{position:absolute;left:0;right:0;top:0;opacity:0;animation:golpe 3.2s infinite}
-.tel .sub-dinamico em{font-style:normal;color:var(--c)}
-@keyframes golpe{0%{opacity:0;transform:scale(.55)}3%{opacity:1;transform:scale(1.15)}6%{transform:scale(1)}23%{opacity:1}25%,100%{opacity:0}}
-.tel .sub-mezcla{color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.8)}
-.tel .sub-mezcla em{display:inline-block;color:var(--c);font-size:1.3em;line-height:1;animation:latido 2.4s infinite}
-@keyframes latido{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
-@media (prefers-reduced-motion:reduce){.tel .sub span,.tel .sub em{animation:none!important}.tel .sub-dinamico span{position:static;opacity:1}}
+.est-muestra .tel{max-width:230px;margin:0 auto}
+.perfil-muestra{display:block;width:100%;height:auto;border-radius:10px;border:1px solid var(--linea-2);background:#000}
 .est-progreso{display:flex;gap:.35rem;flex-wrap:wrap;margin:0 0 1rem}
 .est-progreso button{border:1px solid var(--linea-2);background:none;border-radius:999px;padding:.3rem .75rem;font-size:.78rem;font-weight:700;color:var(--crema-3);cursor:pointer}
 .est-progreso button.hecho{color:var(--crema-2);border-color:var(--crema-3)}
@@ -2223,15 +2212,13 @@ const FUENTES = {
 };
 const ESTILO_DEF = { color: '#39FF88', fuente: 'anton', subtitulos: 'resaltada', portada: 'abajo', logo_uso: 'final', logo_url: null, ritmo: 'dinamico', broll: [], musica: 'energia', notas: null, confirmado_at: null, confirmado_por: null };
 const OPCIONES_ESTILO = [
-  ['subtitulos', 'Subtítulos', 'Cómo aparece en pantalla lo que dices.', { resaltada: ['Palabra resaltada', 'La palabra que dices se ilumina en tu color.'], limpio: ['Limpio', 'Letra blanca con sombra, sin adornos.'], dinamico: ['Dinámico', 'De una a tres palabras a la vez, grandes y con golpe.'], mezcla: ['Mezcla de letras', 'La palabra clave en otra letra, para que destaque.'] }],
-  ['portada', 'Portada', 'Cómo se ve cada video en tu perfil.', { abajo: ['Título abajo', 'Título grande sobre un degradado oscuro.'], caja: ['Caja al centro', 'Título en cajas al centro de la imagen.'], franja: ['Franja de color', 'El título en una franja de tu color, de lado a lado.'], marco: ['Marco de color', 'Un marco de tu color y el título al centro.'] }],
-  ['logo_uso', 'Tu logo', 'Dónde aparece tu logo en los videos.', { esquina: ['En la esquina', 'Pequeño, durante todo el video.'], final: ['Solo al final', 'Cierra cada video.'], sin: ['Sin logo', 'Tu marca la dice tu voz.'] }],
-  ['musica', 'Música', 'Lo que suena de fondo en tus videos.', { energia: ['Con energía', 'Empuja el ritmo y ayuda a retener.'], tranquila: ['Tranquila', 'De fondo, sin robar atención.'], sin: ['Sin música', 'Solo tu voz.'] }]
+  ['portada', 'Portada', 'Cómo se ve cada video en tu perfil.', { abajo: ['Título abajo', 'Título grande con una barra de tu color.'], caja: ['Caja al centro', 'Título en cajas, con un ligero giro.'], franja: ['Franja de color', 'El título en una franja doble de tu color.'], marco: ['Marco de color', 'Doble marco de tu color, como tu logo, y el título al centro.'] }],
+  ['logo_uso', 'Tu logo', 'Dónde aparece tu logo en los videos.', { esquina: ['En la esquina', 'Pequeño, durante todo el video.'], final: ['Solo al final', 'Cierra cada video.'], sin: ['Sin logo', 'Tu marca la dice tu voz.'] }]
 ];
-// La palabra clave de "Mezcla de letras" va en una letra que contrasta con la principal
-const acentoDe = k => ['playfair', 'pacifico'].includes(k) ? Object.assign({ italic: false }, FUENTES.anton) : { css: "'Playfair Display', Georgia, serif", peso: 900, italic: true };
+// Cuadros de muestra (de videos reales) y títulos para ver cómo queda el perfil completo
+const MUESTRAS = ['img/muestra-portada.webp', 'img/muestra-portada-2.webp', 'img/muestra-portada-3.webp'];
+const TITULOS_MUESTRA = ['Esto es lo que *nadie te dice*', '3 errores que *te cuestan clientes*', '¿Vale la pena *invertir en esto?*', 'Así se hace *en tu negocio*', 'Lo que *más me preguntan*', 'Antes vs *después*'];
 const COLORES = ['#39FF88', '#FF5A36', '#FFD23F', '#2F80FF', '#A855F7', '#FF4D9D', '#FFFFFF'];
-const MUESTRA_PORTADA = 'img/muestra-portada.webp';
 const estiloFila = id => (S.estilos || []).find(e => e.client_id === id) || null;
 const conDefecto = e => Object.assign({}, ESTILO_DEF, e || {});
 const nombreOpcion = (campo, val) => { const o = OPCIONES_ESTILO.find(x => x[0] === campo); return o && o[3][val] ? o[3][val][0] : val; };
@@ -2267,6 +2254,10 @@ async function dibujarPortada(cv, { fuente: src, titulo, estilo, logo }) {
   ctx.fillStyle = '#0b0b0c'; ctx.fillRect(0, 0, W, H);
   const sw = src && (src.videoWidth || src.naturalWidth), sh = src && (src.videoHeight || src.naturalHeight);
   if (sw && sh) { const k = Math.max(W / sw, H / sh); ctx.drawImage(src, (W - sw * k) / 2, (H - sh * k) / 2, sw * k, sh * k); }
+  // Viñeta suave: centra la mirada y le da cuerpo a cualquier cuadro
+  const vi = ctx.createRadialGradient(W / 2, H / 2, H * 0.22, W / 2, H / 2, H * 0.78);
+  vi.addColorStop(0, 'rgba(0,0,0,0)'); vi.addColorStop(1, 'rgba(0,0,0,.5)');
+  ctx.fillStyle = vi; ctx.fillRect(0, 0, W, H);
   const tokens = partesTitulo(titulo).map(x => f.mayus ? { w: x.w.toUpperCase(), r: x.r } : x), color = estilo.color || ESTILO_DEF.color;
   const fuente = tam => { ctx.font = `${f.peso} ${Math.round(tam * f.escala)}px ${f.css}`; };   // las letras anchas van más chicas
   // Alto real de la letra (con acentos y colitas) para que ningún renglón se encime
@@ -2274,35 +2265,43 @@ async function dibujarPortada(cv, { fuente: src, titulo, estilo, logo }) {
   const renglon = (l, x, y) => l.forEach((tk, j) => { const t = tk.w + (j < l.length - 1 ? ' ' : ''); ctx.fillStyle = tk.r ? color : '#fff'; ctx.fillText(t, x, y); x += ctx.measureText(t).width; });
   ctx.textBaseline = 'alphabetic';
   if (estilo.portada === 'caja') {
+    // Cajas con sombra y un ligero giro
     const tramos = tokens.reduce((t, tk) => { const u = t[t.length - 1]; if (u && u[0].r === tk.r) u.push(tk); else t.push([tk]); return t; }, []);
-    const acomodar = () => tramos.flatMap(t => partirLineas(ctx, t, 860));
+    const acomodar = () => tramos.flatMap(t => partirLineas(ctx, t, 840));
     let tam = 106; fuente(tam); let ls = acomodar();
     while (ls.length > 5 && tam > 60) { tam -= 6; fuente(tam); ls = acomodar(); }
     const { asc, desc } = medida(), pad = Math.round((asc + desc) * 0.2), gap = 18, caja = asc + desc + pad * 2;
-    let y = H / 2 - (ls.length * caja + (ls.length - 1) * gap) / 2;
-    ctx.textAlign = 'center';
+    let y = -(ls.length * caja + (ls.length - 1) * gap) / 2;
+    ctx.save(); ctx.translate(W / 2, H / 2); ctx.rotate(-0.03); ctx.textAlign = 'center';
     ls.forEach(l => {
       const txt = l.map(x => x.w).join(' '), w = ctx.measureText(txt).width, res = l.some(x => x.r);
-      ctx.fillStyle = res ? color : '#fff'; ctx.fillRect(W / 2 - w / 2 - 30, y, w + 60, caja);
-      ctx.fillStyle = res ? tintaSobre(color) : '#000'; ctx.fillText(txt, W / 2, y + pad + asc);
+      ctx.fillStyle = 'rgba(0,0,0,.4)'; ctx.fillRect(-w / 2 - 30 + 12, y + 12, w + 60, caja);
+      ctx.fillStyle = res ? color : '#fff'; ctx.fillRect(-w / 2 - 30, y, w + 60, caja);
+      ctx.fillStyle = res ? tintaSobre(color) : '#000'; ctx.fillText(txt, 0, y + pad + asc);
       y += caja + gap;
     });
+    ctx.restore();
   } else if (estilo.portada === 'franja') {
+    // Franja doble e inclinada, con sombra
     let tam = 124; fuente(tam); let ls = partirLineas(ctx, tokens, 860);
     while (ls.length > 4 && tam > 64) { tam -= 6; fuente(tam); ls = partirLineas(ctx, tokens, 860); }
-    const { asc, desc } = medida(), linea = (asc + desc) * 1.08, banda = ls.length * linea + 100, cy = PORTADA.abajo - 170 - banda / 2;
+    const { asc, desc } = medida(), linea = (asc + desc) * 1.08, banda = ls.length * linea + 100, cy = PORTADA.abajo - 190 - banda / 2;
     ctx.save(); ctx.translate(W / 2, cy); ctx.rotate(-0.045);
-    ctx.fillStyle = 'rgba(0,0,0,.35)'; ctx.fillRect(-W / 2 - 80, -banda / 2 + 14, W + 160, banda);
-    ctx.fillStyle = color; ctx.fillRect(-W / 2 - 80, -banda / 2, W + 160, banda);
+    ctx.fillStyle = 'rgba(0,0,0,.4)'; ctx.fillRect(-W / 2 - 80, -banda / 2 + 16, W + 160, banda);
+    ctx.fillStyle = color; ctx.fillRect(-W / 2 - 80, -banda / 2 - 34, W + 160, 14);
+    ctx.fillRect(-W / 2 - 80, -banda / 2, W + 160, banda);
     ctx.fillStyle = tintaSobre(color); ctx.textAlign = 'center';
     ls.forEach((l, i) => ctx.fillText(l.map(x => x.w).join(' '), 0, -banda / 2 + 50 + i * linea + (linea - asc - desc) / 2 + asc));
     ctx.restore();
   } else if (estilo.portada === 'marco') {
-    ctx.fillStyle = 'rgba(0,0,0,.34)'; ctx.fillRect(0, 0, W, H);
-    const mx = 58, top = PORTADA.arriba + 34, alto = PORTADA.abajo - PORTADA.arriba - 68;
-    ctx.lineWidth = 30; ctx.strokeStyle = color; ctx.strokeRect(mx, top, W - mx * 2, alto);
-    let tam = 118; fuente(tam); let ls = partirLineas(ctx, tokens, 800);
-    while (ls.length > 5 && tam > 64) { tam -= 6; fuente(tam); ls = partirLineas(ctx, tokens, 800); }
+    // Doble marco de color, como el recuadro del logo, y el título al centro
+    ctx.fillStyle = 'rgba(0,0,0,.3)'; ctx.fillRect(0, 0, W, H);
+    const top = PORTADA.arriba + 34, alto = PORTADA.abajo - PORTADA.arriba - 68;
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 8; ctx.strokeRect(42, top - 16, W - 84, alto + 32);
+    ctx.lineWidth = 24; ctx.strokeRect(74, top + 16, W - 148, alto - 32);
+    let tam = 118; fuente(tam); let ls = partirLineas(ctx, tokens, 780);
+    while (ls.length > 5 && tam > 64) { tam -= 6; fuente(tam); ls = partirLineas(ctx, tokens, 780); }
     const { asc, desc } = medida(), linea = (asc + desc) * 1.06;
     let y = top + alto / 2 - (ls.length * linea) / 2 + asc;
     ctx.textAlign = 'left'; ctx.shadowColor = 'rgba(0,0,0,.6)'; ctx.shadowBlur = 26;
@@ -2310,14 +2309,18 @@ async function dibujarPortada(cv, { fuente: src, titulo, estilo, logo }) {
     ctx.shadowBlur = 0; ctx.shadowColor = 'transparent';
     ctx.fillStyle = color; ctx.fillRect(W / 2 - 70, y - linea + desc + 46, 140, 12);
   } else {
+    // Título abajo con una barra de color encima
     const g = ctx.createLinearGradient(0, H * 0.4, 0, H * 0.82);
-    g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,.86)');
+    g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,.88)');
     ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
     let tam = 134; fuente(tam); let ls = partirLineas(ctx, tokens, 920);
     while (ls.length > 4 && tam > 80) { tam -= 8; fuente(tam); ls = partirLineas(ctx, tokens, 920); }
     const { asc, desc } = medida(), linea = (asc + desc) * 1.06, base = PORTADA.abajo - 80 - desc;
-    ctx.textAlign = 'left';
+    const arribaTxt = base - (ls.length - 1) * linea - asc;
+    ctx.fillStyle = color; ctx.fillRect(80, arribaTxt - 58, 130, 16);
+    ctx.textAlign = 'left'; ctx.shadowColor = 'rgba(0,0,0,.45)'; ctx.shadowBlur = 18;
     ls.forEach((l, i) => renglon(l, 80, base - (ls.length - 1 - i) * linea));
+    ctx.shadowBlur = 0; ctx.shadowColor = 'transparent';
   }
   if (logo && estilo.logo_uso !== 'sin' && logo.naturalWidth) {
     const k = Math.min(300 / logo.naturalWidth, 120 / logo.naturalHeight);
@@ -2326,41 +2329,35 @@ async function dibujarPortada(cv, { fuente: src, titulo, estilo, logo }) {
 }
 
 // La muestra del estilo: un cuadro de video con sus subtítulos y su portada
-function muestraVideo(e) {
-  const f = FUENTES[e.fuente] || FUENTES.anton, a = acentoDe(e.fuente);
-  let sub;
-  if (e.subtitulos === 'dinamico') {
-    const golpes = [['Esto'], ['es', 'lo', 'que'], ['nadie'], ['te', 'dice']];
-    sub = `<p class="sub sub-dinamico">${golpes.map((g, i) => `<span style="animation-delay:${i * 0.8}s">${g.map(w => w === 'nadie' ? `<em>${w}</em>` : w).join(' ')}</span>`).join('')}</p>`;
-  } else if (e.subtitulos === 'mezcla') {
-    sub = `<p class="sub sub-mezcla">Esto es lo que <em style="font-family:${esc(a.css)};font-weight:${a.peso};font-style:${a.italic ? 'italic' : 'normal'};text-transform:${a.italic ? 'none' : 'uppercase'}">nadie</em> te dice</p>`;
-  } else if (e.subtitulos === 'limpio') {
-    sub = '<p class="sub sub-limpio">Esto es lo que nadie te dice</p>';
-  } else {
-    sub = `<p class="sub sub-resaltada">${['Esto', 'es', 'lo', 'que', 'nadie', 'te', 'dice'].map((w, i) => `<span style="animation-delay:${(i * 0.45).toFixed(2)}s">${w}</span>`).join(' ')}</p>`;
-  }
-  const logo = e.logo_uso === 'esquina' ? (urlSegura(e.logo_url) ? `<img class="tel-logo" src="${esc(e.logo_url)}" alt="">` : '<span class="tel-logo tel-logo-txt">TU LOGO</span>') : '';
-  return `<div class="tel" style="--c:${esc(e.color)};--fs:${esc(f.css)};--fw:${f.peso};--tt:${f.mayus ? 'uppercase' : 'none'};--lh:${(f.alto * 1.15).toFixed(2)}"><img src="${MUESTRA_PORTADA}" alt="">${logo}${sub}${e.logo_uso === 'final' ? '<span class="tel-nota">Tu logo cierra cada video</span>' : ''}</div>`;
-}
 let turnoMuestra = 0;
 async function pintarMuestras() {
-  if (!document.querySelector('canvas[data-portada-muestra]') || !S.estiloMuestra) return;
-  const mio = ++turnoMuestra, e = S.estiloMuestra, tmp = document.createElement('canvas');
-  const [fondo, logo] = await Promise.all([imagen(MUESTRA_PORTADA), imagen(urlSegura(e.logo_url))]);
-  await dibujarPortada(tmp, { fuente: fondo, titulo: 'Esto es lo que *nadie te dice*', estilo: e, logo });
+  if (!document.querySelector('canvas[data-portada-muestra], canvas[data-perfil-muestra]') || !S.estiloMuestra) return;
+  const mio = ++turnoMuestra, e = S.estiloMuestra;
+  const [fondos, logo] = await Promise.all([Promise.all(MUESTRAS.map(imagen)), imagen(urlSegura(e.logo_url))]);
+  const tmp = document.createElement('canvas');
+  await dibujarPortada(tmp, { fuente: fondos[0], titulo: TITULOS_MUESTRA[0], estilo: e, logo });
   if (mio !== turnoMuestra) return;
   document.querySelectorAll('canvas[data-portada-muestra]').forEach(cv => { cv.width = tmp.width; cv.height = tmp.height; cv.getContext('2d').drawImage(tmp, 0, 0); });
+  // El perfil: seis portadas recortadas como las enseña Instagram (3:4)
+  if (!document.querySelector('canvas[data-perfil-muestra]')) return;
+  const grid = document.createElement('canvas'); grid.width = 720; grid.height = 640;
+  const gx = grid.getContext('2d'); gx.fillStyle = '#000'; gx.fillRect(0, 0, 720, 640);
+  for (let i = 0; i < 6; i++) {
+    const t = i ? document.createElement('canvas') : tmp;
+    if (i) await dibujarPortada(t, { fuente: fondos[i % MUESTRAS.length], titulo: TITULOS_MUESTRA[i], estilo: e, logo });
+    if (mio !== turnoMuestra) return;
+    gx.drawImage(t, 0, PORTADA.arriba, PORTADA.w, PORTADA.abajo - PORTADA.arriba, (i % 3) * 240 + 1, Math.floor(i / 3) * 320 + 1, 238, 318);
+  }
+  document.querySelectorAll('canvas[data-perfil-muestra]').forEach(cv => { cv.width = 720; cv.height = 640; cv.getContext('2d').drawImage(grid, 0, 0); });
 }
 
 // Pestaña "Mi estilo": el cliente va paso por paso (una decisión por pantalla) y al final
 // revisa su resumen y lo confirma. En la ventana del admin se ve todo junto para ajustarlo rápido.
 const PASOS_ESTILO = [
   ['color', 'El color de tu marca', 'Va en tus portadas y en lo que resalta en pantalla.', 'Color'],
-  ['fuente', 'La letra de tus títulos', 'En tus portadas, subtítulos y textos en pantalla.', 'Letra'],
-  ['subtitulos', 'Tus subtítulos', 'Cómo aparece en pantalla lo que dices. Mira la muestra: así se mueven.', 'Subtítulos'],
-  ['portada', 'Tu portada', 'Cómo se ve cada video en tu perfil.', 'Portada'],
-  ['logo_uso', 'Tu logo', 'Súbelo y elige dónde aparece.', 'Logo'],
-  ['musica', 'Tu música', 'Lo que suena de fondo en tus videos.', 'Música']
+  ['fuente', 'La letra de tu marca', 'Se usa en tus portadas, títulos y subtítulos.', 'Letra'],
+  ['portada', 'Tu portada', 'Cómo se ve cada video en tu perfil. A la derecha ves tu perfil completo.', 'Portada'],
+  ['logo_uso', 'Tu logo', 'Súbelo y elige dónde aparece.', 'Logo']
 ];
 function vistaEstilo(fila, modo, idCliente) {
   const e = conDefecto(fila), bloq = !!e.confirmado_at;
@@ -2373,18 +2370,18 @@ function vistaEstilo(fila, modo, idCliente) {
     color: `<div class="swatches">${COLORES.map(c => op('color', c, `<span style="background:${c}"></span>`, ' sw')).join('')}
       <label class="sw-libre${COLORES.includes(color) ? '' : ' activo'}"><input type="color" value="${esc(e.color)}" data-cambio="estilo-color"${edita ? '' : ' disabled'} aria-label="Otro color"><span>${COLORES.includes(color) ? 'Otro' : esc(color)}</span></label></div>`,
     fuente: `<div class="op-grid" style="--n:4">${Object.entries(FUENTES).map(([k, x]) => op('fuente', k, `<b class="op-letra" style="font-family:${esc(x.css)};font-weight:${x.peso};text-transform:${x.mayus ? 'uppercase' : 'none'}">Título</b><span>${esc(x.tipo)} · ${esc(x.nombre)}</span>`)).join('')}</div>`,
-    subtitulos: opciones('subtitulos'),
     portada: opciones('portada'),
     logo_uso: `<div class="logo-subir">${urlSegura(e.logo_url) ? `<img src="${esc(e.logo_url)}" alt="Tu logo">` : '<span class="logo-vacio">Todavía sin logo</span>'}
-      ${edita ? `<label class="btn btn-s">${e.logo_url ? 'Cambiar logo' : 'Subir logo'}<input type="file" accept="image/png,image/jpeg" data-cambio="estilo-logo" hidden></label><span class="nota">PNG con fondo transparente, de preferencia.</span>` : ''}</div>${opciones('logo_uso')}`,
-    musica: opciones('musica')
+      ${edita ? `<label class="btn btn-s">${e.logo_url ? 'Cambiar logo' : 'Subir logo'}<input type="file" accept="image/png,image/jpeg" data-cambio="estilo-logo" hidden></label><span class="nota">PNG con fondo transparente, de preferencia.</span>` : ''}</div>${opciones('logo_uso')}`
   };
   const notas = `<div class="campo" style="margin:0"><label for="est-notas">¿Algo más? <span class="opc">(opcional)</span></label>
     <textarea id="est-notas" data-cambio="estilo-notas" maxlength="1000" placeholder="Ej. Nada de rosa; me gusta cómo edita @cuenta"${edita ? '' : ' disabled'}>${esc(e.notas || '')}</textarea></div>`;
   const cab = (i, t, sub, clase = '') => `<div class="est-cab"><span class="est-n">${String(i + 1).padStart(2, '0')}</span><div><h3>${t}</h3>${sub ? `<p>${sub}</p>` : ''}</div></div>`;
-  const muestra = acciones => `<aside class="est-muestra"><p class="rep-et">Así se ve</p>
-      <div class="muestras">${muestraVideo(e)}<div class="tel"><canvas data-portada-muestra aria-label="Muestra de tu portada"></canvas></div></div>
-      <div class="muestras-et"><span>Tu video</span><span>Tu portada</span></div>${acciones ? `<div class="est-acciones">${acciones}</div>` : ''}</aside>`;
+  const muestra = acciones => `<aside class="est-muestra"><p class="rep-et">Tu portada</p>
+      <div class="tel"><canvas data-portada-muestra aria-label="Muestra de tu portada"></canvas></div>
+      <p class="rep-et" style="margin-top:1.1rem">Así se ve tu perfil</p>
+      <canvas class="perfil-muestra" data-perfil-muestra width="720" height="640" aria-label="Muestra de tu perfil con seis portadas"></canvas>
+      ${acciones ? `<div class="est-acciones" style="margin-top:1rem">${acciones}</div>` : ''}</aside>`;
 
   if (modo === 'admin') {
     const acciones = bloq ? `<button class="btn" data-accion="estilo-desbloquear" data-id="${esc(idCliente)}">Desbloquear para que lo cambie</button><p class="nota">Tú lo puedes ajustar aunque esté confirmado.</p>`
@@ -2402,7 +2399,7 @@ function vistaEstilo(fila, modo, idCliente) {
   const wa = CONFIG.WHATSAPP ? `https://wa.me/${encodeURIComponent(CONFIG.WHATSAPP)}?text=${encodeURIComponent('Hola, quiero cambiar algo de mi estilo visual.')}` : '';
   const intro = bloq ? `<div class="est-intro"><h2>Tu estilo visual</h2><p>Así se editan todos tus videos. Si quieres cambiar algo, escríbenos y lo vemos juntos.</p></div>
       <div class="est-ok">✓ Confirmado el ${esc(fCorta(e.confirmado_at))}${e.confirmado_por ? ` por ${esc(e.confirmado_por)}` : ''}.${modo === 'cliente' && wa ? ` <a class="btn btn-s" href="${esc(wa)}" target="_blank" rel="noopener noreferrer">Quiero cambiar algo</a>` : ''}</div>`
-    : `<div class="est-intro"><h2>Tu estilo visual</h2><p>Seis decisiones rápidas y listo. Tu editor lo sigue en cada video, así no hay sorpresas.</p></div>`;
+    : `<div class="est-intro"><h2>Tu estilo visual</h2><p>Cuatro decisiones rápidas y listo. Con esto armamos tus portadas y tus textos en pantalla; tu editor lo sigue en cada video.</p></div>`;
   let contenido;
   if (paso < total) {
     const [k, t, sub] = PASOS_ESTILO[paso];
@@ -2413,10 +2410,8 @@ function vistaEstilo(fila, modo, idCliente) {
     const filas = [
       ['Color', `<span class="chip"><i style="background:${esc(color)}"></i>${esc(color)}</span>`],
       ['Letra', `<span style="font-family:${esc(f.css)};font-weight:${f.peso}">${esc(f.nombre)}</span> · ${esc(f.tipo)}`],
-      ['Subtítulos', esc(nombreOpcion('subtitulos', e.subtitulos))],
       ['Portada', esc(nombreOpcion('portada', e.portada))],
-      ['Logo', `${esc(nombreOpcion('logo_uso', e.logo_uso))}${urlSegura(e.logo_url) ? `<img src="${esc(e.logo_url)}" alt="">` : e.logo_uso !== 'sin' ? ' · <span class="error-linea">falta subirlo</span>' : ''}`],
-      ['Música', esc(nombreOpcion('musica', e.musica))]
+      ['Logo', `${esc(nombreOpcion('logo_uso', e.logo_uso))}${urlSegura(e.logo_url) ? `<img src="${esc(e.logo_url)}" alt="">` : e.logo_uso !== 'sin' ? ' · <span class="error-linea">falta subirlo</span>' : ''}`]
     ];
     contenido = `<section class="est-bloque est-paso"><div class="est-cab"><div><h3>${bloq ? 'Tu estilo' : 'Tu resumen'}</h3>${bloq ? '' : '<p>Revisa que todo esté como lo quieres. Puedes cambiar cualquier cosa antes de confirmar.</p>'}</div></div>
       <div class="est-resumen">${filas.map(([nom, val], i) => `<div class="est-fila"><span>${nom}</span><div>${val}</div>${edita ? `<button class="f-ver" data-accion="estilo-paso" data-id="${i}">Cambiar</button>` : '<span></span>'}</div>`).join('')}</div>
@@ -2479,7 +2474,7 @@ function resumenEstilo(fila) {
   return `<div class="est-chips">
     <span class="chip"><i style="background:${esc(e.color)}"></i>${esc(String(e.color).toUpperCase())}</span>
     <span class="chip" style="font-family:${esc(f.css)};font-weight:${f.peso}">${esc(f.nombre)}</span>
-    ${['subtitulos', 'portada', 'logo_uso', 'musica'].map(k => `<span class="chip">${esc(OPCIONES_ESTILO.find(o => o[0] === k)[1])}: ${esc(nombreOpcion(k, e[k]))}</span>`).join('')}
+    ${['portada', 'logo_uso'].map(k => `<span class="chip">${esc(OPCIONES_ESTILO.find(o => o[0] === k)[1])}: ${esc(nombreOpcion(k, e[k]))}</span>`).join('')}
   </div>${e.notas ? `<p class="ayuda" style="margin:.4rem 0 0">Notas del cliente: ${esc(e.notas)}</p>` : ''}${e.confirmado_at ? '' : '<p class="ayuda" style="margin:.4rem 0 0">Todavía no lo confirma: puede cambiar.</p>'}`;
 }
 function bloquePortadaVideo(v, c) {
