@@ -755,15 +755,13 @@ function rango(a, b) {
   if (x.getMonth() === y.getMonth() && x.getFullYear() === y.getFullYear()) return `${x.getDate()}–${y.getDate()} ${MESES_C[y.getMonth()]}`;
   return `${fCorta(a)} – ${fCorta(b)}`;
 }
-function rangoLargo(a, b) {
-  if (a === b) return `el ${fLarga(a)}`;
-  const x = aFecha(a), y = aFecha(b);
-  if (x.getMonth() === y.getMonth()) {
-    return diasEntre(x, y) === 1
-      ? `el ${x.getDate()} y ${y.getDate()} de ${MESES[y.getMonth()]}`
-      : `del ${x.getDate()} al ${y.getDate()} de ${MESES[y.getMonth()]}`;
-  }
-  return `del ${fLarga(a)} al ${fLarga(b)}`;
+// Días de grabación: el primero y el último del ciclo. Son días sueltos, no un rango
+// (pueden no ser seguidos): "el 18 y el 20 de octubre", nunca "del 18 al 20".
+function diasGrab(a, b, largo) {
+  if (!b || a === b) return largo ? `el ${fLarga(a)}` : fCorta(a);
+  const x = aFecha(a), y = aFecha(b), mismoMes = x.getMonth() === y.getMonth();
+  if (largo) return mismoMes ? `el ${x.getDate()} y el ${y.getDate()} de ${MESES[y.getMonth()]}` : `el ${fLarga(a)} y el ${fLarga(b)}`;
+  return mismoMes ? `${x.getDate()} y ${y.getDate()} ${MESES_C[y.getMonth()]}` : `${fCorta(a)} y ${fCorta(b)}`;
 }
 // Tu regla: si grabas del 1 al 15, entregas el 1 del mes siguiente; si grabas del 16 en adelante, el 15.
 function sugerirEntrega(inicioISO) {
@@ -1063,7 +1061,7 @@ function cabGrupo(g, abierto) {
       <h3 class="g-cliente"><button class="g-plegar" data-accion="plegar" data-id="${c.id}" aria-expanded="${abierto}" aria-label="${esc((cli ? cli.name + ', ' : '') + c.name)}"><span class="g-flecha" aria-hidden="true"></span>${esc(c.name)}</button></h3>
       ${abierto ? '' : `<p class="g-mes"><span class="g-resumen">${esc(resumenEstados(todos))}</span></p>`}
       <div class="g-datos">
-        <span>Grabación <b>${rango(c.record_start, c.record_end)}</b></span>
+        <span>Grabación <b>${diasGrab(c.record_start, c.record_end)}</b></span>
         <span class="limite${nivel !== 'hecho' ? ' plazo-' + p.nivel : ''}">Límite de edición <b>${fDia(c.editor_due)}</b>${nivel !== 'hecho' ? ` <em class="faltan">${p.txt}</em>` : ''}</span>
         ${esAdmin ? `<span>Entrega al cliente <b>${fDia(c.delivery_date)}</b></span>` : ''}
         ${c.revision_estado ? `<span>Cliente: <b>${c.revision_estado === 'ajustes' ? 'pidió ajustes' : c.revision_estado === 'revision' && c.revision_hasta >= hoyISO() ? 'revisando' : 'aprobado'}</b></span>` : ''}
@@ -1256,7 +1254,7 @@ function vistaCalendario() {
 
   const carga = new Array(DIAS).fill(0);
   enRango.forEach(c => {
-    for (let i = Math.max(0, idx(c.record_start)); i <= Math.min(DIAS - 1, idx(c.record_end)); i++) carga[i]++;
+    [...new Set([c.record_start, c.record_end])].forEach(d => { const i = idx(d); if (i >= 0 && i < DIAS) carga[i]++; });
   });
   const celdasCarga = carga.map((n, i) => n ? `<span class="carga ${n > 1 ? 'c2' : 'c1'}" style="left:${i * DW}px" title="${n} ${n > 1 ? 'grabaciones' : 'grabación'} el ${fLarga(aISO(sumarDias(inicio, i)))}">${n}</span>` : '').join('');
 
@@ -1274,7 +1272,12 @@ function vistaCalendario() {
   const filas = filasCli.map(cl => {
     const clips = enRango.filter(c => c.client_id === cl.id).map(c => {
       const e = idx(c.delivery_date);
-      return tramo(c.record_start, c.record_end, 'clip-grab', 'Grabación', c, `${c.name}: grabación ${rango(c.record_start, c.record_end)}`)
+      const tGrab = `${c.name}: grabación ${diasGrab(c.record_start, c.record_end)}`;
+      // Si los dos días no van seguidos, cada uno es su propio tramo
+      const grab = diasEntre(aFecha(c.record_start), aFecha(c.record_end)) > 1
+        ? tramo(c.record_start, c.record_start, 'clip-grab', 'Grabación', c, tGrab) + tramo(c.record_end, c.record_end, 'clip-grab', 'Grabación', c, tGrab)
+        : tramo(c.record_start, c.record_end, 'clip-grab', 'Grabación', c, tGrab);
+      return grab
         + tramo(aISO(sumarDias(aFecha(c.record_end), 1)), c.editor_due, 'clip-edit', `${esAdmin ? 'Edición' : 'Tu edición'} ${c.name}`, c, `${c.name}: edición hasta ${fDia(c.editor_due)}`)
         + tramo(aISO(sumarDias(aFecha(c.editor_due), 1)), aISO(sumarDias(aFecha(c.delivery_date), -1)), 'clip-rev', 'Revisión', c, `${c.name}: ${esAdmin ? 'tu revisión' : 'revisión de Connect Studios'} antes de entregar`)
         + ((e >= 0 && e < DIAS) ? `<span class="hito" style="left:${e * DW + DW / 2 - 1}px" title="${esc(c.name)}: entrega ${fDia(c.delivery_date)}"></span>` : '');
@@ -1373,7 +1376,7 @@ function filaCiclo(c) {
   const r = S.reportes.find(x => x.cycle_id === c.id);
   return `<div class="ciclo">
     <b>${esc(c.name)}</b>
-    <span class="nota">${c.script_due ? `Guiones hasta ${fCorta(c.script_due)}. ` : ''}Graba ${rango(c.record_start, c.record_end)}. Edición hasta ${fCorta(c.editor_due)}. Entrega ${fCorta(c.delivery_date)}.</span>
+    <span class="nota">${c.script_due ? `Guiones hasta ${fCorta(c.script_due)}. ` : ''}Graba ${diasGrab(c.record_start, c.record_end)}. Edición hasta ${fCorta(c.editor_due)}. Entrega ${fCorta(c.delivery_date)}.</span>
     ${vs.length ? `<div class="ciclo-av">${tira(vs)}<span class="nota">${ent} de ${vs.length} entregados</span></div>` : `<button class="btn btn-s btn-t" data-accion="historial" data-id="${c.id}">Ver videos</button>`}
     <span class="controles">
       ${ent || (r && r.publicado) ? `<button class="btn btn-s btn-t" data-accion="wa-aviso" data-id="${c.id}" title="Avisar al cliente por WhatsApp">WhatsApp</button>` : ''}
@@ -2547,7 +2550,7 @@ function vistaCliente(P, previa) {
       <h1 class="mes-grande">${esc(c.name)}</h1>
       <div class="mes-info">
         ${c.script_due && aISO(hoy()) <= c.record_start && conGuion < vs.length ? `<div class="clave">Tus guiones, a más tardar<b>el ${esc(fLarga(c.script_due))}</b></div>` : ''}
-        <div>Grabamos<b>${esc(rangoLargo(c.record_start, c.record_end))}</b></div>
+        <div>Grabamos<b>${esc(diasGrab(c.record_start, c.record_end, true))}</b></div>
         <div class="clave">Recibes tus videos<b>el ${esc(fLarga(c.delivery_date))}</b></div>
         ${urlSegura(P.client.shared_url) ? `<div>Carpeta compartida<b>${enlace(P.client.shared_url, 'Abrir en Drive')}</b></div>` : ''}
       </div>
@@ -3259,8 +3262,8 @@ function modalCiclo(idCiclo, idCliente) {
     <div class="campo"><label for="c-gui">Límite para subir guiones</label><input id="c-gui" name="script_due" type="date" required value="${d.script_due || ''}" style="max-width:12rem">
       <p class="ayuda">Se calcula solo: ${CONFIG.DIAS_GUIONES} días antes de la grabación. Cámbialo si hace falta; el cliente lo ve y MailerLite le recuerda apartar su día una semana antes.</p></div>
     <div class="fila-campos">
-      <div class="campo"><label for="c-ini">Grabación: primer día</label><input id="c-ini" name="record_start" type="date" required value="${d.record_start}"></div>
-      <div class="campo"><label for="c-fin">Grabación: último día</label><input id="c-fin" name="record_end" type="date" required value="${d.record_end}"></div>
+      <div class="campo"><label for="c-ini">Primer día de grabación</label><input id="c-ini" name="record_start" type="date" required value="${d.record_start}"></div>
+      <div class="campo"><label for="c-fin">Segundo día de grabación</label><input id="c-fin" name="record_end" type="date" required value="${d.record_end}"></div>
       <div class="campo"><label for="c-ed">Límite del editor</label><input id="c-ed" name="editor_due" type="date" required value="${d.editor_due}"></div>
       <div class="campo"><label for="c-ent">Entrega al cliente</label><input id="c-ent" name="delivery_date" type="date" required value="${d.delivery_date}"></div>
     </div>
