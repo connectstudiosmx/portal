@@ -1545,6 +1545,27 @@ const PROP_DEF = {
   }
 };
 
+// Proyectos por servicio: condiciones propias encima de las generales. Los pasos de
+// "Cómo trabajamos" y el video de ejemplo los elige la página de la propuesta.
+const COND_SERV = {
+  institucional: ['Tú confirmas a las personas que salen a cuadro y que están de acuerdo en aparecer',
+    'Las locaciones tienen que estar listas el día de grabación: limpias, cuidadas y con los permisos que hagan falta'],
+  capsula: ['El mensaje y quién lo comunica se confirman antes de grabar'],
+  capacitacion: ['Necesito la información de los procesos y a alguien de tu equipo que los conozca el día de grabación'],
+  induccion: ['Necesito la filosofía, los procesos y el flujo de información de tu empresa, y a alguien de tu equipo que los conozca el día de grabación'],
+  evento: ['La cobertura es por la jornada acordada; si el evento se alarga, el tiempo extra se cotiza aparte',
+    'Necesito el programa del evento y acceso a las salas con anticipación'],
+  podcast: ['Los temas y los invitados de cada episodio se confirman antes de grabar',
+    'Los episodios se graban en una sola sesión; si se dividen en más días, cada día extra se cotiza aparte'],
+  comercial: ['Actores, locutor o locaciones rentadas que no estén en esta propuesta se cotizan aparte'],
+  testimonial: ['Tú confirmas a las personas que dan su testimonio y que están de acuerdo en aparecer']
+};
+const condDe = s => s === 'direccion' ? 'Incluye las horas de trabajo acordadas en esta propuesta'
+  : PROP_DEF.proyecto.condiciones + (COND_SERV[s] ? '\n' + COND_SERV[s].join('\n') : '');
+const incluyeDe = s => { const p = COT_PLANT.find(x => x.id === s);
+  return p && p.incluye ? p.incluye({ grab: p.grab || 1, dron: !!(p.equipo && p.equipo.dron) }).join('\n') : PROP_DEF.proyecto.incluye; };
+const SERVICIOS_PROP = () => COT_PLANT.filter(p => p.tipo === 'proyecto' && p.id !== 'blanco');
+
 function vistaPropuestas() {
   const todas = S.propuestas, f = S.propFiltro;
   const lista = todas.filter(x => { const e = estadoPropuesta(x).clave; return f === 'activas' ? ['sin_enviar', 'enviada', 'vista'].includes(e) : !f || e === f; });
@@ -3366,6 +3387,9 @@ function modalPropuesta(id, desde) {
       <div class="campo"><label for="pr-tipo">Tipo</label><select id="pr-tipo" name="tipo"><option value="mensual"${tipo === 'mensual' ? ' selected' : ''}>Contenido mensual</option><option value="proyecto"${tipo === 'proyecto' ? ' selected' : ''}>Proyecto (corporativo, evento)</option></select></div>
       <div class="campo"><label for="pr-titulo">Título</label><input id="pr-titulo" name="titulo" maxlength="140" required value="${v('titulo')}"></div>
     </div>
+    <div class="campo" data-solo-proyecto${tipo === 'proyecto' ? '' : ' hidden'}><label for="pr-serv">Servicio</label>
+      <select id="pr-serv" name="servicio" style="max-width:22rem"><option value="">Otro (pasos generales)</option>${SERVICIOS_PROP().map(p => `<option value="${p.id}"${(base && base.servicio) === p.id ? ' selected' : ''}>${esc(p.nombre)}</option>`).join('')}</select>
+      <p class="ayuda">Elige los pasos de “Cómo trabajamos”. “Así se ve” solo sale en el institucional (con el video de CABB) o si pegas un video de ejemplo.</p></div>
     <div class="campo"><label for="pr-diag">Lo que entendí en la llamada</label><textarea id="pr-diag" name="diagnostico" maxlength="3000" style="min-height:6rem" placeholder="Con tus palabras: qué quiere lograr, qué le preocupa y por qué ahora. Es lo primero que lee.">${base ? esc(base.diagnostico || '') : ''}</textarea></div>
     <div class="campo"><label for="pr-incluye">Qué incluye</label><textarea id="pr-incluye" name="incluye" maxlength="3000" style="min-height:9rem">${v('incluye')}</textarea><p class="ayuda">Un punto por renglón.</p></div>
     <div class="d-sep"><h3>Inversión</h3></div>
@@ -3405,6 +3429,18 @@ function modalPropuesta(id, desde) {
       CAMPOS.forEach(k => { const el = f.elements[k]; if (!el.value.trim() || el.value.trim() === String(de[k]).trim()) el.value = a[k]; });
       anterior = f.elements.tipo.value;
       dlg.querySelectorAll('[data-solo-mensual]').forEach(el => { el.hidden = anterior !== 'mensual'; });
+      dlg.querySelectorAll('[data-solo-proyecto]').forEach(el => { el.hidden = anterior !== 'proyecto'; });
+    });
+    // Al cambiar el servicio, lo que no tocaste cambia a lo de ese servicio
+    let servPrev = f.elements.servicio.value;
+    const nombreServ = s => { const p = COT_PLANT.find(x => x.id === s); return p ? p.nombre : PROP_DEF.proyecto.titulo; };
+    f.elements.servicio.addEventListener('change', () => {
+      const s = f.elements.servicio.value;
+      const poner = (k, de, a) => { const el = f.elements[k]; if (!el.value.trim() || el.value.trim() === String(de).trim()) el.value = a; };
+      poner('titulo', nombreServ(servPrev), nombreServ(s));
+      poner('incluye', incluyeDe(servPrev), incluyeDe(s));
+      poner('condiciones', condDe(servPrev), condDe(s));
+      servPrev = s;
     });
   });
 }
@@ -3702,6 +3738,7 @@ const FORMS = {
     const d = {
       nombre: valor(f, 'nombre'), empresa: valor(f, 'empresa'), whatsapp: valor(f, 'whatsapp') || null, correo: valor(f, 'correo') || null,
       tipo: valor(f, 'tipo'), titulo: valor(f, 'titulo'), diagnostico: valor(f, 'diagnostico') || null, incluye: valor(f, 'incluye') || null,
+      servicio: valor(f, 'tipo') === 'proyecto' ? valor(f, 'servicio') || null : null,
       precio: num('precio'), iva: valor(f, 'iva'), precio_nota: valor(f, 'precio_nota') || null, anticipo: num('anticipo'),
       forma_pago: valor(f, 'forma_pago') || null, condiciones: valor(f, 'condiciones') || null,
       ejemplo_url: valor(f, 'ejemplo_url') || null, vigencia: valor(f, 'vigencia'), notas: valor(f, 'notas') || null,
@@ -4144,6 +4181,8 @@ const ACC = {
     const dron = c.lineas.some(l => l.ref === 'dron' && l.cant > 0);
     modalPropuesta(null, { cot: c.id, para: { empresa: c.empresa }, duplicar: Object.assign({}, def, {
       tipo: p.tipo, titulo: c.titulo || p.nombre, precio: r.precio, iva: 'mas_iva', anticipo: null, diagnostico: '', ejemplo_url: '',
+      servicio: p.tipo === 'proyecto' && p.id !== 'blanco' ? p.id : null,
+      condiciones: p.tipo === 'proyecto' ? condDe(p.id) : def.condiciones,
       incluye: p.incluye ? p.incluye({ grab, dron }).join('\n') : def.incluye,
       notas: `Del cotizador: costo ${pesos(r.costo)}, utilidad ${pesos(r.utilReal)} (${Math.round(r.margen)}%).`,
       videos_ciclo: 12, dias_grabacion: p.tipo === 'mensual' ? Math.max(1, Math.round(grab) || 2) : 2, plazo_minimo: 3

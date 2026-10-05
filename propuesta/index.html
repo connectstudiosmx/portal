@@ -523,6 +523,69 @@ const ETAPAS = {
     ['Día 1 o 15', 'Entrega', 'Edito cada video y lo reviso antes de que llegue a ti. Tienes 3 días hábiles para ajustes.'],
     ['Cada mes', 'Resultados', 'Se publica en tus redes y cada mes vemos qué funcionó y ajustamos.']
   ],
+  institucional: [
+    ['Paso 1', 'Diagnóstico', 'Definimos qué tiene que lograr el video y a quién le habla: las columnas, los objetivos y el propósito de tu empresa.'],
+    ['Paso 2', 'Guion y plan', 'Guion, entrevistados, locaciones y plan de rodaje.'],
+    ['Paso 3', 'Grabación', 'Grabamos donde de verdad pasa: tus instalaciones, tu gente y tus clientes.'],
+    ['Paso 4', 'Edición', 'Edición, color, audio y música con licencia, con una ronda de ajustes.'],
+    ['Paso 5', 'Entrega', 'El video final, en los formatos que necesites.']
+  ],
+  capsula: [
+    ['Paso 1', 'El mensaje', 'Definimos qué se tiene que comunicar, a quién y quién lo dice.'],
+    ['Paso 2', 'Guion', 'Un mensaje claro, conciso y relevante.'],
+    ['Paso 3', 'Grabación', 'Grabamos en tus instalaciones, normalmente en un solo día.'],
+    ['Paso 4', 'Edición y entrega', 'Edición con música con licencia y una ronda de ajustes.']
+  ],
+  capacitacion: [
+    ['Paso 1', 'Diagnóstico', 'Revisamos los procesos que tu equipo tiene que aprender.'],
+    ['Paso 2', 'Guion', 'Ordenamos la información paso a paso, con los apoyos visuales que hagan falta.'],
+    ['Paso 3', 'Grabación', 'Grabamos los procesos y las explicaciones donde se hacen.'],
+    ['Paso 4', 'Edición', 'Edición con apoyos visuales, música con licencia y una ronda de ajustes.'],
+    ['Paso 5', 'Entrega', 'El video listo para compartirlo con tu equipo.']
+  ],
+  induccion: [
+    ['Paso 1', 'Diagnóstico', 'Reunimos la filosofía, los procesos y el flujo de información de tu empresa.'],
+    ['Paso 2', 'Guion', 'Lo ordenamos en una pieza larga o en varias cortas, según lo que se tenga que explicar.'],
+    ['Paso 3', 'Grabación', 'Grabamos en tus instalaciones, con la gente que conoce cada proceso.'],
+    ['Paso 4', 'Edición', 'Edición con música con licencia y una ronda de ajustes.'],
+    ['Paso 5', 'Entrega', 'La inducción lista para cada persona que entra.']
+  ],
+  evento: [
+    ['Antes', 'Plan de cobertura', 'Revisamos el programa, los momentos clave y para qué vas a usar el material.'],
+    ['Durante', 'Cobertura', 'Grabamos el evento con dos cámaras, sin interrumpir a nadie.'],
+    ['Después', 'Edición', 'Video resumen con música con licencia y una ronda de ajustes.'],
+    ['Entrega', 'Material listo', 'El video en los formatos que necesites.']
+  ],
+  podcast: [
+    ['Paso 1', 'Preparación', 'Definimos el formato, los temas y los invitados de cada episodio.'],
+    ['Paso 2', 'Grabación', 'Grabamos con varias cámaras y un micrófono para cada participante.'],
+    ['Paso 3', 'Edición', 'Edición de cada episodio, con una ronda de ajustes.'],
+    ['Paso 4', 'Entrega', 'Los episodios listos para publicar.']
+  ],
+  comercial: [
+    ['Paso 1', 'Diagnóstico', 'Definimos qué tiene que lograr el video y a quién le habla.'],
+    ['Paso 2', 'Idea y guion', 'La idea creativa, el guion y el plan de rodaje.'],
+    ['Paso 3', 'Grabación', 'Grabamos con dirección creativa.'],
+    ['Paso 4', 'Edición', 'Edición, color, audio y música con licencia, con una ronda de ajustes.'],
+    ['Paso 5', 'Entrega', 'El video en los formatos que necesites.']
+  ],
+  testimonial: [
+    ['Paso 1', 'Preguntas clave', 'Definimos qué tiene que contar cada persona.'],
+    ['Paso 2', 'Grabación', 'Entrevista con dos cámaras, en un ambiente en el que la persona se sienta cómoda.'],
+    ['Paso 3', 'Edición', 'Edición con música con licencia y una ronda de ajustes.'],
+    ['Paso 4', 'Entrega', 'El testimonio listo para tu sitio o tus redes.']
+  ],
+  reel: [
+    ['Paso 1', 'Idea y guion', 'Definimos qué tiene que lograr el reel.'],
+    ['Paso 2', 'Grabación', 'Grabamos en unas horas.'],
+    ['Paso 3', 'Edición y entrega', 'Edición vertical con una ronda de ajustes.']
+  ],
+  direccion: [
+    ['Paso 1', 'Diagnóstico', 'Revisamos lo que tienes y lo que tiene que lograr tu contenido.'],
+    ['Paso 2', 'Línea visual', 'Definimos la línea visual y los mensajes clave.'],
+    ['Paso 3', 'Guiones', 'Escribo o reviso los guiones con tu equipo.'],
+    ['Paso 4', 'Seguimiento', 'Juntas para revisar lo que se hizo y ajustar.']
+  ],
   proyecto: [
     ['Paso 1', 'Diagnóstico', 'Definimos qué tiene que lograr el video y a quién le habla.'],
     ['Paso 2', 'Guion y plan', 'Guion, locaciones, fechas y plan de rodaje.'],
@@ -553,15 +616,16 @@ function videoYouTube(url) {
   return m ? m[1] : null;
 }
 
-function bloqueEjemplo() {
-  const id = videoYouTube(P.ejemplo_url);
+function bloqueEjemplo(url0) {
+  const ej = url0 || P.ejemplo_url;
+  const id = videoYouTube(ej);
   if (id) {
     return `<div class="ejemplo r" data-yt="${id}">
       <img src="https://i.ytimg.com/vi/${id}/hqdefault.jpg" alt="" loading="lazy">
       <button class="play" type="button" data-accion="ver-video"><i></i><span>Mira un ejemplo</span><small>Un proyecto parecido al tuyo</small></button>
     </div>`;
   }
-  const url = /^https?:\/\//i.test(P.ejemplo_url || '') ? P.ejemplo_url : '/casos/';
+  const url = /^https?:\/\//i.test(ej || '') ? ej : '/casos/';
   return `<a class="ejemplo r" href="${esc(url)}" target="_blank" rel="noopener">
     <img src="https://connectstudios.mx/assets/img/cabb/cabb-4-entrega.webp" alt="" loading="lazy">
     <span class="play"><i></i><span>${P.ejemplo_url ? 'Mira un ejemplo' : 'Mira casos reales'}</span><small>${P.ejemplo_url ? 'Un proyecto parecido al tuyo' : 'Tres negocios, tres problemas y cómo se resolvieron en video'}</small></span>
@@ -569,8 +633,15 @@ function bloqueEjemplo() {
 }
 
 // Así se ve: videos reales (mensual) o el ejemplo
+// Cómo trabajamos: título por servicio
+const TITULO_ETAPAS = { evento: 'Antes, durante y después', podcast: 'De la idea al episodio', direccion: 'Cómo te acompaño' };
+// "Así se ve" en proyectos: solo con un video que tenga que ver con el servicio.
+// Sin video, la sección no sale (decisión de Manuel, oct 2026: nada de mandar a los casos).
+const EJEMPLO_SERVICIO = { institucional: 'https://www.youtube.com/watch?v=DnunIRVCx58' };   // CABB Arrenda
 function bloqueTrabajo(ceja) {
   const mensual = P.tipo === 'mensual';
+  const ejemplo = P.ejemplo_url || EJEMPLO_SERVICIO[P.servicio] || '';
+  if (!mensual && !/^https?:\/\//i.test(ejemplo)) return '';
   const reels = `<div class="reels">${REELS.map(([id, tipo, titulo]) => `<figure class="reel r">
       <div class="marco"><span class="tipo">${esc(tipo)}</span><img src="${SITIO}img/${id}-poster.webp" alt="" loading="lazy">
         <button type="button" data-accion="ver-reel" data-video="${SITIO}video/${id}.mp4" aria-label="Ver el video ${esc(titulo)}"><i></i></button></div>
@@ -579,7 +650,7 @@ function bloqueTrabajo(ceja) {
   return `<section class="seccion">
     <div class="cab r"><div>${ceja('El trabajo')}<h2>Así se ve</h2></div>
       <p>${mensual ? 'Videos reales de Dorma, un cliente con contenido mensual. Tócalos para verlos con sonido.' : 'Cada proyecto empieza por definir qué tiene que lograr el video, antes de encender la cámara.'}</p></div>
-    ${mensual ? reels + (P.ejemplo_url ? `<div style="margin-top:1.2rem">${bloqueEjemplo()}</div>` : '') : bloqueEjemplo()}
+    ${mensual ? reels + (P.ejemplo_url ? `<div style="margin-top:1.2rem">${bloqueEjemplo()}</div>` : '') : bloqueEjemplo(ejemplo)}
   </section>`;
 }
 
@@ -810,7 +881,7 @@ function pintar() {
   document.title = `Propuesta para ${P.empresa} · Connect Studios`;
   const incluye = renglones(P.incluye), condiciones = renglones(P.condiciones), diag = parrafos(P.diagnostico);
   const nota = [IVA[P.iva], P.precio_nota].filter(Boolean).join(' ');
-  const etapas = ETAPAS[P.tipo] || ETAPAS.proyecto;
+  const etapas = (P.tipo === 'mensual' ? ETAPAS.mensual : ETAPAS[P.servicio]) || ETAPAS.proyecto;
   const tot = totalAnticipo();
   const mensual = P.tipo === 'mensual';
   // "Primer mes sin riesgo" sale como sello (con el texto de las condiciones, si viene ahí) y no repetido en la lista
@@ -864,7 +935,7 @@ function pintar() {
 
     <section class="seccion">
       <div class="cab r">
-        <div>${ceja('Cómo trabajamos')}<h2>${mensual ? 'Así es cada mes' : 'De la idea al video'}</h2></div>
+        <div>${ceja('Cómo trabajamos')}<h2>${mensual ? 'Así es cada mes' : TITULO_ETAPAS[P.servicio] || 'De la idea al video'}</h2></div>
         <p>${mensual ? 'Todo se sigue en tu portal: guiones, fechas, avance y entregas.' : 'Sabes en qué va cada etapa y qué necesito de ti.'}</p>
       </div>
       ${mensual ? `<div class="tiempo r"><b>${diasTiempo}</b><div><strong>días al mes</strong><span>Es todo lo que necesito de tu tiempo: uno para tus guiones y ${esc(NUMEROS[diasTiempo - 1] || String(diasTiempo - 1))} para grabar. La edición, la publicación y los reportes los hago yo.</span></div></div>` : ''}
