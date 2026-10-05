@@ -2940,7 +2940,7 @@ function vistaEstilo(fila, modo, idCliente) {
       ${edita ? `<label class="btn btn-s">${e.logo_url ? 'Cambiar logo' : 'Subir logo'}<input type="file" accept="image/png,image/jpeg" data-cambio="estilo-logo" hidden></label><span class="nota">PNG con fondo transparente, de preferencia.</span>` : ''}</div>${opciones('logo_uso')}`
   };
   const notas = `<div class="campo" style="margin:0"><label for="est-notas">¿Algo más? <span class="opc">(opcional)</span></label>
-    <textarea id="est-notas" data-cambio="estilo-notas" maxlength="1000" placeholder="Ej. Nada de rosa; me gusta cómo edita @cuenta"${edita ? '' : ' disabled'}>${esc(e.notas || '')}</textarea></div>`;
+    <textarea id="est-notas" data-cambio="estilo-notas" maxlength="1000" placeholder="Ej. Mi logo siempre en blanco; nada de rosa ni morado."${edita ? '' : ' disabled'}>${esc(e.notas || '')}</textarea></div>`;
   const cab = (i, t, sub, clase = '') => `<div class="est-cab"><span class="est-n">${String(i + 1).padStart(2, '0')}</span><div><h3>${t}</h3>${sub ? `<p>${sub}</p>` : ''}</div></div>`;
   const muestra = acciones => `<aside class="est-muestra"><p class="rep-et">Tu portada</p>
       <div class="tel"><canvas data-portada-muestra aria-label="Muestra de tu portada"></canvas></div>
