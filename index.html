@@ -375,6 +375,78 @@ main.app{max-width:var(--ancho);margin:0 auto;padding:1.75rem 1.25rem 5rem}
 .p-nota::placeholder{color:var(--crema-3)}
 .link-tarjeta{display:inline-flex;align-items:center;gap:.5rem;flex-wrap:wrap;font-size:.86rem;color:var(--crema-2)}
 
+/* Cotizador */
+.cot-plants{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:.6rem}
+.cot-plant{display:grid;gap:.2rem;align-content:start;text-align:left;background:var(--panel);border:1px solid var(--linea);border-radius:var(--r2);padding:.85rem 1rem;color:var(--crema);font:inherit;cursor:pointer;transition:border-color .2s}
+.cot-plant:hover,.cot-plant:focus-visible{border-color:var(--verde)}
+.cot-plant-n{font-weight:700}
+.cot-plant-m{margin-top:.25rem;font-size:.8rem;color:var(--verde);font-variant-numeric:tabular-nums}
+.cot-datos{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:0 1rem;max-width:46rem}
+.cot-datos .campo{margin-bottom:.6rem}
+.cot-info{margin:0 0 1.2rem}
+.cot-info b{color:var(--dorado)}
+.cot-layout{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:1.2rem;align-items:start}
+@media (max-width:980px){.cot-layout{grid-template-columns:1fr}}
+.cot-grupo{background:var(--panel);border:1px solid var(--linea);border-radius:var(--r2);padding:.9rem 1rem 1rem;margin-bottom:.8rem}
+.cot-g-cab{display:flex;justify-content:space-between;align-items:baseline;gap:1rem}
+.cot-g-cab h3{margin:0;font-size:1rem}
+.cot-g-total{font-weight:700;color:var(--verde);font-variant-numeric:tabular-nums}
+.cot-grupo>.nota{margin:.15rem 0 0}
+.cot-fila{display:grid;grid-template-columns:minmax(0,1fr) 5.2rem 6.8rem 6.4rem 2.25rem;gap:.45rem;align-items:end;padding:.55rem 0;border-bottom:1px solid var(--linea)}
+.cot-fila .campo-in{width:100%;min-width:0}
+.cot-n{display:grid;gap:.15rem;font-size:.7rem;color:var(--crema-3)}
+.cot-sub{text-align:right;font-variant-numeric:tabular-nums;font-weight:600;padding-bottom:.5rem;white-space:nowrap}
+.cot-quitar{width:2.25rem;height:2.25rem;border:1px solid var(--linea-2);border-radius:var(--r2);background:none;color:var(--crema-3);cursor:pointer;font-size:1.15rem;line-height:1}
+.cot-quitar:hover,.cot-quitar:focus-visible{color:var(--rojo);border-color:var(--rojo)}
+.cot-agregar{margin-top:.75rem;max-width:22rem;width:100%}
+@media (max-width:640px){
+  .cot-fila{grid-template-columns:1fr 1fr 2.25rem}
+  .cot-nombre{grid-column:1/-1}
+  .cot-quitar{grid-column:3;grid-row:2}
+  .cot-sub{grid-column:1/-1;text-align:left;padding:0}
+}
+.cot-resumen{position:sticky;top:1rem;background:var(--panel);border:1px solid var(--linea);border-left:3px solid var(--verde);border-radius:var(--r2);padding:1rem 1.1rem 1.1rem}
+@media (max-width:980px){.cot-resumen{position:static}}
+.cot-resumen h3{margin:0 0 .5rem;font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:1.7rem;line-height:1}
+.cot-r{display:flex;justify-content:space-between;align-items:center;gap:.6rem;padding:.26rem 0;font-size:.9rem;color:var(--crema-2)}
+.cot-r b{color:var(--crema);font-variant-numeric:tabular-nums;white-space:nowrap}
+.cot-r-sub{border-top:1px solid var(--linea);margin-top:.3rem;padding-top:.5rem}
+.cot-r-sub span{color:var(--crema);font-weight:600}
+.cot-r-total{border-top:1px solid var(--linea);margin-top:.3rem;padding-top:.5rem}
+.cot-r-total span{color:var(--crema);font-weight:600}
+.cot-r-total b{color:var(--verde);font-size:1.2rem}
+.cot-r-mal b{color:var(--rojo)}
+.cot-pct{width:3.1rem;height:1.75rem;margin:0 .15rem 0 .3rem;background:var(--negro);border:1px solid var(--linea-2);border-radius:var(--r1);color:var(--crema);text-align:right;padding:0 .35rem;font:inherit;font-size:.85rem}
+.cot-pct:focus{border-color:var(--verde);outline:none}
+.cot-final{margin:.8rem 0 .5rem}
+.cot-final input{font-size:1.15rem;font-weight:700}
+.cot-merc{margin:0 0 .8rem;padding:.7rem .8rem;border-radius:var(--r2);background:var(--negro);border:1px solid var(--linea)}
+.cot-merc-cab{display:flex;justify-content:space-between;gap:.5rem;flex-wrap:wrap;font-size:.86rem;font-variant-numeric:tabular-nums}
+.m-ok .cot-merc-cab b{color:var(--verde)}
+.m-bajo .cot-merc-cab b{color:var(--dorado)}
+.m-alto .cot-merc-cab b{color:var(--rojo)}
+.cot-merc .nota{margin:0}
+.cot-barra{position:relative;height:8px;border-radius:4px;background:var(--linea);margin:.6rem 0 .5rem}
+.cot-rango{position:absolute;top:0;bottom:0;background:var(--verde-t);border:1px solid rgba(57,255,136,.5);border-radius:4px}
+.cot-punto{position:absolute;top:50%;width:14px;height:14px;border-radius:50%;background:var(--crema);border:3px solid var(--negro);transform:translate(-50%,-50%);box-shadow:0 0 0 1px var(--crema)}
+.cot-tuyo{margin:.8rem 0 1rem;padding-top:.7rem;border-top:1px solid var(--linea);font-size:.86rem;color:var(--crema-2)}
+.cot-tuyo p{margin:.25rem 0}
+.cot-tuyo b{color:var(--crema)}
+.cot-dia{padding:.45rem .6rem;border-radius:var(--r1);background:var(--verde-t)}
+.cot-dia-bajo{background:rgba(227,178,60,.12);color:var(--crema)}
+.cot-dia-bajo b{color:var(--dorado)}
+.cot-acc{display:grid;gap:.5rem}
+.fila-campos.tres{grid-template-columns:repeat(3,1fr)}
+@media (max-width:560px){.fila-campos.tres{grid-template-columns:1fr 1fr}}
+.cot-aj-fila{display:grid;grid-template-columns:minmax(0,1fr) 7rem 2.25rem;gap:.4rem;margin-bottom:.4rem}
+.cot-aj-fila.con-unidad{grid-template-columns:minmax(0,1fr) 7.5rem 6.5rem 2.25rem}
+.cot-aj-fila .campo-in{width:100%;min-width:0}
+@media (max-width:560px){
+  .cot-aj-fila,.cot-aj-fila.con-unidad{grid-template-columns:1fr 1fr 2.25rem}
+  .cot-aj-fila [data-aj=nombre]{grid-column:1/-1}
+  .cot-aj-fila:not(.con-unidad) [data-aj=precio]{grid-column:1/3}
+}
+
 /* Propuestas en línea */
 .e-sin_enviar{border-style:dashed;border-color:var(--crema-3);color:var(--crema-3)}
 .e-enviada{border-color:var(--crema-2);color:var(--crema-2)}
@@ -635,6 +707,7 @@ const S = {
   clientes: [], ciclos: [], videos: [], perfiles: [], asignaciones: [], solicitudes: [], reportes: [], mlLog: [], verAtendidas: false, solFiltro: { ruta: '', califica: '', estado: '' },
   postulaciones: [], postFiltro: { rol: '', estado: 'activas', pais: '' }, facturas: [], pagoDatos: null, facFiltro: 'pendiente', faltaBase: false,
   pagosCli: null, propuestas: [], propFiltro: 'activas', ajustes: null, contratos: [], pagosStripe: [], stripeModo: null,
+  cot: { config: null, lista: [], actual: null, falta: false },
   portal: null, cicloCliente: null, previa: null, pestanaCli: 'videos',
   filtro: { cliente: 'todos', estado: 'todos', mios: false, entregados: false },
   calInicio: null, verTodos: {}, cargadoEn: 0
@@ -802,6 +875,14 @@ async function cargarEquipo() {
       sb.rpc('stripe_modo')
     ]);
     S.ajustes = aj.error ? null : aj.data;
+    // Cotizador: si aún no se corre cotizador.sql, el portal sigue funcionando
+    const [cc, cl] = await Promise.all([
+      sb.from('cotizador_config').select('*').eq('id', 1).maybeSingle(),
+      sb.from('cotizaciones').select('*').order('created_at', { ascending: false }).limit(300)
+    ]);
+    S.cot.falta = !!(cc.error || cl.error);
+    S.cot.config = cc.error ? null : cc.data;
+    S.cot.lista = cl.error ? [] : cl.data || [];
     const cob = await sb.from('cobros').select('*').order('vence');
     S.cobros = cob.error ? [] : cob.data || [];
     S.stripeModo = sm.error ? null : sm.data;
@@ -881,7 +962,7 @@ function pantallaSimple(titulo, texto, boton, accion) {
 function barra() {
   const p = S.perfil, esAdmin = p.role === 'admin';
   const tabs = esAdmin ? [['produccion', 'Producción'], ['clientes', 'Clientes'], ['solicitudes', 'Solicitudes'],
-      ['propuestas', 'Propuestas'], ['postulaciones', 'Postulaciones'], ['pagos', 'Pagos']]
+      ['propuestas', 'Propuestas'], ['cotizador', 'Cotizador'], ['postulaciones', 'Postulaciones'], ['pagos', 'Pagos']]
     : p.role === 'editor' ? [['produccion', 'Producción']] : [];
   const pendientes = esAdmin ? S.perfiles.filter(x => x.role === 'pendiente').length : 0;
   const nuevas = esAdmin ? S.solicitudes.filter(x => !x.atendida).length : 0;
@@ -926,11 +1007,12 @@ function render() {
   else if (S.vista === 'accesos' && S.perfil.role === 'admin') cuerpo = vistaAccesos();
   else if (S.vista === 'solicitudes' && S.perfil.role === 'admin') cuerpo = vistaSolicitudes();
   else if (S.vista === 'propuestas' && S.perfil.role === 'admin') cuerpo = vistaPropuestas();
+  else if (S.vista === 'cotizador' && S.perfil.role === 'admin') cuerpo = vistaCotizador();
   else if (S.vista === 'postulaciones' && S.perfil.role === 'admin') cuerpo = vistaPostulaciones();
   else if (S.vista === 'pagos' && S.perfil.role === 'admin') cuerpo = vistaPagos();
   else cuerpo = vistaProduccion();
   if (S.perfil.role !== 'cliente' && S.vista !== 'previa') {
-    const v = ['calendario', 'accesos', 'solicitudes'].includes(S.vista) && (S.vista === 'calendario' || S.perfil.role === 'admin') ? S.vista : (['clientes', 'propuestas', 'postulaciones', 'pagos'].includes(S.vista) && S.perfil.role === 'admin' ? S.vista : 'produccion');
+    const v = ['calendario', 'accesos', 'solicitudes'].includes(S.vista) && (S.vista === 'calendario' || S.perfil.role === 'admin') ? S.vista : (['clientes', 'propuestas', 'cotizador', 'postulaciones', 'pagos'].includes(S.vista) && S.perfil.role === 'admin' ? S.vista : 'produccion');
     cuerpo = subPestanas(v) + cuerpo;
   }
   pintar(barra() + `<main class="app">${cuerpo}</main>`);
@@ -1538,6 +1620,352 @@ async function marcarEnviada(x) {
     x.enviada_at = ahora;
     if (S.vista === 'propuestas') render();
   } catch (e) { /* no importa si no se marca */ }
+}
+
+// ---------- Cotizador (solo admin) -------------------------------------
+// El precio se arma de abajo hacia arriba: tu tiempo + tu equipo (como si
+// lo rentaras, para que se pague solo) + colaboradores + terceros, y encima
+// gastos generales, imprevistos y utilidad. Después se compara con el rango
+// del mercado. Rangos: investigación de oct 2026, MXN antes de IVA.
+// Costos y márgenes nunca salen de aquí: la propuesta solo lleva el precio.
+const COT_DEF = {
+  tarifas: { dia_grabacion: 4000, dia_edicion: 2000, hora: 350 },
+  meta: { mensual: 65000, dias: 20 },
+  equipo: [
+    { id: 'cam_a', nombre: 'Cámara full frame con lentes (24-70 f/2.8 y 50 f/1.8)', precio: 1000 },
+    { id: 'cam_b', nombre: 'Segunda cámara full frame', precio: 700 },
+    { id: 'luz', nombre: 'Luz de 100 W', precio: 250 },
+    { id: 'audio', nombre: 'Micrófono de escopeta', precio: 200 },
+    { id: 'estab', nombre: 'Estabilizador', precio: 300 },
+    { id: 'dron', nombre: 'Dron (lo vuelas tú)', precio: 2000 }
+  ],
+  crew: [
+    { id: 'asistente', nombre: 'Asistente o segunda cámara', precio: 2000 },
+    { id: 'sonidista', nombre: 'Sonidista con equipo', precio: 4500 },
+    { id: 'maquillaje', nombre: 'Maquillaje', precio: 1500 }
+  ],
+  extras: [
+    { id: 'gasolina', nombre: 'Gasolina y traslados', unidad: 'día', precio: 300 },
+    { id: 'editor', nombre: 'Editor externo (video corto)', unidad: 'pieza', precio: 300 },
+    { id: 'locutor', nombre: 'Locutor profesional', unidad: 'pieza', precio: 4500 },
+    { id: 'musica', nombre: 'Canción con licencia comercial (fuera de Envato)', unidad: 'pieza', precio: 2000 },
+    { id: 'mics', nombre: 'Renta de micrófonos de solapa o podcast', unidad: 'día', precio: 600 },
+    { id: 'luces_renta', nombre: 'Renta de luces extra', unidad: 'día', precio: 1500 }
+  ],
+  pct: { generales: 10, imprevistos: 5, utilidad: 15 },
+  redondeo: 500
+};
+const COT_GRUPOS = [['tiempo', 'Tu tiempo'], ['equipo', 'Tu equipo', 'Lo cobras como si lo rentaras: así se paga solo y lo puedes reponer.'],
+  ['crew', 'Colaboradores'], ['extras', 'Terceros y gastos']];
+// true = un día por cada día de grabación
+const COT_PLANT = [
+  { id: 'institucional', nombre: 'Video institucional', detalle: '2 a 3 minutos', tipo: 'proyecto', horas: 12, grab: 2, edicion: 10,
+    equipo: { cam_a: true, cam_b: true, luz: true, audio: true, estab: true, dron: 1 }, crew: { asistente: true }, extras: { gasolina: true },
+    mercado: [45000, 120000], fuente: 'Productoras en México, 2026: básico de 1 día $40–70 mil; estándar de 2 días con varias locaciones $80–150 mil.',
+    incluye: d => ['Diagnóstico y guion a partir de las columnas, los objetivos y el propósito de tu empresa', 'Preproducción: locaciones, entrevistados y plan de rodaje',
+      `${d.grab} ${d.grab === 1 ? 'día' : 'días'} de grabación en tus instalaciones, con dos cámaras`, 'Entrevistas a directivos, colaboradores y clientes',
+      ...(d.dron ? ['Tomas aéreas con dron'] : []), 'Edición, color y audio, con música con licencia', 'Video final de 2 a 3 minutos', 'Una ronda de ajustes'] },
+  { id: 'capsula', nombre: 'Cápsula de comunicación interna', detalle: '45 segundos a 3 minutos', tipo: 'proyecto', horas: 4, grab: 1, edicion: 2,
+    equipo: { cam_a: true, luz: true, audio: true }, extras: { gasolina: true },
+    mercado: [15000, 40000], fuente: 'Piezas cortas de 1 día (testimonial, entrevista, aviso interno): $15–40 mil.',
+    incluye: () => ['Guion del mensaje', 'Grabación en tus instalaciones', 'Edición con música con licencia', 'Cápsula de 45 segundos a 3 minutos', 'Una ronda de ajustes'] },
+  { id: 'capacitacion', nombre: 'Video de capacitación', detalle: '8 a 10 minutos', tipo: 'proyecto', horas: 12, grab: 1, edicion: 5,
+    equipo: { cam_a: true, cam_b: true, luz: true, audio: true }, crew: { asistente: true }, extras: { gasolina: true },
+    mercado: [30000, 100000], fuente: 'Capacitación: desde $30 mil sencillo hasta ~$98 mil (5 min con locución, productora grande).',
+    incluye: () => ['Guion a partir de tus procesos', 'Grabación de los procesos y las explicaciones', 'Edición con apoyos visuales y música con licencia', 'Video de 8 a 10 minutos', 'Una ronda de ajustes'] },
+  { id: 'induccion', nombre: 'Video de inducción', detalle: 'hasta 30 minutos', tipo: 'proyecto', horas: 12, grab: 1, edicion: 8,
+    equipo: { cam_a: true, cam_b: true, luz: true, audio: true, estab: true }, crew: { asistente: true }, extras: { gasolina: true },
+    mercado: [35000, 120000], fuente: 'Estimado: pieza larga, entre una capacitación ($30 mil en adelante) y un institucional.',
+    incluye: () => ['Guion con la filosofía, los procesos y el flujo de información de tu empresa', 'Grabación en tus instalaciones', 'Edición en una pieza larga o en varias cortas', 'Una ronda de ajustes'] },
+  { id: 'evento', nombre: 'Cobertura de evento', detalle: 'jornada y video resumen', tipo: 'proyecto', horas: 2, grab: 1, edicion: 2,
+    equipo: { cam_a: true, cam_b: true, audio: true, estab: true }, crew: { asistente: true }, extras: { gasolina: true },
+    mercado: [12000, 45000], fuente: 'Cobertura de evento: básica $8,500–15,000; profesional desde $41 mil.',
+    incluye: () => ['Cobertura del evento con dos cámaras', 'Video resumen del evento', 'Una ronda de ajustes'] },
+  { id: 'podcast', nombre: 'Podcast en video', detalle: 'sesión de 4 episodios', tipo: 'proyecto', horas: 4, grab: 1, edicion: 2.5,
+    equipo: { cam_a: true, cam_b: true, audio: true }, crew: { asistente: true }, extras: { mics: 1, gasolina: true },
+    mercado: [20000, 30000], fuente: 'Paquetes de 4 episodios en video multicámara: $20–28 mil.',
+    incluye: () => ['Grabación multicámara de 4 episodios', 'Micrófono para cada participante', 'Edición de cada episodio', 'Una ronda de ajustes'] },
+  { id: 'comercial', nombre: 'Video comercial o promocional', detalle: '30 segundos a 1 minuto', tipo: 'proyecto', horas: 10, grab: 1, edicion: 5,
+    equipo: { cam_a: true, cam_b: true, luz: true, audio: true, estab: true }, crew: { asistente: true }, extras: { gasolina: true },
+    mercado: [30000, 120000], fuente: 'Comercial sin actores ni campaña: $30–120 mil; spots de TV desde $120 mil.',
+    incluye: () => ['Idea y guion', 'Grabación con dirección creativa', 'Edición, color y audio, con música con licencia', 'Una ronda de ajustes'] },
+  { id: 'testimonial', nombre: 'Testimonial o entrevista', detalle: '1 a 3 minutos', tipo: 'proyecto', horas: 4, grab: 1, edicion: 2,
+    equipo: { cam_a: true, cam_b: true, luz: true, audio: true }, extras: { gasolina: true },
+    mercado: [15000, 40000], fuente: 'Testimonial o entrevista: $15–40 mil.',
+    incluye: () => ['Preguntas clave para la entrevista', 'Grabación con dos cámaras', 'Edición con música con licencia', 'Una ronda de ajustes'] },
+  { id: 'reel', nombre: 'Reel suelto', detalle: '30 a 60 segundos', tipo: 'proyecto', horas: 2, grab: 0.5, edicion: 0.5,
+    equipo: { cam_a: true, luz: true, audio: true }, extras: { gasolina: 1 },
+    mercado: [5000, 20000], fuente: 'Reel suelto: $5–20 mil.',
+    incluye: () => ['Idea y guion', 'Grabación', 'Edición vertical', 'Una ronda de ajustes'] },
+  { id: 'mensual', nombre: 'Contenido mensual', detalle: '12 videos al mes', tipo: 'mensual', horasTxt: 'Estrategia, revisión de guiones, copys y programación',
+    horas: 10, grab: 2, edicion: 1, edicionTxt: 'Revisión de la edición', equipo: { cam_a: true, luz: true, audio: true }, extras: { editor: 12, gasolina: true },
+    mercado: [21500, 28000], fuente: 'Agencias con 12 reels al mes: $21,500–28,000 + IVA, con 1 día de grabación.',
+    precioFijo: 14499, nota: 'Tu precio fijo es $14,499: aquí ves cuánto te cuesta de verdad.' },
+  { id: 'direccion', nombre: 'Dirección creativa', detalle: 'por mes, por horas', tipo: 'proyecto', horasTxt: 'Diagnóstico, línea visual, guiones y juntas', horas: 16,
+    fuente: '', incluye: () => ['Diagnóstico y línea visual', 'Guiones o revisión de guiones', 'Juntas de seguimiento con tu equipo'] },
+  { id: 'blanco', nombre: 'En blanco', detalle: 'arma la tuya desde cero', tipo: 'proyecto', fuente: '' }
+];
+const cotPlant = id => COT_PLANT.find(p => p.id === id) || COT_PLANT[COT_PLANT.length - 1];
+function cotCfg() {
+  const c = (S.cot.config && S.cot.config.config) || {};
+  return {
+    tarifas: Object.assign({}, COT_DEF.tarifas, c.tarifas), meta: Object.assign({}, COT_DEF.meta, c.meta),
+    pct: Object.assign({}, COT_DEF.pct, c.pct), redondeo: c.redondeo || COT_DEF.redondeo,
+    equipo: c.equipo || COT_DEF.equipo, crew: c.crew || COT_DEF.crew, extras: c.extras || COT_DEF.extras
+  };
+}
+const cotClave = () => Math.random().toString(36).slice(2, 9);
+const pesos = n => (Number(n) < 0 ? '−$' : '$') + Math.abs(Math.round(Number(n) || 0)).toLocaleString('es-MX');
+// Acepta "1,500", "$1500" y "0,5" (coma decimal)
+const cotNum = s => {
+  let t = String(s ?? '').trim().replace(/[$\s]/g, '');
+  t = /^\d+,\d{1,2}$/.test(t) ? t.replace(',', '.') : t.replace(/,/g, '');
+  const n = Number(t); return isFinite(n) && n >= 0 ? n : 0;
+};
+const COT_UNIDAD = { h: ['Horas', 'Por hora'], 'día': ['Días', 'Por día'], pieza: ['Cantidad', 'Cada uno'] };
+
+function cotNueva(pid) {
+  const p = cotPlant(pid), cfg = cotCfg(), t = cfg.tarifas, L = [];
+  const lin = (grupo, ref, nombre, unidad, cant, precio) => L.push({ k: cotClave(), grupo, ref, nombre, unidad, cant, precio });
+  if (p.horas) lin('tiempo', 'hora', p.horasTxt || 'Preproducción: diagnóstico, guion, scouting y juntas', 'h', p.horas, t.hora);
+  if (p.grab) lin('tiempo', 'dia_grabacion', 'Días de grabación con dirección', 'día', p.grab, t.dia_grabacion);
+  if (p.edicion) lin('tiempo', 'dia_edicion', p.edicionTxt || 'Días de edición, color y audio', 'día', p.edicion, t.dia_edicion);
+  ['equipo', 'crew', 'extras'].forEach(g => Object.entries(p[g] || {}).forEach(([id, v]) => {
+    const it = cfg[g].find(x => x.id === id); if (!it) return;
+    lin(g, id, it.nombre, it.unidad || 'día', v === true ? p.grab : v, it.precio);
+  }));
+  return { id: null, plantilla: p.id, empresa: '', titulo: p.id === 'blanco' ? '' : p.nombre, lineas: L,
+    pct: Object.assign({}, cfg.pct), redondeo: cfg.redondeo, precio: p.precioFijo || null, notas: '', sucio: false };
+}
+
+function cotCalc(c) {
+  const suma = g => c.lineas.filter(l => !g || l.grupo === g).reduce((s, l) => s + (Number(l.cant) || 0) * (Number(l.precio) || 0), 0);
+  const por = { tiempo: suma('tiempo'), equipo: suma('equipo'), crew: suma('crew'), extras: suma('extras') };
+  const costo = suma(), pct = c.pct || {};
+  const generales = costo * (pct.generales || 0) / 100;
+  const imprevistos = (costo + generales) * (pct.imprevistos || 0) / 100;
+  const base = costo + generales + imprevistos;
+  const utilidad = base * (pct.utilidad || 0) / 100;
+  const r = Number(c.redondeo) || 1;
+  const sugerido = Math.ceil((base + utilidad) / r) * r;
+  const precio = c.precio > 0 ? c.precio : sugerido;
+  const utilReal = precio - base, iva = precio * 0.16, total = precio + iva;
+  const fuera = por.crew + por.extras;                        // colaboradores y terceros
+  const tuyo = precio - fuera - generales;                    // para tu tiempo, tu equipo y la utilidad
+  const dias = c.lineas.filter(l => l.grupo === 'tiempo').reduce((s, l) => s + (l.unidad === 'h' ? l.cant / 8 : l.unidad === 'día' ? l.cant : 0), 0);
+  return { por, costo, generales, imprevistos, base, utilidad, sugerido, precio, utilReal, margen: precio ? utilReal / precio * 100 : 0,
+    iva, total, anticipo: precio / 2, fuera, tuyo, dias, porDia: dias ? tuyo / dias : 0,
+    comision: (total * 0.036 + 3) * 1.16 };                   // Stripe, si paga con tarjeta (la absorbes)
+}
+// Lo mínimo que debe valer tu día, según tu meta mensual
+const cotMetaDia = () => { const m = cotCfg().meta; return m.dias ? m.mensual / m.dias : 0; };
+
+function cotMercado(p, precio) {
+  if (!p.mercado) return '<p class="nota" style="margin:.3rem 0 .8rem">Sin referencia de mercado para este servicio: guíate por tus costos.</p>';
+  const [a, b] = p.mercado, lo = a * 0.5, hi = b * 1.3;
+  const x = v => Math.max(0, Math.min(100, (v - lo) / (hi - lo) * 100));
+  const [cl, txt, consejo] = precio < a ? ['bajo', 'Abajo del mercado', 'Revisa que de verdad cubra tu tiempo.']
+    : precio > b ? ['alto', 'Arriba del mercado', 'Justifícalo con lo que incluye o revisa días y equipo.']
+    : ['ok', 'En el rango del mercado', ''];
+  return `<div class="cot-merc m-${cl}">
+    <div class="cot-merc-cab"><b>${txt}</b><span>${pesos(a)} – ${pesos(b)}</span></div>
+    <div class="cot-barra" aria-hidden="true"><span class="cot-rango" style="left:${x(a)}%;width:${x(b) - x(a)}%"></span><span class="cot-punto" style="left:${x(precio)}%"></span></div>
+    <p class="nota">${consejo ? esc(consejo) + ' ' : ''}${esc(p.fuente)}</p>
+  </div>`;
+}
+
+function vistaCotizador() {
+  const C = S.cot;
+  const cab = `<div class="encabezado">
+    <div><h1>Cotizador</h1><p class="sub">Arma el precio con tus costos reales y compáralo con el mercado. Solo tú ves esta pestaña: a tu cliente le llega únicamente el precio final, en su propuesta.</p></div>
+    <div class="controles">${C.actual ? '<button class="btn btn-t" data-accion="cot-salir">← Otra cotización</button>' : ''}<button class="btn" data-accion="cot-ajustes">Tus tarifas y equipo</button></div>
+  </div>`;
+  if (C.falta) return cab + '<p class="aviso-linea aviso-error">Falta preparar la base de datos: corre <b>cotizador.sql</b> en Supabase (SQL Editor). Mientras, el cotizador no guarda nada.</p>' + (C.actual ? cotEditor(C.actual) : cotInicio());
+  return cab + (C.actual ? cotEditor(C.actual) : cotInicio());
+}
+
+function cotInicio() {
+  const tarjetas = COT_PLANT.map(p => `<button class="cot-plant" data-accion="cot-nueva" data-id="${p.id}">
+    <span class="cot-plant-n">${esc(p.nombre)}</span><span class="nota">${esc(p.detalle)}</span>
+    ${p.mercado ? `<span class="cot-plant-m">Mercado: ${pesos(p.mercado[0])} – ${pesos(p.mercado[1])}</span>` : ''}
+  </button>`).join('');
+  const hist = S.cot.lista;
+  return `<div class="titulo-sec"><h2>Nueva cotización</h2><p class="nota">Elige el servicio: se llena con los días, horas y equipo típicos, y lo ajustas.</p></div>
+  <div class="cot-plants">${tarjetas}</div>
+  <div class="titulo-sec"><h2>Guardadas</h2></div>
+  ${hist.length ? `<div class="sol-lista">${hist.map(x => {
+    const p = cotPlant(x.plantilla), pr = x.propuesta_id && S.propuestas.find(y => y.id === x.propuesta_id), e = pr && estadoPropuesta(pr);
+    return `<article class="sol">
+      <div>
+        <div class="sol-nombre">${esc(x.empresa)} <span>· ${esc(x.titulo || p.nombre)}</span></div>
+        <div class="sol-meta"><span><b>${pesos(x.precio)}</b> + IVA</span><span>Costo ${pesos(x.costo)}</span><span>${esc(fHora(x.updated_at || x.created_at))}</span></div>
+        ${x.notas ? `<p class="nota" style="margin:.4rem 0 0">${esc(x.notas)}</p>` : ''}
+        <div class="sol-acc">
+          <button class="btn btn-s btn-p" data-accion="cot-abrir" data-id="${x.id}">Abrir</button>
+          <button class="btn btn-s btn-t" data-accion="cot-duplicar" data-id="${x.id}">Duplicar</button>
+          <button class="btn btn-s btn-t btn-peligro" data-accion="cot-borrar" data-id="${x.id}">Borrar</button>
+        </div>
+      </div>
+      <div class="sol-der">${e ? `<span class="estado e-${e.clave}">${esc(e.txt)}</span><span class="nota">Propuesta</span>` : '<span class="nota">Sin propuesta</span>'}</div>
+    </article>`;
+  }).join('')}</div>` : '<div class="caja-vacia"><p>Aquí vas a ver lo que cotizaste, a cuánto y si ya es propuesta.</p></div>'}`;
+}
+
+function cotEditor(c) {
+  const p = cotPlant(c.plantilla), cfg = cotCfg(), r = cotCalc(c);
+  const grupos = COT_GRUPOS.map(([g, titulo, ayuda]) => {
+    const filas = c.lineas.map((l, i) => [l, i]).filter(([l]) => l.grupo === g);
+    const cat = g === 'tiempo' ? [['hora', 'Horas de trabajo'], ['dia_grabacion', 'Día de grabación'], ['dia_edicion', 'Día de edición']]
+      : cfg[g].map(x => [x.id, x.nombre]);
+    return `<section class="cot-grupo">
+      <div class="cot-g-cab"><h3>${titulo}</h3><span class="cot-g-total" data-r-grupo="${g}">${pesos(r.por[g])}</span></div>
+      ${ayuda ? `<p class="nota">${ayuda}</p>` : ''}
+      ${filas.map(([l, i]) => { const u = COT_UNIDAD[l.unidad] || COT_UNIDAD.pieza; return `<div class="cot-fila">
+        <input class="campo-in cot-nombre" data-cot="nombre" data-i="${i}" value="${esc(l.nombre)}" maxlength="120" placeholder="Concepto" aria-label="Concepto">
+        <label class="cot-n"><span>${u[0]}</span><input class="campo-in" inputmode="decimal" autocomplete="off" data-cot="cant" data-i="${i}" value="${esc(l.cant)}"></label>
+        <label class="cot-n"><span>${u[1]}</span><input class="campo-in" inputmode="decimal" autocomplete="off" data-cot="precio" data-i="${i}" value="${esc(l.precio)}"></label>
+        <span class="cot-sub" data-r-linea="${i}">${pesos(l.cant * l.precio)}</span>
+        <button class="cot-quitar" data-accion="cot-quitar" data-id="${i}" aria-label="Quitar ${esc(l.nombre || 'concepto')}">×</button>
+      </div>`; }).join('')}
+      <select class="campo-in cot-agregar" data-cambio="cot-agregar" data-grupo="${g}" aria-label="Agregar a ${titulo}">
+        <option value="">+ Agregar…</option>${cat.map(([v, t]) => `<option value="${esc(v)}">${esc(t)}</option>`).join('')}<option value="__otro">Otro concepto…</option>
+      </select>
+    </section>`;
+  }).join('');
+  return `<div class="cot-datos">
+    <div class="campo"><label for="cot-empresa">Cliente o empresa</label><input id="cot-empresa" data-cot="empresa" maxlength="160" value="${esc(c.empresa)}" placeholder="Ej. CABB Arrenda"></div>
+    <div class="campo"><label for="cot-titulo">Qué se cotiza</label><input id="cot-titulo" data-cot="titulo" maxlength="140" value="${esc(c.titulo)}" placeholder="${esc(p.nombre)}"></div>
+  </div>
+  <p class="nota cot-info">${esc(p.nombre)} · ${esc(p.detalle)}${p.nota ? ` · <b>${esc(p.nota)}</b>` : ''}</p>
+  <div class="cot-layout">
+    <div>${grupos}
+      <div class="campo"><label for="cot-notas">Notas internas <span class="opc">(solo tú)</span></label><textarea id="cot-notas" data-cot="notas" maxlength="2000" placeholder="Qué platicaron, qué supusiste, qué falta confirmar…">${esc(c.notas || '')}</textarea></div>
+    </div>
+    <aside class="cot-resumen" aria-label="Resumen de la cotización">${cotResumen(c, r, p)}</aside>
+  </div>`;
+}
+
+function cotResumen(c, r, p) {
+  const fila = (t, k, cls) => `<div class="cot-r${cls ? ' ' + cls : ''}"><span>${t}</span><b data-r="${k}">${cotValor(r, k)}</b></div>`;
+  const pct = (t, k) => `<div class="cot-r"><span>${t} <input class="cot-pct" data-cot="pct" data-k="${k}" inputmode="decimal" autocomplete="off" value="${esc(c.pct[k])}" aria-label="Porcentaje de ${t.toLowerCase()}">%</span><b data-r="${k}">${cotValor(r, k)}</b></div>`;
+  return `<h3>Resumen</h3>
+    ${fila('Tu tiempo', 'tiempo')}${fila('Tu equipo', 'equipo')}${fila('Colaboradores', 'crew')}${fila('Terceros y gastos', 'extras')}
+    ${fila('Costo', 'costo', 'cot-r-sub')}
+    ${pct('Gastos generales', 'generales')}${pct('Imprevistos', 'imprevistos')}${pct('Utilidad', 'utilidad')}
+    ${fila('Precio sugerido', 'sugerido', 'cot-r-sub')}
+    <div class="campo cot-final"><label for="cot-precio">Precio final antes de IVA</label>
+      <input id="cot-precio" inputmode="decimal" autocomplete="off" data-cot="precio-final" value="${c.precio > 0 ? esc(c.precio) : ''}" placeholder="${esc(r.sugerido)}">
+      <p class="ayuda">Vacío = el sugerido. Si lo cambias, abajo ves tu utilidad real.</p></div>
+    <div data-r-merc>${cotMercado(p, r.precio)}</div>
+    ${fila('Utilidad real', 'utilReal', r.utilReal < 0 ? 'cot-r-mal' : '')}
+    ${fila('IVA (16%)', 'iva')}
+    ${fila('Total con IVA', 'total', 'cot-r-total')}
+    ${fila(p.tipo === 'mensual' ? 'Anticipo (50% del primer mes)' : 'Anticipo (50%)', 'anticipo')}
+    <div class="cot-tuyo">
+      <p><b data-r="fuera">${cotValor(r, 'fuera')}</b> se van a colaboradores y terceros.</p>
+      <p><b data-r="tuyo">${cotValor(r, 'tuyo')}</b> te quedan a ti, ya descontados los gastos generales: es lo que paga tu tiempo, tu equipo y la utilidad.</p>
+      <p class="cot-dia${r.porDia < cotMetaDia() ? ' cot-dia-bajo' : ''}" data-r-dia>${cotDiaTxt(r)}</p>
+      <p class="nota">Si paga con tarjeta, la comisión de Stripe es de unos <span data-r="comision">${cotValor(r, 'comision')}</span> y la absorbes tú.</p>
+    </div>
+    <div class="cot-acc">
+      <button class="btn btn-p" data-accion="cot-propuesta">Crear propuesta con este precio</button>
+      <button class="btn" data-accion="cot-guardar">${c.id ? 'Guardar cambios' : 'Guardar cotización'}</button>
+    </div>`;
+}
+function cotDiaTxt(r) {
+  if (!r.dias) return '';
+  const d = Math.round(r.dias * 10) / 10, meta = cotMetaDia();
+  return `Son ${d} ${d === 1 ? 'día' : 'días'} de trabajo tuyo: te sale en <b>${pesos(r.porDia)} por día</b>.` +
+    (meta && r.porDia < meta ? ` Tu meta es de ${pesos(meta)} por día.` : '');
+}
+function cotValor(r, k) {
+  if (k in r.por) return pesos(r.por[k]);
+  if (k === 'utilReal') return `${pesos(r.utilReal)} · ${Math.round(r.margen)}%`;
+  if (k === 'anticipo') return pesos(r.anticipo) + ' + IVA';
+  return pesos(r[k]);
+}
+// Al teclear solo se actualizan los números: si se repintara todo, se perdería el cursor
+function cotNumeros() {
+  const c = S.cot.actual, r = cotCalc(c), raiz = document.querySelector('.cot-layout');
+  if (!raiz) return;
+  raiz.querySelectorAll('[data-r]').forEach(el => { el.textContent = cotValor(r, el.dataset.r); });
+  raiz.querySelectorAll('[data-r-grupo]').forEach(el => { el.textContent = pesos(r.por[el.dataset.rGrupo]); });
+  raiz.querySelectorAll('[data-r-linea]').forEach(el => { const l = c.lineas[Number(el.dataset.rLinea)]; if (l) el.textContent = pesos(l.cant * l.precio); });
+  const real = raiz.querySelector('[data-r="utilReal"]'); if (real) real.parentElement.classList.toggle('cot-r-mal', r.utilReal < 0);
+  const merc = raiz.querySelector('[data-r-merc]'); if (merc) merc.innerHTML = cotMercado(cotPlant(c.plantilla), r.precio);
+  const dia = raiz.querySelector('[data-r-dia]'); if (dia) { dia.innerHTML = cotDiaTxt(r); dia.classList.toggle('cot-dia-bajo', r.porDia < cotMetaDia()); }
+  const pr = document.getElementById('cot-precio'); if (pr) pr.placeholder = String(r.sugerido);
+}
+
+async function cotRecargarLista() {
+  const r = await sb.from('cotizaciones').select('*').order('created_at', { ascending: false }).limit(300);
+  if (!r.error) S.cot.lista = r.data || [];
+}
+async function cotGuardar(silencio) {
+  const c = S.cot.actual, r = cotCalc(c), empresa = (c.empresa || '').trim();
+  if (!empresa) { aviso('Escribe el cliente o empresa.', true); const el = document.getElementById('cot-empresa'); if (el) el.focus(); return null; }
+  const d = { empresa, plantilla: c.plantilla, titulo: (c.titulo || '').trim() || null, notas: (c.notas || '').trim() || null,
+    lineas: c.lineas.map(l => ({ grupo: l.grupo, ref: l.ref || null, nombre: (l.nombre || '').trim() || 'Concepto', unidad: l.unidad, cant: l.cant, precio: l.precio })),
+    pct: Object.assign({}, c.pct, { redondeo: c.redondeo, precio_manual: c.precio > 0 }),
+    costo: Math.round(r.costo * 100) / 100, precio: Math.round(r.precio * 100) / 100 };
+  if (c.id) await q(sb.from('cotizaciones').update(d).eq('id', c.id));
+  else c.id = (await q(sb.from('cotizaciones').insert(d).select('id').single())).id;
+  c.sucio = false;
+  await cotRecargarLista();
+  if (!silencio) aviso('Cotización guardada');
+  return c;
+}
+function cotDesde(x, comoNueva) {
+  const pct = Object.assign({}, x.pct);
+  const c = { id: comoNueva ? null : x.id, plantilla: x.plantilla, empresa: comoNueva ? '' : x.empresa, titulo: x.titulo || '',
+    lineas: (x.lineas || []).map(l => Object.assign({ k: cotClave() }, l)), redondeo: pct.redondeo || cotCfg().redondeo,
+    precio: pct.precio_manual ? Number(x.precio) : null, notas: comoNueva ? '' : x.notas || '', sucio: !!comoNueva };
+  delete pct.redondeo; delete pct.precio_manual; c.pct = pct;
+  return c;
+}
+async function cotSalirOk() {
+  return !(S.cot.actual && S.cot.actual.sucio) || confirmar('¿Salir sin guardar?', 'Esta cotización tiene cambios que no guardaste.', 'Salir sin guardar', true);
+}
+
+function modalCotAjustes() {
+  const cfg = cotCfg(), t = cfg.tarifas;
+  const lista = (g, titulo, ayuda) => `<div class="d-sep"><h3>${titulo}</h3><p>${ayuda}</p></div>
+    <div data-lista="${g}">${cfg[g].map(x => cotAjFila(g, x)).join('')}</div>
+    <button type="button" class="btn btn-s" data-cot-mas="${g}">+ Agregar</button>`;
+  const num = (id, n, label, v) => `<div class="campo"><label for="${id}">${label}</label><input id="${id}" name="${n}" inputmode="decimal" autocomplete="off" value="${esc(v)}"></div>`;
+  abrirModal(`<form data-form="cot-ajustes" novalidate>
+    <div class="d-cab"><div><h2 class="d-titulo">Tus tarifas y equipo</h2><p class="d-sub">Con esto arranca cada cotización nueva. Las que ya guardaste no cambian.</p></div></div>
+    <div class="d-sep"><h3>Cuánto vale tu tiempo</h3><p>Sale de cuánto quieres ganar al mes entre los días que trabajas.</p></div>
+    <div class="fila-campos">${num('ca-meta', 'meta_mensual', 'Quiero ganar al mes', cfg.meta.mensual)}${num('ca-dias', 'meta_dias', 'Días que trabajo al mes', cfg.meta.dias)}</div>
+    <p class="ayuda" id="ca-sug" style="margin:-.4rem 0 1rem"></p>
+    <div class="fila-campos tres">${num('ca-grab', 'dia_grabacion', 'Día de grabación', t.dia_grabacion)}${num('ca-edic', 'dia_edicion', 'Día de edición', t.dia_edicion)}${num('ca-hora', 'hora', 'Hora de trabajo', t.hora)}</div>
+    ${lista('equipo', 'Tu equipo', 'Cuánto cobras por día por usar cada cosa. Referencia: rentar una cámara de cine en Guadalajara cuesta $4,000–5,500 al día.')}
+    ${lista('crew', 'Colaboradores', 'Lo que le pagas a cada persona por día.')}
+    ${lista('extras', 'Terceros y gastos', 'Lo que pagas por pieza, por día o por hora: editor externo, locutor, música, rentas, gasolina.')}
+    <div class="d-sep"><h3>Porcentajes</h3><p>Se suman encima del costo, en este orden.</p></div>
+    <div class="fila-campos tres">${num('ca-gen', 'generales', 'Gastos generales %', cfg.pct.generales)}${num('ca-imp', 'imprevistos', 'Imprevistos %', cfg.pct.imprevistos)}${num('ca-uti', 'utilidad', 'Utilidad %', cfg.pct.utilidad)}</div>
+    <div class="campo" style="max-width:14rem"><label for="ca-red">Redondear el precio a</label><input id="ca-red" name="redondeo" inputmode="decimal" value="${esc(cfg.redondeo)}"><p class="ayuda">Hacia arriba, por ejemplo a los $500.</p></div>
+    <div class="d-pie"><button type="button" class="btn" data-accion="cerrar">Cancelar</button><button type="submit" class="btn btn-p">Guardar</button></div>
+  </form>`, dlg => {
+    const f = dlg.querySelector('form');
+    const sug = () => { const m = cotNum(f.elements.meta_mensual.value), d = cotNum(f.elements.meta_dias.value);
+      dlg.querySelector('#ca-sug').textContent = d ? `Cada día de trabajo tuyo tiene que valer al menos ${pesos(m / d)}. El de grabación vale más que el de edición porque ahí diriges y respondes por el resultado.` : ''; };
+    f.addEventListener('input', e => { if (['meta_mensual', 'meta_dias'].includes(e.target.name)) sug(); });
+    sug();
+    dlg.addEventListener('click', e => {
+      const mas = e.target.closest('[data-cot-mas]');
+      if (mas) { const box = dlg.querySelector(`[data-lista="${mas.dataset.cotMas}"]`); box.insertAdjacentHTML('beforeend', cotAjFila(mas.dataset.cotMas, { id: '', nombre: '', precio: '' })); box.lastElementChild.querySelector('input').focus(); }
+      const quitar = e.target.closest('[data-cot-quitar-aj]'); if (quitar) quitar.closest('.cot-aj-fila').remove();
+    });
+  });
+}
+function cotAjFila(g, x) {
+  return `<div class="cot-aj-fila${g === 'extras' ? ' con-unidad' : ''}" data-id="${esc(x.id)}">
+    <input class="campo-in" data-aj="nombre" maxlength="120" value="${esc(x.nombre)}" placeholder="Concepto" aria-label="Concepto">
+    ${g === 'extras' ? `<select class="campo-in" data-aj="unidad" aria-label="Se cobra">${[['pieza', 'por pieza'], ['día', 'por día'], ['h', 'por hora']].map(([v, t]) => `<option value="${v}"${(x.unidad || 'pieza') === v ? ' selected' : ''}>${t}</option>`).join('')}</select>` : ''}
+    <input class="campo-in" data-aj="precio" inputmode="decimal" autocomplete="off" value="${esc(x.precio)}" placeholder="${g === 'extras' ? 'Costo' : 'Por día'}" aria-label="Costo">
+    <button type="button" class="cot-quitar" data-cot-quitar-aj aria-label="Quitar">×</button>
+  </div>`;
 }
 
 const avisoFaltaBase = () => S.faltaBase
@@ -2920,9 +3348,9 @@ function modalPropuesta(id, desde) {
   const tipo = base ? base.tipo : (sol && (sol.ruta === 'B' || sol.interes === 'proyecto') ? 'proyecto' : 'mensual');
   const def = PROP_DEF[tipo];
   const v = (k, otro) => esc(base ? (base[k] ?? '') : (otro ?? def[k] ?? ''));
-  const para = k => esc(x ? x[k] || '' : sol ? sol[k] || '' : '');
+  const para = k => esc(x ? x[k] || '' : sol ? sol[k] || '' : desde.para ? desde.para[k] || '' : '');
   const vigencia = x ? x.vigencia : aISO(sumarDias(hoy(), 15));
-  abrirModal(`<form data-form="propuesta" data-id="${x ? x.id : ''}" data-solicitud="${sol ? sol.id : ''}" novalidate>
+  abrirModal(`<form data-form="propuesta" data-id="${x ? x.id : ''}" data-solicitud="${sol ? sol.id : ''}" data-cotizacion="${esc(desde.cot || '')}" novalidate>
     <div class="d-cab"><div><h2 class="d-titulo">${x ? 'Editar propuesta' : 'Nueva propuesta'}</h2>
       <p class="d-sub">${x && x.aceptada_at ? 'Ya la aceptó: si la cambias, verá la versión nueva.' : 'Lo que escribas aquí es lo que ve tu prospecto, salvo las notas internas.'}</p></div></div>
     <div class="fila-campos">
@@ -3300,12 +3728,34 @@ const FORMS = {
       } else {
         if (f.dataset.solicitud) d.solicitud_id = f.dataset.solicitud;
         const nueva = await q(sb.from('propuestas').insert(d).select('*').single());
+        // Hecha desde el cotizador: la cotización queda ligada a su propuesta
+        if (f.dataset.cotizacion) { try { await q(sb.from('cotizaciones').update({ propuesta_id: nueva.id }).eq('id', f.dataset.cotizacion)); S.cot.actual = null; } catch (e) { /* la propuesta ya quedó */ } }
         S.propFiltro = 'activas'; S.vista = 'propuestas';
         await recargar();
         if (!S.propuestas.some(pr => pr.id === nueva.id)) S.propuestas.unshift(nueva);
         modalPropuestaLista(S.propuestas.find(pr => pr.id === nueva.id));
       }
     } catch (e) { aviso(humano(e), true); }
+  },
+  async 'cot-ajustes'(f) {
+    const n = name => cotNum(valor(f, name));
+    const leer = g => [...f.querySelectorAll(`[data-lista="${g}"] .cot-aj-fila`)].map(row => {
+      const x = { id: row.dataset.id || cotClave(), nombre: row.querySelector('[data-aj=nombre]').value.trim(), precio: cotNum(row.querySelector('[data-aj=precio]').value) };
+      const u = row.querySelector('[data-aj=unidad]'); if (u) x.unidad = u.value;
+      return x;
+    }).filter(x => x.nombre);
+    const config = {
+      tarifas: { dia_grabacion: n('dia_grabacion'), dia_edicion: n('dia_edicion'), hora: n('hora') },
+      meta: { mensual: n('meta_mensual'), dias: n('meta_dias') },
+      pct: { generales: n('generales'), imprevistos: n('imprevistos'), utilidad: n('utilidad') },
+      redondeo: Math.max(1, n('redondeo')), equipo: leer('equipo'), crew: leer('crew'), extras: leer('extras')
+    };
+    if (!(config.tarifas.dia_grabacion > 0 && config.tarifas.dia_edicion > 0 && config.tarifas.hora > 0)) { aviso('Pon tus tres tarifas: día de grabación, día de edición y hora.', true); return f.elements.dia_grabacion.focus(); }
+    await q(sb.from('cotizador_config').upsert({ id: 1, config }));
+    S.cot.config = { id: 1, config };
+    cerrarModal();
+    aviso('Listo: las cotizaciones nuevas ya usan estas tarifas');
+    render();
   },
   async ajustes(f) {
     const num = n => { const t = (valor(f, n) || '').replace(/[$,\s]/g, ''); return t === '' ? null : Number(t); };
@@ -3672,6 +4122,49 @@ const ACC = {
       location.href = d.url;
     } catch (e) { el.disabled = false; aviso(String(e.message || e) + ' También puedes pagar por transferencia.', true); }
   },
+  'cot-ajustes'() { modalCotAjustes(); },
+  async 'cot-nueva'(el, id) {
+    S.cot.actual = cotNueva(id); render(); window.scrollTo(0, 0);
+    const e = document.getElementById('cot-empresa'); if (e) e.focus();
+  },
+  async 'cot-salir'() { if (!await cotSalirOk()) return; S.cot.actual = null; render(); window.scrollTo(0, 0); },
+  'cot-quitar'(el, i) { S.cot.actual.lineas.splice(Number(i), 1); S.cot.actual.sucio = true; render(); },
+  async 'cot-guardar'(el) {
+    el.disabled = true;
+    try { if (await cotGuardar()) render(); } finally { if (document.contains(el)) el.disabled = false; }
+  },
+  async 'cot-propuesta'(el) {
+    el.disabled = true;
+    let c;
+    try { c = await cotGuardar(true); } finally { if (document.contains(el)) el.disabled = false; }
+    if (!c) return;
+    render();
+    const p = cotPlant(c.plantilla), r = cotCalc(c), def = PROP_DEF[p.tipo];
+    const grab = c.lineas.filter(l => l.ref === 'dia_grabacion').reduce((s, l) => s + l.cant, 0);
+    const dron = c.lineas.some(l => l.ref === 'dron' && l.cant > 0);
+    modalPropuesta(null, { cot: c.id, para: { empresa: c.empresa }, duplicar: Object.assign({}, def, {
+      tipo: p.tipo, titulo: c.titulo || p.nombre, precio: r.precio, iva: 'mas_iva', anticipo: null, diagnostico: '', ejemplo_url: '',
+      incluye: p.incluye ? p.incluye({ grab, dron }).join('\n') : def.incluye,
+      notas: `Del cotizador: costo ${pesos(r.costo)}, utilidad ${pesos(r.utilReal)} (${Math.round(r.margen)}%).`,
+      videos_ciclo: 12, dias_grabacion: p.tipo === 'mensual' ? Math.max(1, Math.round(grab) || 2) : 2, plazo_minimo: 3
+    }) });
+  },
+  async 'cot-abrir'(el, id) {
+    const x = S.cot.lista.find(y => y.id === id); if (!x || !await cotSalirOk()) return;
+    S.cot.actual = cotDesde(x); render(); window.scrollTo(0, 0);
+  },
+  async 'cot-duplicar'(el, id) {
+    const x = S.cot.lista.find(y => y.id === id); if (!x || !await cotSalirOk()) return;
+    S.cot.actual = cotDesde(x, true); render(); window.scrollTo(0, 0);
+    const e = document.getElementById('cot-empresa'); if (e) e.focus();
+  },
+  async 'cot-borrar'(el, id) {
+    const x = S.cot.lista.find(y => y.id === id); if (!x) return;
+    if (!await confirmar(`¿Borrar la cotización de ${x.empresa}?`, 'Se borra solo la cotización; si ya hiciste propuesta, la propuesta se queda.', 'Borrar', true)) return;
+    await q(sb.from('cotizaciones').delete().eq('id', id));
+    if (S.cot.actual && S.cot.actual.id === id) S.cot.actual = null;
+    await cotRecargarLista(); aviso('Cotización borrada'); render();
+  },
   'prop-nueva'(el, id) {
     const sol = id ? S.solicitudes.find(x => x.id === id) : null;
     modalPropuesta(null, sol ? { solicitud: sol } : {});
@@ -3780,6 +4273,20 @@ const CAMBIOS = {
   },
   'fac-filtro'(el) { S.facFiltro = el.value; render(); },
   'prop-filtro'(el) { S.propFiltro = el.value; render(); },
+  'cot-agregar'(el) {
+    const g = el.dataset.grupo, v = el.value, c = S.cot.actual; if (!v || !c) return;
+    const cfg = cotCfg(), t = cfg.tarifas;
+    const dias = c.lineas.filter(l => l.ref === 'dia_grabacion').reduce((s, l) => s + l.cant, 0) || 1;
+    const TIEMPO = { hora: ['Horas de trabajo', 'h', 1, t.hora], dia_grabacion: ['Día de grabación', 'día', 1, t.dia_grabacion], dia_edicion: ['Día de edición', 'día', 1, t.dia_edicion] };
+    let l;
+    if (v === '__otro') l = { ref: null, nombre: '', unidad: g === 'tiempo' ? 'h' : g === 'extras' ? 'pieza' : 'día', cant: 1, precio: 0 };
+    else if (g === 'tiempo') { const [nombre, unidad, cant, precio] = TIEMPO[v]; l = { ref: v, nombre, unidad, cant, precio }; }
+    else { const it = cfg[g].find(x => x.id === v); if (!it) return;
+      const unidad = it.unidad || 'día'; l = { ref: it.id, nombre: it.nombre, unidad, cant: unidad === 'día' ? dias : 1, precio: it.precio }; }
+    c.lineas.push(Object.assign({ k: cotClave(), grupo: g }, l));
+    c.sucio = true; render();
+    if (v === '__otro') { const ins = document.querySelectorAll('.cot-nombre'); const ult = [...ins].find(i => Number(i.dataset.i) === c.lineas.length - 1); if (ult) ult.focus(); }
+  },
   'cob-filtro'(el) { S.cobFiltro = el.value; render(); },
   'estilo-color'(el) { cambiarEstilo({ color: el.value.toUpperCase() }); },
   'estilo-notas'(el) { cambiarEstilo({ notas: el.value.trim() }); },
@@ -3807,6 +4314,19 @@ document.addEventListener('submit', ev => {
   Promise.resolve(FORMS[f.dataset.form](f))
     .catch(e => aviso(humano(e), true))
     .finally(() => { if (btn && document.contains(btn)) btn.disabled = false; });
+});
+// Cotizador: cada tecla actualiza la cotización y sus números, sin repintar la página
+document.addEventListener('input', ev => {
+  const el = ev.target.closest('[data-cot]'), c = S.cot.actual;
+  if (!el || !c) return;
+  const k = el.dataset.cot, l = c.lineas[Number(el.dataset.i)];
+  if (k === 'nombre' && l) l.nombre = el.value;
+  else if ((k === 'cant' || k === 'precio') && l) l[k] = cotNum(el.value);
+  else if (k === 'pct') c.pct[el.dataset.k] = cotNum(el.value);
+  else if (k === 'precio-final') c.precio = el.value.trim() ? cotNum(el.value) : null;
+  else if (['empresa', 'titulo', 'notas'].includes(k)) c[k] = el.value;
+  c.sucio = true;
+  cotNumeros();
 });
 raizModal.addEventListener('click', ev => { if (ev.target.classList.contains('velo')) cerrarModal(); });
 document.addEventListener('keydown', ev => { if (ev.key === 'Escape' && raizModal.innerHTML) cerrarModal(); });
