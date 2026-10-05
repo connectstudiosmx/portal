@@ -9,7 +9,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23000'/%3E%3Crect x='14' y='10' width='36' height='44' rx='4' fill='none' stroke='%23F3E7C8' stroke-width='5'/%3E%3Crect x='14' y='44' width='36' height='10' fill='%23E3B23C'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400..700&family=Bangers&family=Pacifico&family=Permanent+Marker&family=Playfair+Display:ital,wght@0,900;1,900&family=Poppins:wght@800&family=Righteous&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400..700&family=Bangers&family=Lobster&family=Permanent+Marker&family=Playfair+Display:ital,wght@0,900;1,900&family=Poppins:wght@800&family=Righteous&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
 <style>
 :root{
   --negro:#000;
@@ -612,6 +612,7 @@ main.app{max-width:var(--ancho);margin:0 auto;padding:1.75rem 1.25rem 5rem}
 .seg{display:inline-flex;gap:4px;padding:4px;border:1px solid var(--linea-2);border-radius:999px}
 .seg button{border:0;background:none;border-radius:999px;padding:.4rem .9rem;font-weight:600;font-size:.86rem;color:var(--crema-2);cursor:pointer}
 .seg button[aria-pressed="true"]{background:var(--crema);color:#000}
+.seg-envuelve{display:flex;flex-wrap:wrap;border-radius:16px}
 .gen-perfil{display:flex;align-items:flex-end;gap:.8rem}
 .gen-perfil canvas{width:120px;height:160px;border-radius:4px;border:1px solid var(--linea-2)}
 .entrega-extra{display:grid;grid-template-columns:auto minmax(0,1fr);gap:1rem;align-items:start;margin:0 0 1rem}
@@ -2688,11 +2689,14 @@ const FUENTES = {
   righteous: { nombre: 'Righteous', tipo: 'Retro', css: "'Righteous', sans-serif", peso: 400, escala: 0.84, alto: 1.04, mayus: true },
   bangers: { nombre: 'Bangers', tipo: 'Cómic', css: "'Bangers', Impact, sans-serif", peso: 400, escala: 1.06, alto: 1.02, mayus: true },
   marker: { nombre: 'Permanent Marker', tipo: 'Marcador', css: "'Permanent Marker', sans-serif", peso: 400, escala: 0.8, alto: 1.1, mayus: true },
-  pacifico: { nombre: 'Pacifico', tipo: 'Cursiva', css: "'Pacifico', cursive", peso: 400, escala: 0.74, alto: 1.34, mayus: false }
+  // Cursiva gruesa: Pacifico no se leía en el feed, en miniatura (oct 2026)
+  lobster: { nombre: 'Lobster', tipo: 'Cursiva', css: "'Lobster', cursive", peso: 400, escala: 0.9, alto: 1.12, mayus: false }
 };
 const ESTILO_DEF = { color: '#39FF88', fuente: 'anton', subtitulos: 'resaltada', portada: 'abajo', logo_uso: 'final', logo_url: null, ritmo: 'dinamico', broll: [], musica: 'energia', notas: null, confirmado_at: null, confirmado_por: null };
 const OPCIONES_ESTILO = [
-  ['portada', 'Portada', 'Cómo se ve cada video en tu perfil.', { abajo: ['Título abajo', 'Título grande con una barra de tu color.'], caja: ['Caja al centro', 'Título en cajas, con un ligero giro.'], franja: ['Franja de color', 'El título en una franja doble de tu color.'], marco: ['Marco de color', 'Doble marco de tu color, como tu logo, y el título al centro.'] }],
+  ['portada', 'Portada', 'Cómo se ve cada video en tu perfil.', { abajo: ['Título abajo', 'Título grande con una barra de tu color.'], caja: ['Caja al centro', 'Título en cajas, con un ligero giro.'], franja: ['Franja de color', 'El título en una franja doble de tu color.'], marco: ['Marco de color', 'Doble marco de tu color, como tu logo, y el título al centro.'],
+    resaltado: ['Resaltado', 'Título al centro; lo importante, en pastillas de tu color.'], diagonal: ['Corte diagonal', 'Panel oscuro en diagonal, con filos de tu color.'],
+    cine: ['Cinematográfico', 'Barras de cine y el título entre dos líneas de tu color.'], tarjeta: ['Tarjeta', 'Una nota blanca con una cinta de tu color, como pegada.'] }],
   ['logo_uso', 'Tu logo', 'Dónde aparece tu logo en los videos.', { esquina: ['En la esquina', 'Pequeño, durante todo el video.'], final: ['Solo al final', 'Cierra cada video.'], sin: ['Sin logo', 'Tu marca la dice tu voz.'] }]
 ];
 // Cuadros de muestra (de videos reales) y títulos para ver cómo queda el perfil completo
@@ -2744,7 +2748,88 @@ async function dibujarPortada(cv, { fuente: src, titulo, estilo, logo }) {
   const medida = () => { const m = ctx.measureText('ÁÉÍÑgjpqy'); return { asc: m.actualBoundingBoxAscent, desc: m.actualBoundingBoxDescent }; };
   const renglon = (l, x, y) => l.forEach((tk, j) => { const t = tk.w + (j < l.length - 1 ? ' ' : ''); ctx.fillStyle = tk.r ? color : '#fff'; ctx.fillText(t, x, y); x += ctx.measureText(t).width; });
   ctx.textBaseline = 'alphabetic';
-  if (estilo.portada === 'caja') {
+  const redondo = (x, y, w, h, r) => { ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(x, y, w, h, r); else ctx.rect(x, y, w, h); };
+  const sombra = (b, c) => { ctx.shadowBlur = b; ctx.shadowColor = b ? c || 'rgba(0,0,0,.55)' : 'transparent'; };
+  if (estilo.portada === 'resaltado') {
+    // Título abajo y al centro; lo de tu color va en pastillas redondeadas, como marcatextos
+    const g = ctx.createLinearGradient(0, H * 0.45, 0, H * 0.85);
+    g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,.78)');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    let tam = 124; fuente(tam); let ls = partirLineas(ctx, tokens, 860);
+    while (ls.length > 4 && tam > 72) { tam -= 8; fuente(tam); ls = partirLineas(ctx, tokens, 860); }
+    const { asc, desc } = medida(), pad = Math.round((asc + desc) * 0.16), linea = asc + desc + pad * 2 + 16;
+    const base = PORTADA.abajo - 110 - desc, esp = ctx.measureText(' ').width;
+    ctx.textAlign = 'left';
+    ls.forEach((l, i) => {
+      const y = base - (ls.length - 1 - i) * linea, anchos = l.map(tk => ctx.measureText(tk.w).width);
+      let x = (W - anchos.reduce((s, a) => s + a, 0) - esp * (l.length - 1)) / 2;
+      l.forEach((tk, j) => {
+        if (tk.r) {
+          ctx.save(); ctx.translate(x + anchos[j] / 2, y - (asc - desc) / 2); ctx.rotate(j % 2 ? 0.02 : -0.024);
+          sombra(18, 'rgba(0,0,0,.35)'); ctx.fillStyle = color;
+          redondo(-anchos[j] / 2 - pad * 1.2, -(asc + desc) / 2 - pad, anchos[j] + pad * 2.4, asc + desc + pad * 2, pad); ctx.fill();
+          ctx.restore(); sombra(0);
+          ctx.fillStyle = tintaSobre(color); ctx.fillText(tk.w, x, y);
+        } else { sombra(20); ctx.fillStyle = '#fff'; ctx.fillText(tk.w, x, y); sombra(0); }
+        x += anchos[j] + esp;
+      });
+    });
+  } else if (estilo.portada === 'diagonal') {
+    // Panel oscuro cortado en diagonal, con un filo grueso y uno delgado de tu color
+    let tam = 120; fuente(tam); let ls = partirLineas(ctx, tokens, 900);
+    while (ls.length > 4 && tam > 70) { tam -= 8; fuente(tam); ls = partirLineas(ctx, tokens, 900); }
+    const { asc, desc } = medida(), linea = (asc + desc) * 1.08;
+    const base = PORTADA.abajo - 100 - desc, techo = base - (ls.length - 1) * linea - asc;
+    const yI = techo - 80, yD = techo - 240;   // sube hacia la derecha
+    const banda = (d0, d1) => { ctx.beginPath(); ctx.moveTo(0, yI - d0); ctx.lineTo(W, yD - d0); ctx.lineTo(W, yD - d1); ctx.lineTo(0, yI - d1); ctx.closePath(); ctx.fill(); };
+    sombra(40, 'rgba(0,0,0,.5)'); ctx.fillStyle = 'rgba(10,10,11,.94)';
+    ctx.beginPath(); ctx.moveTo(0, yI); ctx.lineTo(W, yD); ctx.lineTo(W, H); ctx.lineTo(0, H); ctx.closePath(); ctx.fill(); sombra(0);
+    ctx.fillStyle = color; banda(24, 0); banda(58, 48);
+    ctx.textAlign = 'left';
+    ls.forEach((l, i) => renglon(l, 80, base - (ls.length - 1 - i) * linea));
+  } else if (estilo.portada === 'cine') {
+    // Barras de cine arriba y abajo, y el título al centro entre dos líneas de tu color
+    ctx.fillStyle = 'rgba(0,0,0,.28)'; ctx.fillRect(0, 0, W, H);
+    const barra = 170, arriba = PORTADA.arriba + barra, abajo = PORTADA.abajo - barra;
+    ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, arriba); ctx.fillRect(0, abajo, W, H - abajo);
+    // espaciado de cine solo en letras de mayúsculas: en las cursivas separa las letras unidas
+    const espaciar = t => { if (f.mayus && 'letterSpacing' in ctx) ctx.letterSpacing = Math.round(t * 0.05) + 'px'; };
+    let tam = 104; fuente(tam); espaciar(tam); let ls = partirLineas(ctx, tokens, 820);
+    while (ls.length > 4 && tam > 60) { tam -= 6; fuente(tam); espaciar(tam); ls = partirLineas(ctx, tokens, 820); }
+    const { asc, desc } = medida(), linea = (asc + desc) * 1.14, centro = (arriba + abajo) / 2, altoTxt = ls.length * linea;
+    let y = centro - altoTxt / 2 + (linea - asc - desc) / 2 + asc;
+    ctx.textAlign = 'left'; sombra(24, 'rgba(0,0,0,.6)');
+    ls.forEach(l => { renglon(l, W / 2 - ctx.measureText(l.map(x => x.w).join(' ')).width / 2, y); y += linea; });
+    sombra(0); if ('letterSpacing' in ctx) ctx.letterSpacing = '0px';
+    ctx.fillStyle = color; ctx.fillRect(W / 2 - 90, centro - altoTxt / 2 - 46, 180, 6); ctx.fillRect(W / 2 - 90, centro + altoTxt / 2 + 40, 180, 6);
+  } else if (estilo.portada === 'tarjeta') {
+    // Nota blanca un poco girada, con una cinta de tu color; lo resaltado, con marcatextos
+    let tam = 98; fuente(tam); let ls = partirLineas(ctx, tokens, 720);
+    while (ls.length > 5 && tam > 58) { tam -= 6; fuente(tam); ls = partirLineas(ctx, tokens, 720); }
+    const { asc, desc } = medida(), linea = (asc + desc) * 1.16, pad = 64, esp = ctx.measureText(' ').width;
+    const ancho = Math.max(...ls.map(l => ctx.measureText(l.map(x => x.w).join(' ')).width)) + pad * 2;
+    const alto = (ls.length - 1) * linea + asc + desc + pad * 2;
+    const n = parseInt(String(color).slice(1), 16), clarisimo = (0.299 * (n >> 16) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)) > 235;
+    const fondoR = clarisimo ? '#111' : color, tintaR = clarisimo ? '#fff' : tintaSobre(color);
+    ctx.save(); ctx.translate(W / 2, PORTADA.abajo - 170 - alto / 2); ctx.rotate(-0.035);
+    ctx.shadowOffsetY = 18; sombra(44, 'rgba(0,0,0,.5)');
+    ctx.fillStyle = '#fff'; redondo(-ancho / 2, -alto / 2, ancho, alto, 26); ctx.fill();
+    ctx.shadowOffsetY = 0; sombra(0);
+    ctx.save(); ctx.rotate(0.07); ctx.globalAlpha = 0.92; ctx.fillStyle = clarisimo ? '#d9d6cf' : color; ctx.fillRect(-95, -alto / 2 - 30, 190, 58); ctx.restore();
+    ctx.textAlign = 'left';
+    let y = -alto / 2 + pad + asc;
+    ls.forEach(l => {
+      let x = -ancho / 2 + pad;
+      l.forEach(tk => {
+        const w = ctx.measureText(tk.w).width;
+        if (tk.r) { ctx.fillStyle = fondoR; redondo(x - 10, y - asc - 8, w + 20, asc + desc + 16, 10); ctx.fill(); ctx.fillStyle = tintaR; }
+        else ctx.fillStyle = '#111';
+        ctx.fillText(tk.w, x, y); x += w + esp;
+      });
+      y += linea;
+    });
+    ctx.restore();
+  } else if (estilo.portada === 'caja') {
     // Cajas con sombra y un ligero giro
     const tramos = tokens.reduce((t, tk) => { const u = t[t.length - 1]; if (u && u[0].r === tk.r) u.push(tk); else t.push([tk]); return t; }, []);
     const acomodar = () => tramos.flatMap(t => partirLineas(ctx, t, 840));
@@ -2845,7 +2930,7 @@ function vistaEstilo(fila, modo, idCliente) {
   S.estiloMuestra = e;
   const color = String(e.color).toUpperCase(), f = FUENTES[e.fuente] || FUENTES.anton;
   const op = (campo, val, cont, clase = '') => `<button type="button" class="op${clase}" data-accion="estilo-op" data-campo="${campo}" data-valor="${esc(val)}" aria-pressed="${String(campo === 'color' ? color === val : e[campo] === val)}"${edita ? '' : ' disabled'}>${cont}</button>`;
-  const opciones = campo => { const ops = OPCIONES_ESTILO.find(o => o[0] === campo)[3]; return `<div class="op-grid" style="--n:${Object.keys(ops).length}">${Object.entries(ops).map(([k, [t, d]]) => op(campo, k, `<b>${esc(t)}</b><span>${esc(d)}</span>`)).join('')}</div>`; };
+  const opciones = campo => { const ops = OPCIONES_ESTILO.find(o => o[0] === campo)[3]; return `<div class="op-grid" style="--n:${Math.min(4, Object.keys(ops).length)}">${Object.entries(ops).map(([k, [t, d]]) => op(campo, k, `<b>${esc(t)}</b><span>${esc(d)}</span>`)).join('')}</div>`; };
   const cuerpos = {
     color: `<div class="swatches">${COLORES.map(c => op('color', c, `<span style="background:${c}"></span>`, ' sw')).join('')}
       <label class="sw-libre${COLORES.includes(color) ? '' : ' activo'}"><input type="color" value="${esc(e.color)}" data-cambio="estilo-color"${edita ? '' : ' disabled'} aria-label="Otro color"><span>${COLORES.includes(color) ? 'Otro' : esc(color)}</span></label></div>`,
@@ -2989,7 +3074,7 @@ function modalPortada(id) {
           <input id="gen-tiempo" type="range" min="0" max="1" step="0.04" value="0"></div>
         <div class="campo"><label for="gen-titulo">Título</label><input id="gen-titulo" maxlength="140" value="${esc(gen.titulo)}">
           <p class="ayuda">Corto y que enganche. Lo que pongas entre *asteriscos* sale en el color del cliente.</p></div>
-        <div class="campo"><span class="lbl">Estilo</span><div class="seg" role="group" aria-label="Estilo de portada">${['abajo', 'caja', 'franja', 'marco'].map(k => `<button type="button" data-gen-estilo="${k}" aria-pressed="${gen.estilo.portada === k}">${esc(nombreOpcion('portada', k))}</button>`).join('')}</div></div>
+        <div class="campo"><span class="lbl">Estilo</span><div class="seg seg-envuelve" role="group" aria-label="Estilo de portada">${Object.keys(OPCIONES_ESTILO[0][3]).map(k => `<button type="button" data-gen-estilo="${k}" aria-pressed="${gen.estilo.portada === k}">${esc(nombreOpcion('portada', k))}</button>`).join('')}</div></div>
         <div class="gen-perfil"><canvas id="gen-grid" width="360" height="480" aria-label="Así se ve en el perfil"></canvas><span class="nota">Así se ve en el perfil de Instagram (recorte 3:4).</span></div>
       </div>
     </div>
