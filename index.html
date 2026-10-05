@@ -623,7 +623,7 @@ const sb = (configLista() && window.supabase)
 
 const S = {
   sesion: null, perfil: null,
-  vista: 'produccion',
+  vista: 'produccion', subVista: {},
   clientes: [], ciclos: [], videos: [], perfiles: [], asignaciones: [], solicitudes: [], reportes: [], mlLog: [], verAtendidas: false, solFiltro: { ruta: '', califica: '', estado: '' },
   postulaciones: [], postFiltro: { rol: '', estado: 'activas', pais: '' }, facturas: [], pagoDatos: null, facFiltro: 'pendiente', faltaBase: false,
   pagosCli: null, propuestas: [], propFiltro: 'activas', ajustes: null, contratos: [], pagosStripe: [], stripeModo: null,
@@ -872,9 +872,9 @@ function pantallaSimple(titulo, texto, boton, accion) {
 // ---------- Barra superior ------------------------------------------
 function barra() {
   const p = S.perfil, esAdmin = p.role === 'admin';
-  const tabs = esAdmin ? [['produccion', 'Producción'], ['calendario', 'Calendario'], ['clientes', 'Clientes'], ['solicitudes', 'Solicitudes'],
-      ['propuestas', 'Propuestas'], ['postulaciones', 'Postulaciones'], ['pagos', 'Pagos'], ['accesos', 'Accesos']]
-    : p.role === 'editor' ? [['produccion', 'Producción'], ['calendario', 'Calendario']] : [];
+  const tabs = esAdmin ? [['produccion', 'Producción'], ['clientes', 'Clientes'], ['solicitudes', 'Solicitudes'],
+      ['propuestas', 'Propuestas'], ['postulaciones', 'Postulaciones'], ['pagos', 'Pagos']]
+    : p.role === 'editor' ? [['produccion', 'Producción']] : [];
   const pendientes = esAdmin ? S.perfiles.filter(x => x.role === 'pendiente').length : 0;
   const nuevas = esAdmin ? S.solicitudes.filter(x => !x.atendida).length : 0;
   const errML = esAdmin ? mlConError().length : 0;
@@ -885,18 +885,27 @@ function barra() {
     : id === 'propuestas' && porConvertir ? `<span class="punto" aria-label="${porConvertir} ${porConvertir === 1 ? 'pendiente' : 'pendientes'}: contratos por firmar o aceptadas sin dar de alta">${porConvertir}</span>`
     : id === 'postulaciones' && porRevisar ? `<span class="punto" aria-label="${porRevisar} por revisar">${porRevisar}</span>`
     : id === 'pagos' && porEmitir ? `<span class="punto" aria-label="${porEmitir} ${porEmitir === 1 ? 'factura' : 'facturas'} por emitir">${porEmitir}</span>`
-    : id === 'accesos' && pendientes ? `<span class="punto" aria-label="${pendientes} pendientes">${pendientes}</span>`
-    : id === 'solicitudes' && nuevas ? `<span class="punto" aria-label="${nuevas} sin atender">${nuevas}</span>` : '';
-  const actual = S.vista === 'previa' ? 'clientes' : S.vista;
+    : id === 'solicitudes' && nuevas + pendientes ? `<span class="punto" aria-label="${nuevas} sin atender y ${pendientes} accesos pendientes">${nuevas + pendientes}</span>` : '';
+  const actual = S.vista === 'previa' ? 'clientes' : grupoDe(S.vista) || S.vista;
   return `<header class="barra"><div class="barra-in">
     <div class="marca"><b>Connect Studios</b><span>Portal</span></div>
-    ${tabs.length ? `<nav class="nav" aria-label="Secciones">${tabs.map(([id, txt]) => `<button data-accion="ir" data-id="${id}"${actual === id ? ' aria-current="page"' : ''}>${txt}${punto(id)}</button>`).join('')}</nav>` : ''}
+    ${tabs.length ? `<nav class="nav" aria-label="Secciones">${tabs.map(([id, txt]) => `<button data-accion="ir" data-id="${S.subVista[id] || id}"${actual === id ? ' aria-current="page"' : ''}>${txt}${punto(id)}</button>`).join('')}</nav>` : ''}
     <div class="quien">
       <span class="quien-txt"><strong>${esc(nombreDe(p))}</strong><small>${esc(p.role === 'cliente' && S.portal && S.portal.client ? S.portal.client.name : ROL[p.role])}</small></span>
       ${p.role !== 'cliente' ? '<button class="btn btn-s btn-t" data-accion="actualizar">Actualizar</button>' : ''}
       <button class="btn btn-s" data-accion="salir">Salir</button>
     </div>
   </div></header>`;
+}
+
+// Pestañas que agrupan dos vistas: arriba una sola, adentro sus sub-pestañas
+const GRUPOS = { produccion: [['produccion', 'Videos'], ['calendario', 'Calendario']], solicitudes: [['solicitudes', 'Solicitudes'], ['accesos', 'Accesos al portal']] };
+const grupoDe = v => Object.keys(GRUPOS).find(g => GRUPOS[g].some(([id]) => id === v));
+function subPestanas(v) {
+  const g = grupoDe(v); if (!g || (g === 'solicitudes' && S.perfil.role !== 'admin')) return '';
+  S.subVista[g] = v;
+  const cuenta = id => id === 'solicitudes' ? S.solicitudes.filter(x => !x.atendida).length : id === 'accesos' ? S.perfiles.filter(x => x.role === 'pendiente').length : 0;
+  return `<div class="cli-tabs sub-tabs" role="tablist" aria-label="Vistas">${GRUPOS[g].map(([id, txt]) => `<button role="tab" aria-selected="${v === id}" data-accion="ir" data-id="${id}">${txt}${cuenta(id) ? ` <span class="cli-nuevo">${cuenta(id)}</span>` : ''}</button>`).join('')}</div>`;
 }
 
 function render() {
@@ -912,6 +921,10 @@ function render() {
   else if (S.vista === 'postulaciones' && S.perfil.role === 'admin') cuerpo = vistaPostulaciones();
   else if (S.vista === 'pagos' && S.perfil.role === 'admin') cuerpo = vistaPagos();
   else cuerpo = vistaProduccion();
+  if (S.perfil.role !== 'cliente' && S.vista !== 'previa') {
+    const v = ['calendario', 'accesos', 'solicitudes'].includes(S.vista) && (S.vista === 'calendario' || S.perfil.role === 'admin') ? S.vista : (['clientes', 'propuestas', 'postulaciones', 'pagos'].includes(S.vista) && S.perfil.role === 'admin' ? S.vista : 'produccion');
+    cuerpo = subPestanas(v) + cuerpo;
+  }
   pintar(barra() + `<main class="app">${cuerpo}</main>`);
   pintarMuestras();
 }
@@ -1231,7 +1244,7 @@ function bloqueCliente(cl) {
         <h2 class="cli-nombre${cl.active ? '' : ' pausado'}"><button class="g-plegar" data-accion="plegar" data-id="cc:${cl.id}" aria-expanded="${abierto}"><span class="g-flecha" aria-hidden="true"></span>${esc(cl.name)}</button></h2>
         <p class="cli-meta"><b>${cs.length ? `${cs.length} ${cs.length === 1 ? 'mes' : 'meses'}` : 'Sin meses'}</b>${cs.length && !abierto ? ` (${esc(cs.slice(0, 3).map(c => c.name).join(', '))}${cs.length > 3 ? '…' : ''})` : ''}.
           ${cl.videos_per_cycle} videos por mes${cl.active ? '' : ', en pausa'}. ${usuarios.length ? `Con acceso: ${usuarios.map(u => esc(nombreDe(u))).join(', ')}.` : 'Nadie de este cliente tiene acceso todavía.'}
-          ${editores.length ? `Editores: ${editores.map(u => esc(nombreDe(u))).join(', ')}.` : 'Sin editor asignado (se asigna en Accesos).'}</p>
+          ${editores.length ? `Editores: ${editores.map(u => esc(nombreDe(u))).join(', ')}.` : 'Sin editor asignado (se asigna en Solicitudes → Accesos al portal).'}</p>
         ${lineaMailerlite(cl)}
         <p class="cli-meta">${(e => e && e.confirmado_at ? `Estilo visual confirmado el ${esc(fCorta(e.confirmado_at))}.` : e ? 'Estilo visual en proceso: todavía no lo confirma.' : 'Estilo visual: todavía no lo elige.')(estiloFila(cl.id))}</p>
       </div>
@@ -2712,7 +2725,7 @@ function modalAsignarMes(idCiclo) {
     ${vs.length ? `
     <div class="campo"><label for="a-editor">Editor</label>
       <select id="a-editor" name="editor_id">${equipo.map(p => `<option value="${p.id}">${esc(nombreDe(p))}${p.role === 'admin' ? ' (administrador)' : ''}</option>`).join('')}<option value="">Sin editor (quitar)</option></select>
-      ${suyos.length ? '' : '<p class="ayuda">Este cliente no tiene editores asignados. Asígnalos en Accesos para que aparezcan aquí.</p>'}</div>
+      ${suyos.length ? '' : '<p class="ayuda">Este cliente no tiene editores asignados. Asígnalos en Solicitudes → Accesos al portal para que aparezcan aquí.</p>'}</div>
     <div class="campo" role="radiogroup" aria-label="Qué videos">
       <label class="interruptor" style="min-height:2rem"><input type="radio" name="alcance" value="todos" checked> Todos los videos del mes (${vs.length})</label>
       <label class="interruptor" style="min-height:2rem"><input type="radio" name="alcance" value="libres"${libres ? '' : ' disabled'}> Solo los que no tienen editor (${libres})</label>
