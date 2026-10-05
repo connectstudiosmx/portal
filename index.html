@@ -565,6 +565,29 @@ main.app{max-width:var(--ancho);margin:0 auto;padding:1.75rem 1.25rem 5rem}
 .pago-panel>.nota{margin:.7rem 0 0;color:var(--crema-2);max-width:60ch}
 .btn .ico-btn{width:1.2rem;height:1.2rem}
 @media (max-width:560px){.pago-opciones{grid-template-columns:1fr}}
+
+/* Cobranza y revisión del mes */
+.e-cob-vencido{background:var(--rojo);color:#000}
+.e-cob-toca{background:var(--amarillo);color:#000}
+.e-cob-pendiente{border-color:var(--linea-2);color:var(--crema-2)}
+.e-cob-pagado{background:var(--verde);color:#000}
+.e-cob-no_aplica{border-color:var(--linea);color:var(--crema-3)}
+.fac.cob-vencido{border-color:rgba(240,112,90,.55)}
+.fac.cob-toca{border-color:rgba(255,210,63,.5)}
+.rep-dato.malo b{color:var(--rojo)}
+.rep-dato.dinero b{color:var(--crema);font-size:clamp(1.5rem,3.6vw,2rem)}
+.revs{display:grid;gap:.7rem}
+.rev-fila{display:flex;justify-content:space-between;align-items:center;gap:.6rem 1rem;flex-wrap:wrap;background:#0A0A0B;border:1px solid var(--linea);border-radius:10px;padding:.8rem 1rem}
+.rev-fila b{display:block}
+.rev-fila .nota{color:var(--crema-2)}
+.revision{display:flex;justify-content:space-between;align-items:center;gap:1rem 1.5rem;flex-wrap:wrap;margin:0 0 1.4rem;padding:1.2rem 1.3rem;border:1.5px solid var(--verde);border-radius:14px;background:radial-gradient(120% 140% at 0% 0%,rgba(57,255,136,.14),transparent 60%),var(--panel)}
+.revision h2{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:clamp(1.6rem,4vw,2.2rem);line-height:.95;margin:.2rem 0 .4rem}
+.revision p{margin:0;color:var(--crema-2);max-width:48ch}
+.revision.espera{border-color:var(--linea-2);background:var(--panel)}
+.revision ul{margin:.5rem 0 0;padding-left:1.1rem;color:var(--crema-2);font-size:.9rem}
+.aviso-linea.ok{border-left-color:var(--verde)}
+.aviso-linea.malo{border-left-color:var(--rojo)}
+.campo textarea.aj{min-height:4.2rem}
 </style>
 </head>
 <body>
@@ -680,6 +703,9 @@ const tira = vs => `<div class="tira" aria-hidden="true">${vs.map(v => `<i class
 
 function humano(e) {
   const m = (e && (e.message || e.error_description || e.msg)) || String(e || '');
+  if (/fuera_de_plazo/.test(m)) return 'Ya pasó el plazo para pedir ajustes de este mes.';
+  if (/no_en_revision/.test(m)) return 'Este mes ya no está en revisión.';
+  if (/sin_ajustes/.test(m)) return 'Escribe al menos un ajuste.';
   if (/fechas_grabacion/.test(m)) return 'La grabación no puede terminar antes de empezar.';
   if (/fechas_entrega/.test(m)) return 'La entrega no puede ser antes de que termine la grabación.';
   if (/fecha_editor/.test(m)) return 'La fecha límite del editor tiene que quedar entre la grabación y la entrega.';
@@ -768,6 +794,8 @@ async function cargarEquipo() {
       sb.rpc('stripe_modo')
     ]);
     S.ajustes = aj.error ? null : aj.data;
+    const cob = await sb.from('cobros').select('*').order('vence');
+    S.cobros = cob.error ? [] : cob.data || [];
     S.stripeModo = sm.error ? null : sm.data;
     S.contratos = cts.error ? [] : cts.data || [];
     S.pagosStripe = ps.error ? [] : ps.data || [];
@@ -934,6 +962,7 @@ function cabGrupo(g, abierto) {
         <span>Grabación <b>${rango(c.record_start, c.record_end)}</b></span>
         <span class="limite${nivel !== 'hecho' ? ' plazo-' + p.nivel : ''}">Límite de edición <b>${fDia(c.editor_due)}</b>${nivel !== 'hecho' ? ` <em class="faltan">${p.txt}</em>` : ''}</span>
         ${esAdmin ? `<span>Entrega al cliente <b>${fDia(c.delivery_date)}</b></span>` : ''}
+        ${c.revision_estado ? `<span>Cliente: <b>${c.revision_estado === 'ajustes' ? 'pidió ajustes' : c.revision_estado === 'revision' && c.revision_hasta >= hoyISO() ? 'revisando' : 'aprobado'}</b></span>` : ''}
         ${esAdmin ? (c.raw_url ? enlace(c.raw_url, 'Crudos en Drive') : '<span class="nota">Sin carpeta de crudos</span>')
           : (c.raw_url ? '' : '<span class="nota">Crudos: aún sin carpeta</span>')}
         ${esAdmin ? (c.delivery_url ? enlace(c.delivery_url, 'Videos terminados en Drive') : '<span class="nota">Sin carpeta de videos</span>')
@@ -1057,6 +1086,7 @@ function vistaProduccion() {
       ${grupos.length && !filtrando ? `<button class="btn btn-s btn-t" data-accion="${todosAbiertos ? 'plegar-todo' : 'desplegar-todo'}">${todosAbiertos ? 'Plegar todo' : 'Desplegar todo'}</button>` : ''}
     </div>
   </div>
+  ${esAdmin ? avisosRevision() : ''}
   ${!esAdmin && S.clientes.length ? tableroEditor() : ''}
   ${porCliente.length ? porCliente.map(b => {
     const abiertoCli = filtrando || S.abiertos.has('pc:' + b.id);
@@ -1613,6 +1643,7 @@ function vistaPagos() {
     <div><h1>Pagos</h1><p class="sub">Tus clientes ven los datos para transferir y piden su factura en su portal, en la pestaña Pagos. Esos datos no están en el código de la página: solo los ve quien entra como cliente.</p></div>
   </div>
   ${avisoFaltaBase()}
+  ${bloqueCobranza()}
   <section class="rep">
     <div class="rep-cab"><h2>Datos para <span>transferir</span></h2>${d ? '<button class="btn btn-s" data-accion="pago-datos">Editar</button>' : ''}</div>
     ${d ? `${bloqueDatosPago(d)}<p class="nota" style="margin:.9rem 0 0">Última actualización: ${esc(fHora(d.updated_at))}</p>`
@@ -1781,6 +1812,7 @@ function vistaPagosCliente(G, P, previa) {
   const total = G.mensualidad ? (G.iva === 'mas_iva' ? Math.round(G.mensualidad * 116) / 100 : Number(G.mensualidad)) : 0;
   const h = aISO(hoy());
   const prox = (P.cycles || []).filter(c => c.delivery_date >= h).sort((x, y) => x.delivery_date.localeCompare(y.delivery_date))[0];
+  const cobros = G.cobros || [], sig = cobros.filter(k => k.estado === 'pendiente').sort((x, y) => x.vence.localeCompare(y.vence))[0], eSig = sig && estadoCobro(sig);
   const metodo = G.stripe ? (S.metodoPago || 'tarjeta') : 'transferencia';
   const op = (id, icono, titulo, txt) => `<button type="button" class="pago-op" role="radio" aria-checked="${metodo === id}" data-accion="pago-metodo" data-id="${id}">${icono}<span><b>${titulo}</b><small>${txt}</small></span></button>`;
   const waMens = wa(`Hola, quiero pagar mi mensualidad con tarjeta. Soy de ${P.client.name}.`);
@@ -1799,7 +1831,10 @@ function vistaPagosCliente(G, P, previa) {
   <section class="rep">
     <div class="rep-cab"><h2>Tu <span>mensualidad</span></h2></div>
     ${G.mensualidad ? `<div class="pago-monto"><b>${esc(dinero(total))}</b><span>${G.iva === 'mas_iva' ? `${esc(dinero(G.mensualidad))} + IVA` : G.iva === 'incluido' ? 'IVA incluido' : 'MXN'}</span></div>` : ''}
-    ${prox ? `<p class="rep-txt pago-prox">Tu próximo pago es el <b>${esc(fLarga(prox.delivery_date))}</b>, el día que recibes tus videos de ${esc(prox.name)}. Tienes 5 días de tolerancia.</p>` : ''}
+    ${sig ? `<p class="rep-txt pago-prox">${eSig.clave === 'vencido' ? `<b style="color:var(--rojo)">Tu pago de ${esc(sig.mes)} está vencido.</b> Tocaba el ${esc(fLarga(sig.vence))}.`
+        : eSig.clave === 'toca' ? `<b style="color:var(--amarillo)">Toca pagar tu mensualidad de ${esc(sig.mes)}.</b> Tienes hasta el ${esc(fLarga(aISO(sumarDias(aFecha(sig.vence), 5))))}.`
+        : `Tu próximo pago es el <b>${esc(fLarga(sig.vence))}</b>, el día que recibes tus videos de ${esc(sig.mes)}. Tienes 5 días de tolerancia.`}</p>`
+      : prox ? `<p class="rep-txt pago-prox">Tu próximo pago es el <b>${esc(fLarga(prox.delivery_date))}</b>, el día que recibes tus videos de ${esc(prox.name)}. Tienes 5 días de tolerancia.</p>` : ''}
     <h3 class="pago-preg">${G.stripe ? '¿Cómo quieres pagar?' : 'Paga por transferencia'}</h3>
     ${G.stripe ? `<div class="pago-opciones" role="radiogroup" aria-label="Cómo quieres pagar">
       ${op('tarjeta', ICONO_TARJETA, 'Con tarjeta', 'Débito o crédito, con Stripe. Se confirma al instante.')}
@@ -1807,6 +1842,12 @@ function vistaPagosCliente(G, P, previa) {
     </div>` : ''}
     ${metodo === 'tarjeta' ? panelTarjeta : panelTransfer}
   </section>
+  ${cobros.length ? `<section class="rep">
+    <div class="rep-cab"><h2>Estado de <span>cuenta</span></h2></div>
+    <div class="fac-lista">${cobros.map(k => { const e = estadoCobro(k); return `<div class="fac cob-${e.clave}"><div><div class="fac-tit">Mensualidad · ${esc(k.mes || '')}</div>
+        <div class="fac-meta">${k.monto ? esc(dinero(k.monto)) + ' · ' : ''}${esc(e.txt)}</div></div>
+      <div class="fac-der"><span class="estado e-cob-${e.clave}">${e.et}</span></div></div>`; }).join('')}</div>
+  </section>` : ''}
   ${pagos.length ? `<section class="rep">
     <div class="rep-cab"><h2>Tus pagos con <span>tarjeta</span></h2></div>
     <div class="fac-lista">${pagos.map(x => `<div class="fac"><div><div class="fac-tit">${x.tipo === 'anticipo' ? 'Anticipo' : 'Mensualidad'}</div>
@@ -1829,6 +1870,108 @@ function vistaPagosCliente(G, P, previa) {
   </section>`;
 }
 
+// ---------- Cobranza: cada mes vence el día de su entrega, con 5 días de tolerancia ----------
+const hoyISO = () => aISO(hoy());
+function estadoCobro(x) {
+  if (x.estado === 'pagado') return { clave: 'pagado', et: 'Pagado', txt: `Pagado${x.metodo === 'tarjeta' ? ' con tarjeta' : x.metodo === 'transferencia' ? ' por transferencia' : ''}${x.pagado_at ? ' el ' + fCorta(aISO(new Date(x.pagado_at))) : ''}` };
+  if (x.estado === 'no_aplica') return { clave: 'no_aplica', et: 'No aplica', txt: 'No se cobra' };
+  const h = hoyISO(), limite = aISO(sumarDias(aFecha(x.vence), 5));
+  if (h > limite) return { clave: 'vencido', et: 'Vencido', txt: `Venció el ${fCorta(limite)} (tocaba el ${fCorta(x.vence)})` };
+  if (h >= x.vence) return { clave: 'toca', et: 'Toca pagar', txt: h === x.vence ? 'Toca hoy' : `Tocaba el ${fCorta(x.vence)}; tolerancia hasta el ${fCorta(limite)}` };
+  return { clave: 'pendiente', et: 'Pendiente', txt: `Vence el ${fCorta(x.vence)}` };
+}
+function waRecordatorio(x, cl, cy) {
+  const tel = cl && waDe(cl.contact_phone); if (!tel) return '';
+  const e = estadoCobro(x), pila = String((cl && cl.contact_name) || '').split(/\s+/)[0];
+  const cuando = e.clave === 'vencido' ? 'ya pasó su fecha de pago' : e.clave === 'toca' ? 'hoy es su día de pago' : `vence el ${fLarga(x.vence)}`;
+  return `https://wa.me/${tel}?text=${encodeURIComponent(`Hola${pila ? ' ' + pila : ''}, te recuerdo la mensualidad de ${cl.name}${cy ? ` (${cy.name})` : ''}: ${x.monto ? dinero(x.monto) : ''}; ${cuando}. La puedes pagar con tarjeta o por transferencia desde tu portal, en la pestaña Pagos: ${PORTAL_URL}\n\n¡Gracias!`)}`;
+}
+function bloqueCobranza() {
+  const f = S.cobFiltro || 'pendientes';
+  const todos = (S.cobros || []).map(x => Object.assign({}, x, { e: estadoCobro(x), cl: clientePorId(x.client_id), cy: S.ciclos.find(c => c.id === x.cycle_id) }));
+  const suma = xs => xs.reduce((t, x) => t + Number(x.monto || 0), 0);
+  const vencidos = todos.filter(x => x.e.clave === 'vencido'), tocan = todos.filter(x => x.e.clave === 'toca');
+  const mes = hoyISO().slice(0, 7);
+  const cobrado = suma(todos.filter(x => x.estado === 'pagado' && x.pagado_at && aISO(new Date(x.pagado_at)).slice(0, 7) === mes));
+  const orden = { vencido: 0, toca: 1, pendiente: 2, pagado: 3, no_aplica: 4 };
+  const lista = todos.filter(x => f === 'todos' || (f === 'pendientes' ? x.estado === 'pendiente' : x.estado === 'pagado'))
+    .sort((a, b) => (orden[a.e.clave] - orden[b.e.clave]) || (f === 'pagados' ? b.vence.localeCompare(a.vence) : a.vence.localeCompare(b.vence)));
+  const opt = (v, t) => `<option value="${v}"${f === v ? ' selected' : ''}>${t}</option>`;
+  return `<section class="rep">
+    <div class="rep-cab"><h2><span>Cobranza</span></h2><select class="campo-in" data-cambio="cob-filtro" aria-label="Filtrar cobros">${opt('pendientes', 'Por cobrar')}${opt('pagados', 'Pagados')}${opt('todos', 'Todos')}</select></div>
+    <div class="rep-datos">
+      <div class="rep-dato${vencidos.length ? ' malo' : ''}"><b>${vencidos.length}</b><span>Vencidos${vencidos.length ? ` · ${esc(dinero(suma(vencidos)))}` : ''}</span></div>
+      <div class="rep-dato"><b>${tocan.length}</b><span>Toca cobrar ahora</span></div>
+      <div class="rep-dato dinero"><b>${esc(dinero(suma(todos.filter(x => x.estado === 'pendiente'))))}</b><span>Por cobrar</span></div>
+      <div class="rep-dato dinero"><b>${esc(dinero(cobrado))}</b><span>Cobrado este mes</span></div>
+    </div>
+    ${lista.length ? `<div class="fac-lista">${lista.map(x => {
+      const wa = x.estado === 'pendiente' ? waRecordatorio(x, x.cl, x.cy) : '';
+      return `<div class="fac cob-${x.e.clave}"><div>
+          <div class="fac-tit">${esc(x.cl ? x.cl.name : 'Cliente')}${x.cy ? ` · ${esc(x.cy.name)}` : ''}</div>
+          <div class="fac-meta">${x.monto ? esc(dinero(x.monto)) : 'Sin monto'} · ${esc(x.e.txt)}</div></div>
+        <div class="fac-der"><span class="estado e-cob-${x.e.clave}">${x.e.et}</span>
+          ${x.estado === 'pendiente' ? `${wa ? `<a class="btn btn-s" href="${esc(wa)}" target="_blank" rel="noopener noreferrer">Recordar</a>` : ''}
+            <button class="btn btn-s btn-p" data-accion="cobro-transfer" data-id="${x.id}">Pagó por transferencia</button>
+            <button class="btn btn-s btn-t" data-accion="cobro-noaplica" data-id="${x.id}">No aplica</button>`
+          : x.metodo !== 'tarjeta' ? `<button class="btn btn-s btn-t" data-accion="cobro-deshacer" data-id="${x.id}">Deshacer</button>` : ''}</div></div>`;
+    }).join('')}</div>`
+      : `<p class="rep-txt">${f === 'pagados' ? 'Todavía no hay cobros pagados.' : 'Nada por cobrar. Cada mes de un cliente con mensualidad aparece aquí.'}</p>`}
+    <p class="nota" style="margin:.9rem 0 0">Cada mes de un cliente con mensualidad genera su cobro, que vence el día de su entrega, con 5 días de tolerancia. Los pagos con tarjeta se marcan solos. Te llega un Telegram el día que toca cobrar y cuando se vence.</p>
+  </section>`;
+}
+
+// ---------- Revisión del mes (admin): en revisión del cliente o con ajustes pedidos ----------
+function avisosRevision() {
+  const h = hoyISO();
+  const enRev = S.ciclos.filter(c => c.revision_estado === 'revision' && c.revision_hasta >= h);
+  const ajustes = S.ciclos.filter(c => c.revision_estado === 'ajustes');
+  if (!enRev.length && !ajustes.length) return '';
+  const fila = (c, txt, acciones) => { const cl = clientePorId(c.client_id); return `<div class="rev-fila"><div><b>${esc(cl ? cl.name : 'Cliente')} · ${esc(c.name)}</b><span class="nota">${txt}</span></div><div class="controles">${acciones}</div></div>`; };
+  return `<section class="rep revs">
+    ${enRev.map(c => {
+      const cl = clientePorId(c.client_id), tel = cl && waDe(cl.contact_phone), n = S.videos.filter(v => v.cycle_id === c.id).length;
+      const pila = String((cl && cl.contact_name) || '').split(/\s+/)[0];
+      const wa = tel ? `https://wa.me/${tel}?text=${encodeURIComponent(`Hola${pila ? ' ' + pila : ''}, ¡ya ${n === 1 ? 'está tu video' : `están tus ${n} videos`} de ${c.name}! Míralos en tu portal: ${PORTAL_URL}\n\nTienes hasta el ${fLarga(c.revision_hasta)} para pedirme una ronda de ajustes, en un solo mensaje, desde ahí mismo. Si todo está bien, apruébalos; si no me pides nada, se aprueban solos.`)}` : '';
+      return fila(c, `En revisión del cliente hasta el ${esc(fLarga(c.revision_hasta))}. Si no pide ajustes, se aprueba solo.`,
+        `${wa ? `<a class="btn btn-s btn-p" href="${esc(wa)}" target="_blank" rel="noopener noreferrer">Avisarle por WhatsApp</a>` : ''}<button class="btn btn-s btn-t" data-accion="ciclo-aprobar" data-id="${c.id}">Marcar aprobado</button>`);
+    }).join('')}
+    ${ajustes.map(c => fila(c, `Pidió ajustes el ${esc(fCorta(aISO(new Date(c.ajustes_at))))}${c.ajustes_general ? `: “${esc(c.ajustes_general)}”` : ''}. Los videos con ajuste regresaron a edición; al entregarlos, el mes queda aprobado.`,
+      `<button class="btn btn-s btn-t" data-accion="ciclo-aprobar" data-id="${c.id}">Marcar ajustes entregados</button>`)).join('')}
+  </section>`;
+}
+
+// ---------- Revisión del mes (cliente) ----------
+function panelRevision(c, previa) {
+  if (c.revision_estado === 'revision') {
+    return `<section class="revision"><div><p class="rep-et">Revisa tus videos</p><h2>Tienes hasta el ${esc(fLarga(c.revision_hasta))}</h2>
+      <p>Si algo no te convence, pide tus ajustes en un solo mensaje. Si todo está bien, apruébalos. Si no pides nada, se aprueban solos.</p></div>
+      <div class="controles"><button class="btn btn-p" data-accion="aprobar-mes" data-id="${c.id}"${previa ? ' disabled' : ''}>Aprobar mis videos</button>
+        <button class="btn" data-accion="pedir-ajustes" data-id="${c.id}"${previa ? ' disabled' : ''}>Pedir ajustes</button></div></section>`;
+  }
+  if (c.revision_estado === 'ajustes') {
+    const pedidos = (c.videos || []).filter(v => v.ajuste_cliente);
+    return `<section class="revision espera"><div><p class="rep-et">Tus ajustes</p><h2>Los estamos haciendo</h2>
+      <p>Los pediste el ${esc(fCorta(aISO(new Date(c.ajustes_at))))}. Te avisamos en cuanto estén.</p>
+      ${pedidos.length || c.ajustes_general ? `<ul>${pedidos.map(v => `<li><b>${pad(v.number)}</b> ${esc(v.ajuste_cliente)}</li>`).join('')}${c.ajustes_general ? `<li>${esc(c.ajustes_general)}</li>` : ''}</ul>` : ''}</div></section>`;
+  }
+  if (c.revision_estado === 'aprobado') {
+    return `<p class="aviso-linea ok">✓ ${c.aprobado_por === 'cliente' ? 'Aprobaste' : 'Quedaron aprobados'} tus videos de ${esc(c.name)}${c.aprobado_at ? ` el ${esc(fCorta(aISO(new Date(c.aprobado_at))))}` : ''}.</p>`;
+  }
+  return '';
+}
+function modalPedirAjustes(id) {
+  const c = ((S.portal && S.portal.cycles) || []).find(x => x.id === id); if (!c) return;
+  abrirModal(`<form data-form="ajustes-mes" data-id="${c.id}" novalidate>
+    <div class="d-cab"><div><h2 class="d-titulo">Pedir ajustes</h2><p class="d-sub">${esc(c.name)} · tienes hasta el ${esc(fLarga(c.revision_hasta))}. Es una sola ronda: escribe todo lo que quieras cambiar de una vez.</p></div></div>
+    <div class="resumen">Se puede ajustar: cortes, textos en pantalla, subtítulos, música o el texto de publicación. Los errores de ortografía, de datos o de logotipo se corrigen siempre. Lo que ya se grabó no se regraba ni cambia lo que dice.</div>
+    ${(c.videos || []).map(v => `<div class="campo"><label for="aj-${v.id}">${pad(v.number)} · ${esc(v.title || 'Sin título')}</label>
+      <textarea class="aj" id="aj-${v.id}" data-video="${v.id}" maxlength="1500" placeholder="Déjalo vacío si este video está bien"></textarea></div>`).join('')}
+    <div class="campo"><label for="aj-general">¿Algo general? <span class="opc">(opcional)</span></label><textarea class="aj" id="aj-general" name="general" maxlength="1500"></textarea></div>
+    <div class="d-pie"><button type="button" class="btn" data-accion="cerrar">Cancelar</button><button type="submit" class="btn btn-p">Enviar mis ajustes</button></div>
+  </form>`);
+}
+
 // Vista previa del admin: lo mismo que regresaría client_pagos para ese cliente
 function pagosLocal(idCliente) {
   const d = S.pagoDatos, facs = S.facturas.filter(f => f.client_id === idCliente), cl = clientePorId(idCliente);
@@ -1839,7 +1982,9 @@ function pagosLocal(idCliente) {
     fiscales: facs[0] || null,
     mensualidad: cl ? cl.mensualidad : null, iva: cl ? cl.iva : null,
     stripe: !!(S.ajustes && S.ajustes.stripe_activo),
-    pagos: (S.pagosStripe || []).filter(x => x.client_id === idCliente || props.has(x.propuesta_id)).map(x => ({ fecha: x.created_at, tipo: x.tipo, monto: x.monto }))
+    pagos: (S.pagosStripe || []).filter(x => x.client_id === idCliente || props.has(x.propuesta_id)).map(x => ({ fecha: x.created_at, tipo: x.tipo, monto: x.monto })),
+    cobros: (S.cobros || []).filter(x => x.client_id === idCliente && x.estado !== 'no_aplica').map(x => Object.assign({}, x, { mes: (S.ciclos.find(c => c.id === x.cycle_id) || {}).name }))
+      .sort((a, b) => b.vence.localeCompare(a.vence))
   };
 }
 
@@ -1889,6 +2034,8 @@ function vistaCliente(P, previa) {
   else if (conGuion < vs.length) mensaje = `Llevas ${conGuion} de ${vs.length} guiones. Súbelos a más tardar el ${fLarga(c.script_due || c.record_start)}.`;
   else mensaje = `Tus ${vs.length} guiones están listos para grabar.`;
   return `${pestanas}<div class="cli-panel" role="tabpanel">
+    ${(G => { const x = G && (G.cobros || []).filter(k => k.estado === 'pendiente').sort((a, b) => a.vence.localeCompare(b.vence))[0]; const e = x && estadoCobro(x);
+      return e && (e.clave === 'toca' || e.clave === 'vencido') ? `<p class="aviso-linea${e.clave === 'vencido' ? ' malo' : ''}">${e.clave === 'vencido' ? 'Tu mensualidad está vencida' : 'Toca pagar tu mensualidad'}${x.monto ? `: ${esc(dinero(x.monto))}` : ''}. <button class="f-ver" data-accion="cli-pestana" data-id="pagos">Pagar ahora</button></p>` : ''; })(previa ? pagosLocal(S.previa) : S.pagosCli)}
     ${!(P.estilo && P.estilo.confirmado_at) ? `<p class="aviso-linea">Elige tu estilo visual para que tus videos salgan como te gustan. <button class="f-ver" data-accion="cli-pestana" data-id="estilo">Elegir mi estilo</button></p>` : ''}
     ${ciclos.length > 1 ? `<div class="mes-tabs" role="group" aria-label="Meses">${ciclos.map(x => `<button data-accion="ver-mes" data-id="${x.id}" aria-pressed="${x.id === c.id}">${esc(x.name)}</button>`).join('')}</div>` : ''}
     <section class="hero-cli">
@@ -1903,6 +2050,7 @@ function vistaCliente(P, previa) {
       ${urlSegura(c.delivery_url) ? `<div class="hero-cta"><a class="btn btn-p btn-grande" href="${esc(urlSegura(c.delivery_url))}" target="_blank" rel="noopener noreferrer">▶ Ver y descargar tus videos</a>
         <span class="nota">Todos los videos entregados de ${esc(c.name)}, en una carpeta de Drive.</span></div>` : ''}
     </section>
+    ${panelRevision(c, previa)}
     <div class="avance-cli">
       <b class="avance-num" aria-label="${cuenta} de ${vs.length} ${que}">${pad(cuenta)}<small>/${pad(vs.length)}</small></b>
       <div class="avance-txt"><span>${esc(mensaje)}</span>${tira(vs)}</div>
@@ -1966,6 +2114,9 @@ function portalLocal(idCliente) {
     .sort((a, b) => b.delivery_date.localeCompare(a.delivery_date))
     .map(c => ({
       id: c.id, name: c.name, record_start: c.record_start, record_end: c.record_end, script_due: c.script_due, delivery_date: c.delivery_date,
+      revision_estado: c.revision_estado === 'revision' && c.revision_hasta < hoyISO() ? 'aprobado' : c.revision_estado,
+      revision_hasta: c.revision_hasta, ajustes_at: c.ajustes_at, ajustes_general: c.ajustes_general, aprobado_at: c.aprobado_at,
+      aprobado_por: c.revision_estado === 'revision' && c.revision_hasta < hoyISO() ? 'tiempo' : c.aprobado_por,
       // Igual que client_portal: la carpeta aparece cuando ya hay algún video entregado
       delivery_url: S.videos.some(v => v.cycle_id === c.id && v.status === 'entregado') ? c.delivery_url : null,
       videos: S.videos.filter(v => v.cycle_id === c.id).sort((a, b) => a.number - b.number).map(v => ({
@@ -1973,7 +2124,8 @@ function portalLocal(idCliente) {
         status: ['edicion', 'revision', 'listo'].includes(v.status) ? 'produccion' : v.status,
         final_url: v.status === 'entregado' ? v.final_url : null,
         copy: v.status === 'entregado' ? v.copy : null,
-        portada_url: v.status === 'entregado' ? v.portada_url : null
+        portada_url: v.status === 'entregado' ? v.portada_url : null,
+        ajuste_cliente: v.ajuste_cliente
       })),
       // A diferencia de client_portal, aquí se ve también el borrador para revisarlo antes de publicarlo
       report: (r => r ? Object.assign({}, r, { borrador: !r.publicado }) : null)(S.reportes.find(r => r.cycle_id === c.id))
@@ -2898,6 +3050,15 @@ const FORMS = {
     if (!v.editor_id) cambios.editor_id = S.perfil.id;
     await guardarVideo(id, cambios, 'Enviado a revisión');
   },
+  async 'ajustes-mes'(f) {
+    const ajustes = [...f.querySelectorAll('textarea[data-video]')].map(t => ({ video_id: t.dataset.video, texto: t.value.trim() })).filter(a => a.texto);
+    const general = (f.elements.general.value || '').trim();
+    if (!ajustes.length && !general) { aviso('Escribe al menos un ajuste.', true); return; }
+    await q(sb.rpc('client_pedir_ajustes', { p_cycle: f.dataset.id, p_ajustes: ajustes, p_general: general }));
+    cerrarModal();
+    await recargar();
+    aviso('Listo: recibimos tus ajustes');
+  },
   async guion(f) {
     if (!revisarLinks(f, ['script_url'])) return;
     const url = valor(f, 'script_url'), texto = valor(f, 'script_text');
@@ -3385,6 +3546,36 @@ const ACC = {
       if (alta && y && y.client_id) modalYaCliente(y); else aviso('Anticipo marcado como pagado');
     } catch (e) { aviso(humano(e), true); }
   },
+  async 'cobro-transfer'(el, id) {
+    const x = (S.cobros || []).find(k => k.id === id); if (!x) return;
+    const cl = clientePorId(x.client_id), cy = S.ciclos.find(c => c.id === x.cycle_id);
+    if (!await confirmar(`¿${cl ? cl.name : 'El cliente'} pagó por transferencia?`, `Mensualidad de ${cy ? cy.name : 'este mes'}${x.monto ? ': ' + dinero(x.monto) : ''}. Queda como pagada hoy.`, 'Sí, ya pagó')) return;
+    await q(sb.from('cobros').update({ estado: 'pagado', metodo: 'transferencia', pagado_at: new Date().toISOString() }).eq('id', id));
+    await recargar(); aviso('Cobro marcado como pagado');
+  },
+  async 'cobro-noaplica'(el, id) {
+    if (!await confirmar('¿Este mes no se cobra?', 'Por ejemplo, si el cliente terminó su contrato o lo acordaron así. Puedes deshacerlo después.', 'No se cobra')) return;
+    await q(sb.from('cobros').update({ estado: 'no_aplica' }).eq('id', id));
+    await recargar(); aviso('Listo');
+  },
+  async 'cobro-deshacer'(el, id) {
+    await q(sb.from('cobros').update({ estado: 'pendiente', metodo: null, pagado_at: null, avisado_vencido: false }).eq('id', id));
+    await recargar(); aviso('Regresó a pendiente');
+  },
+  async 'ciclo-aprobar'(el, id) {
+    const c = S.ciclos.find(x => x.id === id); if (!c) return;
+    if (!await confirmar(c.revision_estado === 'ajustes' ? '¿Ya entregaste los ajustes?' : '¿Marcar el mes como aprobado?', 'El cliente ya no podrá pedir ajustes de este mes.', 'Sí, aprobado')) return;
+    await q(sb.from('cycles').update({ revision_estado: 'aprobado', aprobado_at: new Date().toISOString(), aprobado_por: 'admin' }).eq('id', id));
+    await recargar(); aviso('Mes aprobado');
+  },
+  async 'aprobar-mes'(el, id) {
+    if (S.vista === 'previa') return;
+    const c = ((S.portal && S.portal.cycles) || []).find(x => x.id === id); if (!c) return;
+    if (!await confirmar(`¿Apruebas tus videos de ${c.name}?`, 'Ya no se podrán pedir ajustes de este mes.', 'Sí, aprobar')) return;
+    await q(sb.rpc('client_aprobar_mes', { p_cycle: id }));
+    await recargar(); aviso('¡Gracias! Tus videos quedaron aprobados');
+  },
+  'pedir-ajustes'(el, id) { if (S.vista !== 'previa') modalPedirAjustes(id); },
   'pago-metodo'(el, id) { S.metodoPago = id === 'transferencia' ? 'transferencia' : 'tarjeta'; render(); },
   async 'pagar-mensualidad'(el) {
     if (S.vista === 'previa') return aviso('En la vista previa no se paga.');
@@ -3505,6 +3696,7 @@ const CAMBIOS = {
   },
   'fac-filtro'(el) { S.facFiltro = el.value; render(); },
   'prop-filtro'(el) { S.propFiltro = el.value; render(); },
+  'cob-filtro'(el) { S.cobFiltro = el.value; render(); },
   'estilo-color'(el) { cambiarEstilo({ color: el.value.toUpperCase() }); },
   'estilo-notas'(el) { cambiarEstilo({ notas: el.value.trim() }); },
   'estilo-logo'(el) { subirLogo(el); }
