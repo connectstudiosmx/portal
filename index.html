@@ -1596,7 +1596,10 @@ function vistaPropuestas() {
         ${x.rechazada_at && !x.aceptada_at ? `<p class="sol-msg"><b>Motivo:</b> ${esc(MOTIVOS_PROP[x.motivo] || 'Otro')}${x.comentario ? ` · ${esc(x.comentario)}` : ''}</p>` : ''}
         ${x.aceptada_at ? (ct => `<div class="sol-meta">
           ${x.tipo === 'mensual' ? (ct ? `<span class="sol-int sol-ok">Contrato firmado el ${esc(fCorta(ct.firmado_at))}</span>${ct.firma_prestador_at ? '<span class="sol-int sol-ok">Ya lo firmaste</span>' : '<span class="sol-int">Falta tu firma</span>'}` : '<span class="sol-int">Contrato sin firmar</span>') : ''}
-          ${x.pagada_at ? `<span class="sol-int sol-ok">Anticipo pagado ${x.pago_metodo === 'tarjeta' ? 'con tarjeta' : 'por transferencia'}</span>` : '<span class="sol-int">Anticipo pendiente</span>'}
+          ${x.pagada_at ? `<span class="sol-int sol-ok">${pagoTotalDe(x) ? 'Pagó todo de una vez con tarjeta' : `Anticipo pagado ${x.pago_metodo === 'tarjeta' ? 'con tarjeta' : 'por transferencia'}`}</span>` : '<span class="sol-int">Anticipo pendiente</span>'}
+          ${x.tipo === 'proyecto' && x.pagada_at && !pagoTotalDe(x) ? (x.liquidada_at
+            ? `<span class="sol-int sol-ok">Pago final recibido ${x.liquidacion_metodo === 'tarjeta' ? 'con tarjeta' : 'por transferencia'}</span>`
+            : `<span class="sol-int">${x.liquidacion_pedida_at ? `Pago final pedido el ${esc(fCorta(x.liquidacion_pedida_at))}` : 'Falta el pago final'}: ${esc(dinero(restanteDe(x)))}</span>`) : ''}
         </div>`)(contratoDe(x)) : ''}
         ${x.notas ? `<p class="nota" style="margin:.5rem 0 0">Nota: ${esc(x.notas)}</p>` : ''}
         <div class="sol-acc">
@@ -1607,6 +1610,8 @@ function vistaPropuestas() {
           <button class="btn btn-s btn-t" data-accion="prop-duplicar" data-id="${x.id}">Duplicar</button>
           ${(ct => ct ? `<a class="btn btn-s" href="${esc(linkPropuesta(x, true).replace('?previa', '?previa&contrato'))}" target="_blank" rel="noopener">Ver contrato</a>${ct.firma_prestador_at ? '' : `<button class="btn btn-s btn-p" data-accion="contrato-firmar" data-id="${ct.id}">Firmar contrato</button>`}` : '')(contratoDe(x))}
           ${x.aceptada_at && !x.pagada_at ? `<button class="btn btn-s btn-t" data-accion="prop-pagada" data-id="${x.id}">Marcar anticipo pagado</button>` : ''}
+          ${x.tipo === 'proyecto' && x.pagada_at && !x.liquidada_at ? `<button class="btn btn-s${x.liquidacion_pedida_at ? '' : ' btn-p'}" data-accion="prop-cobrar-final" data-id="${x.id}">${x.liquidacion_pedida_at ? 'Volver a mandar el cobro' : 'Cobrar el 50% final'}</button>
+            <button class="btn btn-s btn-t" data-accion="prop-final-recibido" data-id="${x.id}">Marcar pago final recibido</button>` : ''}
           ${x.aceptada_at && !x.client_id ? `<button class="btn btn-s btn-p" data-accion="prop-cliente" data-id="${x.id}">Dar de alta como cliente</button>` : ''}
           ${x.client_id ? '<span class="sol-int sol-ok">Ya es cliente</span>' : ''}
         </div>
@@ -1618,6 +1623,25 @@ function vistaPropuestas() {
     </article>`;
   }).join('')}</div>`
     : `<div class="caja-vacia"><p>${todas.length ? 'Nada en este filtro.' : 'Todavía no hay propuestas. Hazla desde una solicitud (botón "Hacer propuesta") o empieza una aquí.'}</p>${todas.length ? '' : '<button class="btn btn-p" data-accion="prop-nueva">Nueva propuesta</button>'}</div>`}`;
+}
+
+// Pago final de un proyecto: lo que falta (total con IVA menos el anticipo con IVA, igual que la base)
+const restanteDe = x => {
+  const ant = x.anticipo != null ? Number(x.anticipo) : Math.round(x.precio * 50) / 100;
+  const r = x.iva === 'mas_iva' ? Math.round(x.precio * 116) / 100 - Math.round(ant * 116) / 100 : Number(x.precio) - ant;
+  return Math.round(r * 100) / 100;
+};
+const pagoTotalDe = x => !!(x.pagada_at && x.liquidada_at && x.pagada_at === x.liquidada_at);   // el cobro "total" marca los dos a la vez
+function modalCobroFinal(x) {
+  const pila = String(x.nombre || '').split(/\s+/)[0], tarjeta = !!(S.ajustes && S.ajustes.stripe_activo);
+  const texto = `Hola ${pila}, ya quedó listo el video de ${x.empresa}. 🎬\n\nAquí puedes pagar el 50% final (${dinero(restanteDe(x))}${x.iva === 'mas_iva' ? ' con IVA' : ''}): ${linkPropuesta(x)}\n\n`
+    + (tarjeta ? 'Puedes pagar con tarjeta, incluso a 3 o 6 meses sin intereses, o por transferencia.' : 'Ahí mismo vienen los datos para transferir.') + ' Cualquier duda me dices por aquí.';
+  const wa = waDe(x.whatsapp);
+  abrirModal(`<div class="d-cab"><div><h2 class="d-titulo">Cobrar el 50% final</h2><p class="d-sub">${esc(x.empresa)} · ${esc(dinero(restanteDe(x)))}${x.iva === 'mas_iva' ? ' con IVA' : ''}. Al mandarlo, su propuesta le muestra el pago final${tarjeta ? ' con tarjeta (también a meses sin intereses) o por transferencia' : ' y los datos para transferir'}, y te llega un aviso cuando paga con tarjeta.</p></div></div>
+    <div class="campo"><label for="wa-texto">Mensaje</label><textarea id="wa-texto" maxlength="1500" style="min-height:9rem">${esc(texto)}</textarea></div>
+    <div class="d-pie"><button class="btn" data-accion="cerrar">Cancelar</button>
+      <button class="btn" data-accion="cobro-final" data-id="${x.id}" data-modo="copiar">Copiar mensaje</button>
+      ${wa ? `<button class="btn btn-p" data-accion="cobro-final" data-id="${x.id}" data-modo="wa">Abrir WhatsApp</button>` : ''}</div>`);
 }
 
 // Ya es cliente (alta manual o automática al pagar): ofrece mandarle la bienvenida
@@ -1776,7 +1800,8 @@ function cotCalc(c) {
   const dias = c.lineas.filter(l => l.grupo === 'tiempo').reduce((s, l) => s + (l.unidad === 'h' ? l.cant / 8 : l.unidad === 'día' ? l.cant : 0), 0);
   return { por, costo, generales, imprevistos, base, utilidad, sugerido, precio, utilReal, margen: precio ? utilReal / precio * 100 : 0,
     iva, total, anticipo: precio / 2, fuera, tuyo, dias, porDia: dias ? tuyo / dias : 0,
-    comision: (total * 0.036 + 3) * 1.16 };                   // Stripe, si paga con tarjeta (la absorbes)
+    // Stripe, si paga con tarjeta (la absorbes): 3.6% + $3, más 5% a 3 meses o 7.5% a 6 meses sin intereses, todo + IVA
+    comision: (total * 0.036 + 3) * 1.16, comision3: (total * 0.086 + 3) * 1.16, comision6: (total * 0.111 + 3) * 1.16 };
 }
 // Lo mínimo que debe valer tu día, según tu meta mensual
 const cotMetaDia = () => { const m = cotCfg().meta; return m.dias ? m.mensual / m.dias : 0; };
@@ -1886,7 +1911,9 @@ function cotResumen(c, r, p) {
       <p><b data-r="fuera">${cotValor(r, 'fuera')}</b> se van a colaboradores y terceros.</p>
       <p><b data-r="tuyo">${cotValor(r, 'tuyo')}</b> te quedan a ti, ya descontados los gastos generales: es lo que paga tu tiempo, tu equipo y la utilidad.</p>
       <p class="cot-dia${r.porDia < cotMetaDia() ? ' cot-dia-bajo' : ''}" data-r-dia>${cotDiaTxt(r)}</p>
-      <p class="nota">Si paga con tarjeta, la comisión de Stripe es de unos <span data-r="comision">${cotValor(r, 'comision')}</span> y la absorbes tú.</p>
+      <p class="nota">Si paga con tarjeta, la comisión de Stripe es de unos <span data-r="comision">${cotValor(r, 'comision')}</span>${p.tipo === 'proyecto'
+        ? `; a 3 meses sin intereses, <span data-r="comision3">${cotValor(r, 'comision3')}</span>, y a 6 meses, <span data-r="comision6">${cotValor(r, 'comision6')}</span>`
+        : ''}. La absorbes tú.</p>
     </div>
     <div class="cot-acc">
       <button class="btn btn-p" data-accion="cot-propuesta">Crear propuesta con este precio</button>
@@ -4209,6 +4236,22 @@ const ACC = {
     modalPropuesta(null, sol ? { solicitud: sol } : {});
   },
   'prop-editar'(el, id) { modalPropuesta(id); },
+  'prop-cobrar-final'(el, id) { const x = S.propuestas.find(pr => pr.id === id); if (x) modalCobroFinal(x); },
+  async 'cobro-final'(el, id) {
+    const x = S.propuestas.find(pr => pr.id === id); if (!x) return;
+    const txt = (document.getElementById('wa-texto') || {}).value || '';
+    if (el.dataset.modo === 'wa') window.open(`https://wa.me/${waDe(x.whatsapp)}?text=${encodeURIComponent(txt)}`, '_blank', 'noopener');
+    else { el.dataset.texto = txt; el.dataset.ok = 'Mensaje copiado: pégalo en tu chat'; await ACC.copiar(el); }
+    // Desde aquí la propuesta le muestra el pago final
+    if (!x.liquidacion_pedida_at) await q(sb.from('propuestas').update({ liquidacion_pedida_at: new Date().toISOString() }).eq('id', id));
+    cerrarModal(); await recargar();
+  },
+  async 'prop-final-recibido'(el, id) {
+    const x = S.propuestas.find(pr => pr.id === id); if (!x) return;
+    if (!await confirmar(`¿Ya recibiste el pago final de ${x.empresa}?`, `Marca ${dinero(restanteDe(x))} como pagado por transferencia. Su propuesta dirá que todo quedó pagado.`, 'Sí, ya lo recibí')) return;
+    await q(sb.from('propuestas').update({ liquidada_at: new Date().toISOString(), liquidacion_metodo: 'transferencia' }).eq('id', id));
+    aviso('Pago final marcado'); await recargar();
+  },
   'prop-duplicar'(el, id) {
     const x = S.propuestas.find(pr => pr.id === id); if (!x) return;
     modalPropuesta(null, { duplicar: Object.assign({}, x, { nombre: '', empresa: '', whatsapp: '', correo: '', diagnostico: '', notas: '' }) });
