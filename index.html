@@ -1632,10 +1632,16 @@ const restanteDe = x => {
   return Math.round(r * 100) / 100;
 };
 const pagoTotalDe = x => !!(x.pagada_at && x.liquidada_at && x.pagada_at === x.liquidada_at);   // el cobro "total" marca los dos a la vez
+// Meses sin intereses: plazo y monto mínimo (con IVA), igual que en Stripe y en /propuesta/
+const MSI_PLANES = [[3, 5000], [6, 30000]];
+const planesMsi = monto => MSI_PLANES.filter(([, min]) => monto >= min).map(([n]) => n);
 function modalCobroFinal(x) {
   const pila = String(x.nombre || '').split(/\s+/)[0], tarjeta = !!(S.ajustes && S.ajustes.stripe_activo);
+  const planes = planesMsi(restanteDe(x));
   const texto = `Hola ${pila}, ya quedó listo el video de ${x.empresa}. 🎬\n\nAquí puedes pagar el 50% final (${dinero(restanteDe(x))}${x.iva === 'mas_iva' ? ' con IVA' : ''}): ${linkPropuesta(x)}\n\n`
-    + (tarjeta ? 'Puedes pagar con tarjeta, incluso a 3 o 6 meses sin intereses, o por transferencia.' : 'Ahí mismo vienen los datos para transferir.') + ' Cualquier duda me dices por aquí.';
+    + (!tarjeta ? 'Ahí mismo vienen los datos para transferir.'
+      : planes.length ? `Puedes pagar con tarjeta, incluso a ${planes.join(' o ')} meses sin intereses, o por transferencia.`
+      : 'Puedes pagar con tarjeta o por transferencia.') + ' Cualquier duda me dices por aquí.';
   const wa = waDe(x.whatsapp);
   abrirModal(`<div class="d-cab"><div><h2 class="d-titulo">Cobrar el 50% final</h2><p class="d-sub">${esc(x.empresa)} · ${esc(dinero(restanteDe(x)))}${x.iva === 'mas_iva' ? ' con IVA' : ''}. Al mandarlo, su propuesta le muestra el pago final${tarjeta ? ' con tarjeta (también a meses sin intereses) o por transferencia' : ' y los datos para transferir'}, y te llega un aviso cuando paga con tarjeta.</p></div></div>
     <div class="campo"><label for="wa-texto">Mensaje</label><textarea id="wa-texto" maxlength="1500" style="min-height:9rem">${esc(texto)}</textarea></div>

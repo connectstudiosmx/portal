@@ -787,12 +787,15 @@ function repintarFechas() {
 
 // Proyectos: total con IVA, si se pagó todo de una vez y los planes de meses sin intereses
 function totalProyecto() { return P.iva === 'mas_iva' ? Math.round(P.precio * 116) / 100 : Number(P.precio); }
-const MSI = [3, 6];
+// Plazos y monto mínimo (con IVA) de cada uno. Tienen que coincidir con Stripe →
+// Configuración → Métodos de pago → Tarjetas → Meses sin intereses (Manuel, oct 2026).
+const MSI = [[3, 5000], [6, 30000]];
+const planesPara = monto => MSI.filter(([, min]) => monto >= min).map(([n]) => n);
 const conMsi = () => P.tipo === 'proyecto' && !!P.stripe;
 const pagoCompleto = () => !!(P.pagada_at && P.liquidada_at && P.pagada_at === P.liquidada_at);   // el cobro "total" marca los dos a la vez
 const alMes = (monto, n) => Math.ceil(monto / n * 100) / 100;
 function opcionesProyecto() {
-  if (!conMsi()) return '';
+  if (!conMsi() || !planesPara(totalProyecto()).length) return '';
   const tot = totalProyecto(), ant = totalAnticipo() ?? Math.round(tot * 50) / 100, resto = Math.round((tot - ant) * 100) / 100;
   const iva = P.iva === 'mas_iva' ? ', IVA incluido' : '';
   return `<div class="opciones-pago">
@@ -801,7 +804,7 @@ function opcionesProyecto() {
       <div class="op-fila"><span>Al entregar el video</span><b>${esc(dinero(resto))}</b></div>
       <p>Con tarjeta o por transferencia${iva}.</p></div>
     <div class="op op-msi r"><small>Opción 2</small><h3>Todo a meses sin intereses</h3>
-      ${MSI.map(n => `<div class="op-fila"><span>${n} meses de</span><b>${esc(dinero(alMes(tot, n)))}</b></div>`).join('')}
+      ${planesPara(tot).map(n => `<div class="op-fila"><span>${n} meses de</span><b>${esc(dinero(alMes(tot, n)))}</b></div>`).join('')}
       <p>Pagas el total de ${esc(dinero(tot))}${P.iva === 'mas_iva' ? ' (IVA incluido)' : ''} con tu tarjeta de crédito y tu banco te lo divide sin intereses. Aplica con la mayoría de las tarjetas de crédito mexicanas.</p></div>
   </div>`;
 }
@@ -832,7 +835,7 @@ function bloqueDecision() {
         <div class="acciones"><a class="btn" href="${esc(wa(`Hola Manuel, te mando el comprobante del ${comprobante} de ${P.empresa}.`))}" target="_blank" rel="noopener">${WA_ICONO} Mandar comprobante</a></div>
       </div>` : '<p>Te mando los datos para transferir por WhatsApp.</p>';
     // Cuánto queda al mes en cada plan de meses sin intereses
-    const notaMsi = (antes, monto) => `<p class="msi-nota">${antes} ${MSI.map(n => `${n} meses de <b>${esc(dinero(alMes(monto, n)))}</b>`).join(' o ')}.</p>`;
+    const notaMsi = (antes, monto) => !planesPara(monto).length ? '' : `<p class="msi-nota">${antes} ${planesPara(monto).map(n => `${n} meses de <b>${esc(dinero(alMes(monto, n)))}</b>`).join(' o ')}.</p>`;
     const opciones = (que, concepto, botonTxt, extra) => P.stripe
       ? `<div class="acciones"><button class="btn btn-v" type="button" data-accion="pagar-tarjeta" data-que="${que}"${previa ? ' disabled' : ''}>${botonTxt}</button>${extra ? extra.boton || '' : ''}
           <button class="enlace" type="button" data-accion="ver-transferencia">${verTransferencia ? 'Ocultar datos para transferir' : 'Prefiero transferir'}</button></div>
@@ -840,7 +843,8 @@ function bloqueDecision() {
           <p class="error" data-error-pago hidden></p>
           ${verTransferencia ? `<div class="transfer">${transferencia(concepto, concepto)}</div>` : ''}`
       : transferencia(concepto, concepto);
-    const opcionesPago = mensual || !conMsi()
+    const msiTotal = conMsi() && planesPara(totalProyecto()).length > 0;
+    const opcionesPago = mensual || !msiTotal
       ? opciones('anticipo', 'anticipo', 'Pagar con tarjeta')
       : opciones('anticipo', 'anticipo', 'Pagar el anticipo con tarjeta', {
           boton: `<button class="btn" type="button" data-accion="pagar-tarjeta" data-que="total"${previa ? ' disabled' : ''}>Pagar todo a meses sin intereses</button>`,
@@ -859,7 +863,7 @@ function bloqueDecision() {
         : paso('hecho', 'Anticipo pagado', `Lo recibí ${P.pago_metodo === 'tarjeta' ? 'con tarjeta' : 'por transferencia'}. ¡Gracias!`)
       : !puedePagar
         ? paso('espera', `Anticipo${monto ? ': ' + monto : ''}`, 'En cuanto firmes, aquí mismo pagas tu anticipo con tarjeta o por transferencia.')
-        : paso('', `Anticipo${monto ? ': ' + monto : ''}`, P.anticipo ? `Con este pago apartamos tus fechas.${!mensual && conMsi() ? ' O, si prefieres, paga todo de una vez a meses sin intereses.' : ''}` : 'El monto te lo confirmo con el contrato.', opcionesPago);
+        : paso('', `Anticipo${monto ? ': ' + monto : ''}`, P.anticipo ? `Con este pago apartamos tus fechas.${!mensual && msiTotal ? ' O, si prefieres, paga todo de una vez a meses sin intereses.' : ''}` : 'El monto te lo confirmo con el contrato.', opcionesPago);
     const msjArranque = mensual
       ? pagado
         ? `Hola Manuel, ya firmé y pagué el anticipo de ${P.empresa}. ¿Qué día hacemos nuestra cita presencial?`
