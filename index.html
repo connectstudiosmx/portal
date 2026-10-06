@@ -968,7 +968,7 @@ function barra() {
   const errML = esAdmin ? mlConError().length : 0;
   const porRevisar = esAdmin ? S.postulaciones.filter(x => x.estado === 'nueva').length : 0;
   const porEmitir = esAdmin ? S.facturas.filter(x => x.estado === 'pendiente').length : 0;
-  const porConvertir = esAdmin ? S.propuestas.filter(x => x.aceptada_at && !x.client_id).length + S.contratos.filter(c => !c.firma_prestador_at).length : 0;
+  const porConvertir = esAdmin ? S.propuestas.filter(x => x.aceptada_at && !x.client_id).length + S.contratos.filter(c => !c.firma_prestador_at && S.propuestas.some(pr => pr.id === c.propuesta_id)).length : 0;
   const punto = id => id === 'clientes' && errML ? `<span class="punto punto-error" aria-label="${errML} con error de MailerLite">!</span>`
     : id === 'propuestas' && porConvertir ? `<span class="punto" aria-label="${porConvertir} ${porConvertir === 1 ? 'pendiente' : 'pendientes'}: contratos por firmar o aceptadas sin dar de alta">${porConvertir}</span>`
     : id === 'postulaciones' && porRevisar ? `<span class="punto" aria-label="${porRevisar} por revisar">${porRevisar}</span>`
