@@ -375,6 +375,9 @@ main.app{max-width:var(--ancho);margin:0 auto;padding:1.75rem 1.25rem 5rem}
 .p-nota::placeholder{color:var(--crema-3)}
 .link-tarjeta{display:inline-flex;align-items:center;gap:.5rem;flex-wrap:wrap;font-size:.86rem;color:var(--crema-2)}
 
+/* Proyectos */
+.tag-proy{display:inline-block;vertical-align:middle;margin-left:.6rem;padding:.15rem .55rem;border:1px solid var(--dorado);border-radius:999px;font-family:var(--texto);font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--dorado)}
+
 /* Cotizador */
 .cot-plants{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:.6rem}
 .cot-plant{display:grid;gap:.2rem;align-content:start;text-align:left;background:var(--panel);border:1px solid var(--linea);border-radius:var(--r2);padding:.85rem 1rem;color:var(--crema);font:inherit;cursor:pointer;transition:border-color .2s}
@@ -1007,13 +1010,13 @@ function cuentas() {
   if (S.perfil.role !== 'admin') return {};
   return {
     solicitudes: S.solicitudes.filter(x => !x.atendida).length,
-    propuestas: S.propuestas.filter(x => x.aceptada_at && !x.client_id).length + S.contratos.filter(c => !c.firma_prestador_at && S.propuestas.some(pr => pr.id === c.propuesta_id)).length,
+    propuestas: S.propuestas.filter(x => sinAlta(x) || porProducir(x)).length + S.contratos.filter(c => !c.firma_prestador_at && S.propuestas.some(pr => pr.id === c.propuesta_id)).length,
     accesos: S.perfiles.filter(x => x.role === 'pendiente').length,
     postulaciones: S.postulaciones.filter(x => x.estado === 'nueva').length,
     pagos: S.facturas.filter(x => x.estado === 'pendiente').length
   };
 }
-const TXT_CUENTA = { solicitudes: 'solicitudes sin atender', propuestas: 'contratos por firmar o aceptadas sin dar de alta', accesos: 'accesos pendientes', postulaciones: 'postulaciones por revisar', pagos: 'facturas por emitir' };
+const TXT_CUENTA = { solicitudes: 'solicitudes sin atender', propuestas: 'contratos por firmar, aceptadas sin dar de alta o proyectos por pasar a producción', accesos: 'accesos pendientes', postulaciones: 'postulaciones por revisar', pagos: 'facturas por emitir' };
 
 function barra() {
   const p = S.perfil, esAdmin = p.role === 'admin';
@@ -1129,8 +1132,9 @@ function porHacer() {
   add(atrasados, atrasados === 1 ? 'guion atrasado (ya pasó su fecha límite)' : 'guiones atrasados (ya pasó su fecha límite)', 'produccion');
   const firmar = S.contratos.filter(c => !c.firma_prestador_at && S.propuestas.some(pr => pr.id === c.propuesta_id)).length;
   add(firmar, firmar === 1 ? 'contrato espera tu firma' : 'contratos esperan tu firma', 'propuestas');
-  const sinAlta = S.propuestas.filter(x => x.aceptada_at && !x.client_id).length;
-  add(sinAlta, sinAlta === 1 ? 'propuesta aceptada sin dar de alta' : 'propuestas aceptadas sin dar de alta', 'propuestas');
+  const altas = S.propuestas.filter(sinAlta).length, producir = S.propuestas.filter(porProducir).length;
+  add(altas, altas === 1 ? 'propuesta aceptada sin dar de alta' : 'propuestas aceptadas sin dar de alta', 'propuestas');
+  add(producir, producir === 1 ? 'proyecto pagado por pasar a producción' : 'proyectos pagados por pasar a producción', 'propuestas');
   const sinAnticipo = S.propuestas.filter(x => x.aceptada_at && !x.pagada_at).length;
   add(sinAnticipo, sinAnticipo === 1 ? 'anticipo pendiente' : 'anticipos pendientes', 'propuestas');
   // Seguimiento: enviadas hace más de 3 días, vigentes y sin respuesta
@@ -1515,7 +1519,7 @@ function cabCliente(b, abierto) {
   const n = b.grupos.length;
   return `<div class="cp-cab">
     <div>
-      <h2 class="cp-nombre"><button class="g-plegar" data-accion="plegar" data-id="pc:${b.id}" aria-expanded="${abierto}"><span class="g-flecha" aria-hidden="true"></span>${esc(b.cli ? b.cli.name : 'Cliente')}</button></h2>
+      <h2 class="cp-nombre"><button class="g-plegar" data-accion="plegar" data-id="pc:${b.id}" aria-expanded="${abierto}"><span class="g-flecha" aria-hidden="true"></span>${esc(b.cli ? b.cli.name : 'Cliente')}</button>${b.cli && b.cli.tipo === 'proyecto' ? '<span class="tag-proy">Proyecto</span>' : ''}</h2>
       <p class="cp-meta">${n} ${n === 1 ? 'mes' : 'meses'}: ${esc(b.grupos.map(g => g.c.name).join(', '))}${abierto ? '' : ` · <span class="g-resumen">${esc(resumenEstados(todos))}</span>`}</p>
       ${prox ? `<p class="cp-meta limite plazo-${p.nivel}">Próximo límite de edición <b>${fDia(prox.c.editor_due)}</b> <em class="faltan">${p.txt}</em>${n > 1 ? ` <span class="nota">(${esc(prox.c.name)})</span>` : ''}</p>` : ''}
     </div>
@@ -1641,17 +1645,17 @@ function bloqueCliente(cl) {
   return `<section class="cli">
     <div class="cli-cab">
       <div>
-        <h2 class="cli-nombre${cl.active ? '' : ' pausado'}"><button class="g-plegar" data-accion="plegar" data-id="cc:${cl.id}" aria-expanded="${abierto}"><span class="g-flecha" aria-hidden="true"></span>${esc(cl.name)}</button></h2>
+        <h2 class="cli-nombre${cl.active ? '' : ' pausado'}"><button class="g-plegar" data-accion="plegar" data-id="cc:${cl.id}" aria-expanded="${abierto}"><span class="g-flecha" aria-hidden="true"></span>${esc(cl.name)}</button>${cl.tipo === 'proyecto' ? '<span class="tag-proy">Proyecto</span>' : ''}</h2>
         <p class="cli-meta"><b>${cs.length ? `${cs.length} ${cs.length === 1 ? 'mes' : 'meses'}` : 'Sin meses'}</b>${cs.length && !abierto ? ` (${esc(cs.slice(0, 3).map(c => c.name).join(', '))}${cs.length > 3 ? '…' : ''})` : ''}.
-          ${cl.videos_per_cycle} videos por mes${cl.active ? '' : ', en pausa'}. ${usuarios.length ? `Con acceso: ${usuarios.map(u => esc(nombreDe(u))).join(', ')}.` : 'Nadie de este cliente tiene acceso todavía.'}
+          ${cl.tipo === 'proyecto' ? 'Proyecto: lo revisa y lo paga en el link de su propuesta, sin portal.' : `${cl.videos_per_cycle} videos por mes${cl.active ? '' : ', en pausa'}. ${usuarios.length ? `Con acceso: ${usuarios.map(u => esc(nombreDe(u))).join(', ')}.` : 'Nadie de este cliente tiene acceso todavía.'}`}
           ${editores.length ? `Editores: ${editores.map(u => esc(nombreDe(u))).join(', ')}.` : 'Sin editor asignado (se asigna en Equipo → Accesos al portal).'}</p>
-        ${lineaMailerlite(cl)}
-        <p class="cli-meta">${(e => e && e.confirmado_at ? `Estilo visual confirmado el ${esc(fCorta(e.confirmado_at))}.` : e ? 'Estilo visual en proceso: todavía no lo confirma.' : 'Estilo visual: todavía no lo elige.')(estiloFila(cl.id))}</p>
+        ${cl.tipo === 'proyecto' ? '' : lineaMailerlite(cl)}
+        <p class="cli-meta"${cl.tipo === 'proyecto' ? ' hidden' : ''}>${(e => e && e.confirmado_at ? `Estilo visual confirmado el ${esc(fCorta(e.confirmado_at))}.` : e ? 'Estilo visual en proceso: todavía no lo confirma.' : 'Estilo visual: todavía no lo elige.')(estiloFila(cl.id))}</p>
       </div>
       <div class="controles">
         <button class="btn btn-s btn-t" data-accion="cli-historial" data-id="${cl.id}">Historial</button>
-        <button class="btn btn-s btn-t" data-accion="estilo-cliente" data-id="${cl.id}">Estilo</button>
-        ${cs.length ? `<button class="btn btn-s btn-t" data-accion="previa" data-id="${cl.id}">Ver como cliente</button>` : ''}
+        ${cl.tipo === 'proyecto' ? '' : `<button class="btn btn-s btn-t" data-accion="estilo-cliente" data-id="${cl.id}">Estilo</button>`}
+        ${cs.length && cl.tipo !== 'proyecto' ? `<button class="btn btn-s btn-t" data-accion="previa" data-id="${cl.id}">Ver como cliente</button>` : ''}
         <button class="btn btn-s" data-accion="editar-cliente" data-id="${cl.id}">Editar</button>
         <button class="btn btn-s btn-p" data-accion="nuevo-ciclo" data-id="${cl.id}">Nuevo mes</button>
       </div>
@@ -1854,7 +1858,7 @@ const PROP_DEF = {
       'Edición con música con licencia',
       'Entrega en los formatos que necesites'].join('\n'),
     forma_pago: '50% de anticipo para apartar las fechas de grabación y 50% al entregar. Cada pago lleva su factura.',
-    condiciones: ['Incluye una ronda de ajustes sobre la edición',
+    condiciones: ['Incluye dos rondas de ajustes sobre la edición',
       'Grabación dentro de la Zona Metropolitana de Guadalajara; fuera de ella, los viáticos se cotizan aparte'].join('\n')
   }
 };
@@ -1883,7 +1887,7 @@ const SERVICIOS_PROP = () => COT_PLANT.filter(p => p.tipo === 'proyecto' && p.id
 function vistaPropuestas() {
   const todas = S.propuestas, f = S.propFiltro;
   const lista = todas.filter(x => { const e = estadoPropuesta(x).clave; return f === 'activas' ? ['sin_enviar', 'enviada', 'vista'].includes(e) : !f || e === f; });
-  const porConvertir = todas.filter(x => x.aceptada_at && !x.client_id).length;
+  const porConvertir = todas.filter(sinAlta).length, producir = todas.filter(porProducir).length;
   const opt = (v, t) => `<option value="${v}"${f === v ? ' selected' : ''}>${esc(t)}</option>`;
   return `<div class="encabezado">
     <div><h1>Propuestas</h1><p class="sub">Después de la llamada, arma la propuesta y mándale el link. Ves cuándo la abre y te avisa por Telegram cuando la acepta o te dice que no. Al aceptarla ve los datos para el anticipo.</p></div>
@@ -1895,6 +1899,7 @@ function vistaPropuestas() {
   ${S.faltaBase ? avisoFaltaBase() : ''}
   ${S.ajustes && !contratoListo() ? '<p class="aviso-linea">Para que tus clientes firmen el contrato en línea, llena tus datos del contrato en <button class="f-ver" data-accion="ir" data-id="pagos">Pagos</button>. Mientras, la propuesta les dice que les mandas el contrato.</p>' : ''}
   ${porConvertir ? `<p class="aviso-linea">${porConvertir === 1 ? '1 propuesta aceptada todavía no está dada de alta como cliente.' : `${porConvertir} propuestas aceptadas todavía no están dadas de alta como clientes.`}</p>` : ''}
+  ${producir ? `<p class="aviso-linea">${producir === 1 ? '1 proyecto ya pagó su anticipo: pásalo a producción.' : `${producir} proyectos ya pagaron su anticipo: pásalos a producción.`}</p>` : ''}
   ${lista.length ? `<div class="sol-lista">${lista.map(x => {
     const e = estadoPropuesta(x), abierta = !x.aceptada_at && e.clave !== 'vencida';
     return `<article class="sol pr-${e.clave}">
@@ -1906,7 +1911,7 @@ function vistaPropuestas() {
           <span>Vigente hasta el ${esc(fCorta(x.vigencia))}</span>
           ${x.tipo === 'mensual' && x.dia_pago ? `<span>Paga el <b>día ${esc(x.dia_pago)}</b> de cada mes</span>` : ''}
         </div>
-        ${x.aceptada_at ? `<p class="sol-msg">Aceptó <b>${esc(x.aceptada_por || x.nombre)}</b> el ${esc(fHora(x.aceptada_at))}. Siguiente: mándale el contrato y confirma el anticipo.</p>` : ''}
+        ${x.aceptada_at ? `<p class="sol-msg">Aceptó <b>${esc(x.aceptada_por || x.nombre)}</b> el ${esc(fHora(x.aceptada_at))}. ${esc(siguientePaso(x))}</p>` : ''}
         ${x.rechazada_at && !x.aceptada_at ? `<p class="sol-msg"><b>Motivo:</b> ${esc(MOTIVOS_PROP[x.motivo] || 'Otro')}${x.comentario ? ` · ${esc(x.comentario)}` : ''}</p>` : ''}
         ${x.aceptada_at ? (ct => `<div class="sol-meta">
           ${x.tipo === 'mensual' ? (ct ? `<span class="sol-int sol-ok">Contrato firmado el ${esc(fCorta(ct.firmado_at))}</span>${ct.firma_prestador_at ? '<span class="sol-int sol-ok">Ya lo firmaste</span>' : '<span class="sol-int">Falta tu firma</span>'}` : '<span class="sol-int">Contrato sin firmar</span>') : ''}
@@ -1926,8 +1931,10 @@ function vistaPropuestas() {
           ${x.aceptada_at && !x.pagada_at ? `<button class="btn btn-s btn-t" data-accion="prop-pagada" data-id="${x.id}">Marcar anticipo pagado</button>` : ''}
           ${x.tipo === 'proyecto' && x.pagada_at && !x.liquidada_at ? `<button class="btn btn-s${x.liquidacion_pedida_at ? '' : ' btn-p'}" data-accion="prop-cobrar-final" data-id="${x.id}">${x.liquidacion_pedida_at ? 'Volver a mandar el cobro' : 'Cobrar el 50% final'}</button>
             <button class="btn btn-s btn-t" data-accion="prop-final-recibido" data-id="${x.id}">Marcar pago final recibido</button>` : ''}
-          ${x.aceptada_at && !x.client_id ? `<button class="btn btn-s btn-p" data-accion="prop-cliente" data-id="${x.id}">Dar de alta como cliente</button>` : ''}
-          ${x.client_id ? '<span class="sol-int sol-ok">Ya es cliente</span>' : ''}
+          ${porProducir(x) ? `<button class="btn btn-s btn-p" data-accion="prop-produccion" data-id="${x.id}">Pasar a producción</button>` : ''}
+          ${x.tipo === 'proyecto' && x.cycle_id ? `<span class="sol-int sol-ok">${esc(estadoProduccion(x))}</span>` : ''}
+          ${sinAlta(x) ? `<button class="btn btn-s btn-p" data-accion="prop-cliente" data-id="${x.id}">Dar de alta como cliente</button>` : ''}
+          ${x.client_id && x.tipo !== 'proyecto' ? '<span class="sol-int sol-ok">Ya es cliente</span>' : ''}
         </div>
       </div>
       <div class="sol-der">
@@ -1937,6 +1944,49 @@ function vistaPropuestas() {
     </article>`;
   }).join('')}</div>`
     : `<div class="caja-vacia"><p>${todas.length ? 'Nada en este filtro.' : 'Todavía no hay propuestas. Hazla desde una solicitud (botón "Hacer propuesta") o empieza una aquí.'}</p>${todas.length ? '' : '<button class="btn btn-p" data-accion="prop-nueva">Nueva propuesta</button>'}</div>`}`;
+}
+
+// Proyectos en producción: dónde va y el botón para pasarlo
+// Los mensuales se dan de alta como clientes; los proyectos pasan a producción al pagar el anticipo
+function sinAlta(x) { return x.tipo !== 'proyecto' && x.aceptada_at && !x.client_id; }
+function porProducir(x) { return x.tipo === 'proyecto' && x.pagada_at && !x.cycle_id; }
+function siguientePaso(x) {
+  if (x.liquidada_at) return 'Todo quedó pagado.';
+  if (porProducir(x)) return 'Siguiente: pásalo a producción.';
+  if (x.tipo === 'proyecto' && x.cycle_id) {
+    const c = S.ciclos.find(y => y.id === x.cycle_id);
+    return !c || !c.revision_estado ? 'Siguiente: grabar y entregar; al marcar los videos como entregados, el cliente lo revisa en su link.'
+      : c.revision_estado === 'aprobado' ? 'Siguiente: el pago final.' : 'Siguiente: que lo revise y lo apruebe en su link.';
+  }
+  if (x.pagada_at) return x.tipo === 'proyecto' ? 'Siguiente: pásalo a producción.' : x.client_id ? 'Ya está en marcha.' : 'Siguiente: dalo de alta como cliente.';
+  return 'Siguiente: mándale el contrato y confirma el anticipo.';
+}
+const PIEZAS_SERV = { podcast: 4 };
+function estadoProduccion(x) {
+  const c = S.ciclos.find(y => y.id === x.cycle_id);
+  if (!c) return 'En producción';
+  return { revision: `En revisión del cliente hasta el ${fCorta(c.revision_hasta)}`, ajustes: `Pidió ajustes (ronda ${c.rondas_usadas} de ${c.rondas})`, aprobado: 'Aprobado por el cliente' }[c.revision_estado]
+    || `En producción · entrega ${fCorta(c.delivery_date)}`;
+}
+function modalProduccion(x) {
+  const hoyD = hoy(), d = n => aISO(sumarDias(hoyD, n));
+  const editores = S.perfiles.filter(p => p.role === 'editor');
+  abrirModal(`<form data-form="produccion" data-id="${x.id}" novalidate>
+    <div class="d-cab"><div><h2 class="d-titulo">Pasar a producción</h2><p class="d-sub">${esc(x.empresa)} · ${esc(x.titulo)}. Aparece en Producción como un proyecto; el cliente no entra al portal: lo revisa, lo aprueba y lo paga en el link de su propuesta.</p></div></div>
+    <div class="campo"><label for="pp-nombre">Nombre del proyecto</label><input id="pp-nombre" name="nombre" maxlength="80" value="${esc(x.titulo)}"></div>
+    <div class="fila-campos">
+      <div class="campo"><label for="pp-g1">Primer día de grabación</label><input id="pp-g1" name="record_start" type="date" required value="${d(7)}"></div>
+      <div class="campo"><label for="pp-g2">Segundo día de grabación</label><input id="pp-g2" name="record_end" type="date" required value="${d(7)}"><p class="ayuda">Si es un solo día, la misma fecha.</p></div>
+      <div class="campo"><label for="pp-ed">Límite del editor</label><input id="pp-ed" name="editor_due" type="date" required value="${d(17)}"></div>
+      <div class="campo"><label for="pp-ent">Entrega al cliente</label><input id="pp-ent" name="delivery_date" type="date" required value="${d(21)}"></div>
+    </div>
+    <div class="fila-campos">
+      <div class="campo"><label for="pp-piezas">Piezas a entregar</label><input id="pp-piezas" name="piezas" type="number" min="1" max="40" value="${PIEZAS_SERV[x.servicio] || 1}"><p class="ayuda">Cada pieza es un video en Producción.</p></div>
+      <div class="campo"><label for="pp-rondas">Rondas de ajustes</label><input id="pp-rondas" name="rondas" type="number" min="0" max="5" value="${x.rondas ?? 2}"></div>
+    </div>
+    <div class="campo"><label for="pp-editor">Editor</label><select id="pp-editor" name="editor"><option value="">Lo edito yo / después lo asigno</option>${editores.map(p => `<option value="${p.id}">${esc(nombreDe(p))}</option>`).join('')}</select></div>
+    <div class="d-pie"><button type="button" class="btn" data-accion="cerrar">Cancelar</button><button type="submit" class="btn btn-p">Pasar a producción</button></div>
+  </form>`);
 }
 
 // Pago final de un proyecto: lo que falta (total con IVA menos el anticipo con IVA, igual que la base)
@@ -2758,12 +2808,16 @@ function avisosRevision() {
     ${enRev.map(c => {
       const cl = clientePorId(c.client_id), tel = cl && waDe(cl.contact_phone), n = S.videos.filter(v => v.cycle_id === c.id).length;
       const pila = String((cl && cl.contact_name) || '').split(/\s+/)[0];
-      const wa = tel ? `https://wa.me/${tel}?text=${encodeURIComponent(`Hola${pila ? ' ' + pila : ''}, ¡ya ${n === 1 ? 'está tu video' : `están tus ${n} videos`} de ${c.name}! Míralos en tu portal: ${PORTAL_URL}\n\nTienes hasta el ${fLarga(c.revision_hasta)} para pedirme una ronda de ajustes, en un solo mensaje, desde ahí mismo. Si todo está bien, apruébalos; si no me pides nada, se aprueban solos.`)}` : '';
+      const prop = cl && cl.tipo === 'proyecto' ? S.propuestas.find(x => x.cycle_id === c.id) : null, quedan = c.rondas - c.rondas_usadas;
+      const texto = prop
+        ? `Hola${pila ? ' ' + pila : ''}, ¡ya ${n === 1 ? 'está listo tu video' : `están listos tus ${n} videos`}! ${n === 1 ? 'Revísalo' : 'Revísalos'} aquí: ${linkPropuesta(prop)}\n\nPuedes comentar en el segundo exacto en Frame.io o escribirme tus cambios ahí mismo. Tienes hasta el ${fLarga(c.revision_hasta)}${quedan > 0 ? ` (te ${quedan === 1 ? 'queda 1 ronda' : `quedan ${quedan} rondas`} de ajustes)` : ''}. Si todo está bien, ${n === 1 ? 'apruébalo' : 'apruébalos'}; si no me dices nada, se aprueba solo.`
+        : `Hola${pila ? ' ' + pila : ''}, ¡ya ${n === 1 ? 'está tu video' : `están tus ${n} videos`} de ${c.name}! Míralos en tu portal: ${PORTAL_URL}\n\nTienes hasta el ${fLarga(c.revision_hasta)} para pedirme una ronda de ajustes, en un solo mensaje, desde ahí mismo. Si todo está bien, apruébalos; si no me pides nada, se aprueban solos.`;
+      const wa = tel ? `https://wa.me/${tel}?text=${encodeURIComponent(texto)}` : '';
       return fila(c, `En revisión del cliente hasta el ${esc(fLarga(c.revision_hasta))}. Si no pide ajustes, se aprueba solo.`,
         `${wa ? `<a class="btn btn-s btn-p" href="${esc(wa)}" target="_blank" rel="noopener noreferrer">Avisarle por WhatsApp</a>` : ''}<button class="btn btn-s btn-t" data-accion="ciclo-aprobar" data-id="${c.id}">Marcar aprobado</button>`);
     }).join('')}
-    ${ajustes.map(c => fila(c, `Pidió ajustes el ${esc(fCorta(aISO(new Date(c.ajustes_at))))}${c.ajustes_general ? `: “${esc(c.ajustes_general)}”` : ''}. Los videos con ajuste regresaron a edición; al entregarlos, el mes queda aprobado.`,
-      `<button class="btn btn-s btn-t" data-accion="ciclo-aprobar" data-id="${c.id}">Marcar ajustes entregados</button>`)).join('')}
+    ${ajustes.map(c => fila(c, `Pidió ajustes el ${esc(fCorta(aISO(new Date(c.ajustes_at))))}${c.ajustes_general ? `: “${esc(c.ajustes_general)}”` : ''}. Los videos con ajuste regresaron a edición; al entregarlos, ${c.rondas_usadas < c.rondas ? `vuelve a su revisión (le ${c.rondas - c.rondas_usadas === 1 ? 'queda 1 ronda' : `quedan ${c.rondas - c.rondas_usadas} rondas`})` : (clientePorId(c.client_id) || {}).tipo === 'proyecto' ? 'queda aprobado y se activa su pago final' : 'el mes queda aprobado'}.`,
+      `<button class="btn btn-s btn-t" data-accion="ciclo-aprobar" data-id="${c.id}">${c.rondas_usadas < c.rondas ? 'Marcar aprobado' : 'Marcar ajustes entregados'}</button>`)).join('')}
   </section>`;
 }
 
@@ -3490,6 +3544,9 @@ function modalVideo(id) {
     <div class="campo"><label for="f-final">Link de este video (opcional si ya está en la carpeta del mes)</label>
       <input id="f-final" name="final_url" type="url" inputmode="url" placeholder="https://drive.google.com/..." value="${esc(v.final_url || '')}"${bloqueado || ajeno ? ' disabled' : ''}>
       <p class="ayuda">El cliente lo ve solo cuando el video se entrega. Revisa que el archivo de Drive esté compartido.</p></div>
+    <div class="campo"><label for="f-rev">Link de revisión (Frame.io)</label>
+      <input id="f-rev" name="revision_url" type="url" inputmode="url" placeholder="https://f.io/..." value="${esc(v.revision_url || '')}"${bloqueado || ajeno ? ' disabled' : ''}>
+      <p class="ayuda">El link de Frame.io donde tú y el cliente comentan en el segundo exacto. En proyectos, el cliente lo abre desde su propuesta al revisar.</p></div>
     ${bloquePortadaVideo(v, c)}
     <div class="campo"><label for="f-notas">Notas del equipo</label>
       <textarea id="f-notas" name="team_notes" maxlength="5000" placeholder="Música, cortes, cambios pedidos">${esc(v.team_notes || '')}</textarea>
@@ -3853,6 +3910,7 @@ function modalPropuesta(id, desde) {
     <div class="campo" data-solo-mensual${tipo === 'mensual' ? '' : ' hidden'}><label for="pr-plazo">Plazo mínimo</label>
       <select id="pr-plazo" name="plazo_minimo" style="max-width:14rem">${[3, 9, 12].map(n => `<option value="${n}"${(base ? base.plazo_minimo || 3 : 3) === n ? ' selected' : ''}>${n} meses</option>`).join('')}</select>
       <p class="ayuda">Videos, días y plazo van al Anexo 1 del contrato.</p></div>
+    <div class="campo" data-solo-proyecto${tipo === 'proyecto' ? '' : ' hidden'} style="max-width:14rem"><label for="pr-rondas">Rondas de ajustes</label><input id="pr-rondas" name="rondas" type="number" min="0" max="5" value="${esc(base && base.rondas != null ? base.rondas : 2)}"><p class="ayuda">Las que puede pedir al revisar. Si Condiciones dice cuántas, se toma de ahí.</p></div>
     <div class="campo"><label for="pr-pago">Forma de pago</label><textarea id="pr-pago" name="forma_pago" maxlength="1500" style="min-height:5rem">${v('forma_pago')}</textarea></div>
     <div class="campo"><label for="pr-cond">Condiciones</label><textarea id="pr-cond" name="condiciones" maxlength="2500" style="min-height:7rem">${v('condiciones')}</textarea><p class="ayuda">Un punto por renglón. Las rondas de ajustes van aquí.</p><p class="aviso-linea" id="pr-aviso-rondas" hidden></p></div>
     <div class="fila-campos">
@@ -3884,6 +3942,7 @@ function modalPropuesta(id, desde) {
       const a = rondas(f.elements.incluye.value), b = rondas(f.elements.condiciones.value);
       const choca = a.length && b.length && a.some(x => !b.includes(x));
       avisoRondas.hidden = !choca;
+      if (b.length && f.elements.rondas) f.elements.rondas.value = Math.min(5, b[0]);   // las rondas que cuenta la revisión salen de Condiciones
       if (choca) avisoRondas.textContent = `Ojo: en “Qué incluye” dice ${a[0]} ${a[0] === 1 ? 'ronda' : 'rondas'} de ajustes y en “Condiciones” dice ${b[0]}. Déjalo igual en los dos o quítalo de uno.`;
     };
     ['incluye', 'condiciones'].forEach(k => f.elements[k].addEventListener('input', revisarRondas));
@@ -4020,7 +4079,7 @@ async function guardarVideo(id, cambios, ok) {
 const FORMS = {
   async video(f) {
     const id = f.dataset.id, v = S.videos.find(x => x.id === id); if (!v) return;
-    if (!revisarLinks(f, ['script_url', 'final_url'])) return;
+    if (!revisarLinks(f, ['script_url', 'final_url', 'revision_url'])) return;
     const esAdmin = S.perfil.role === 'admin', yo = S.perfil.id, cambios = {};
     const poner = (k, x) => { if (x === undefined) return; const nuevo = x === '' ? null : x; if ((v[k] ?? null) !== nuevo) cambios[k] = nuevo; };
     if (esAdmin) {
@@ -4033,6 +4092,8 @@ const FORMS = {
     }
     poner('status', valor(f, 'status'));
     poner('final_url', valor(f, 'final_url'));
+    const rev = valor(f, 'revision_url');
+    poner('revision_url', rev && rev.replace(/^http:\/\//i, 'https://'));
     poner('team_notes', valor(f, 'team_notes'));
     if (!esAdmin) {
       const mio = f.elements.mio;
@@ -4197,6 +4258,7 @@ const FORMS = {
       nombre: valor(f, 'nombre'), empresa: valor(f, 'empresa'), whatsapp: valor(f, 'whatsapp') || null, correo: valor(f, 'correo') || null,
       tipo: valor(f, 'tipo'), titulo: valor(f, 'titulo'), diagnostico: valor(f, 'diagnostico') || null, incluye: valor(f, 'incluye') || null,
       servicio: valor(f, 'tipo') === 'proyecto' ? valor(f, 'servicio') || null : null,
+      rondas: valor(f, 'tipo') === 'proyecto' ? Math.max(0, Math.min(5, Math.round(num('rondas') ?? 2))) : null,
       precio: num('precio'), iva: valor(f, 'iva'), precio_nota: valor(f, 'precio_nota') || null, anticipo: num('anticipo'),
       forma_pago: valor(f, 'forma_pago') || null, condiciones: valor(f, 'condiciones') || null,
       ejemplo_url: valor(f, 'ejemplo_url') || null, vigencia: valor(f, 'vigencia'), notas: valor(f, 'notas') || null,
@@ -4231,6 +4293,19 @@ const FORMS = {
         modalPropuestaLista(S.propuestas.find(pr => pr.id === nueva.id));
       }
     } catch (e) { aviso(humano(e), true); }
+  },
+  async produccion(f) {
+    const x = S.propuestas.find(pr => pr.id === f.dataset.id); if (!x) return;
+    const [a, b, e, g] = ['record_start', 'record_end', 'editor_due', 'delivery_date'].map(n => valor(f, n));
+    if (!a || !b || !e || !g) return aviso('Completa las cuatro fechas.', true);
+    if (b < a) return aviso('El segundo día de grabación no puede ir antes del primero.', true);
+    if (g < b) return aviso('La entrega no puede ir antes de la grabación.', true);
+    const piezas = Math.round(Number(valor(f, 'piezas'))), rondas = Math.round(Number(valor(f, 'rondas')));
+    if (!(piezas >= 1 && piezas <= 40)) return aviso('Las piezas van de 1 a 40.', true);
+    if (!(rondas >= 0 && rondas <= 5)) return aviso('Las rondas de ajustes van de 0 a 5.', true);
+    await q(sb.rpc('proyecto_a_produccion', { p_propuesta: x.id, p_nombre: valor(f, 'nombre') || x.titulo, p_record_start: a, p_record_end: b,
+      p_editor_due: e, p_delivery: g, p_piezas: piezas, p_rondas: rondas, p_editor: valor(f, 'editor') || null }));
+    cerrarModal(); aviso('Listo: ya está en Producción'); await recargar();
   },
   async 'cot-ajustes'(f) {
     const n = name => cotNum(valor(f, name));
@@ -4594,9 +4669,11 @@ const ACC = {
   },
   async 'ciclo-aprobar'(el, id) {
     const c = S.ciclos.find(x => x.id === id); if (!c) return;
-    if (!await confirmar(c.revision_estado === 'ajustes' ? '¿Ya entregaste los ajustes?' : '¿Marcar el mes como aprobado?', 'El cliente ya no podrá pedir ajustes de este mes.', 'Sí, aprobado')) return;
+    const proy = (clientePorId(c.client_id) || {}).tipo === 'proyecto';
+    if (!await confirmar(c.revision_estado === 'ajustes' && c.rondas_usadas >= c.rondas ? '¿Ya entregaste los ajustes?' : proy ? '¿Marcar el proyecto como aprobado?' : '¿Marcar el mes como aprobado?',
+      proy ? 'Ya no podrá pedir más ajustes y se activa su pago final. Si solo entregaste ajustes, mejor marca los videos como entregados: así vuelve a su revisión.' : 'El cliente ya no podrá pedir ajustes de este mes.', 'Sí, aprobado')) return;
     await q(sb.from('cycles').update({ revision_estado: 'aprobado', aprobado_at: new Date().toISOString(), aprobado_por: 'admin' }).eq('id', id));
-    await recargar(); aviso('Mes aprobado');
+    await recargar(); aviso(proy ? 'Proyecto aprobado' : 'Mes aprobado');
   },
   async 'aprobar-mes'(el, id) {
     if (S.vista === 'previa') return;
@@ -4668,6 +4745,7 @@ const ACC = {
     modalPropuesta(null, sol ? { solicitud: sol } : {});
   },
   'prop-editar'(el, id) { modalPropuesta(id); },
+  'prop-produccion'(el, id) { const x = S.propuestas.find(pr => pr.id === id); if (x) modalProduccion(x); },
   'prop-cobrar-final'(el, id) { const x = S.propuestas.find(pr => pr.id === id); if (x) modalCobroFinal(x); },
   async 'cobro-final'(el, id) {
     const x = S.propuestas.find(pr => pr.id === id); if (!x) return;

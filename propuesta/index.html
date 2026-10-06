@@ -221,6 +221,22 @@ h1{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size
 .pasos-sig .acciones{margin-top:.9rem}
 .transfer{margin-top:.9rem}
 
+/* Revisión del proyecto */
+.rev-videos{display:grid;gap:.7rem;margin-top:1rem}
+.rev-video{background:var(--panel);border:1px solid var(--linea);border-radius:14px;padding:1rem 1.1rem}
+.rev-cab{display:flex;align-items:baseline;gap:.7rem;margin:0}
+.rev-cab b{font-family:var(--display);font-weight:400;font-size:1.6rem;line-height:1;color:var(--verde)}
+.rev-cab span{font-weight:600}
+.rev-video .acciones{margin-top:.7rem}
+.rev-video .campo{margin:.9rem 0 0}
+.rev-video .acepto{margin:.6rem 0 0}
+.rev-nota{margin:1rem 0 0;color:var(--crema-3);font-size:.88rem}
+.rev-confirma{margin-top:1rem;padding:1rem 1.1rem;border:1px solid rgba(57,255,136,.4);border-radius:14px;background:var(--verde-t)}
+.rev-confirma p{color:var(--crema);margin:0 0 .8rem}
+.rev-lista{margin:.8rem 0 0;padding-left:1.1rem;color:var(--crema-2);font-size:.92rem}
+.rev-lista li{margin:.25rem 0}
+.rev-lista b{color:var(--crema)}
+
 /* Panel para firmar y vista del contrato */
 .capa{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.82);overflow-y:auto;padding:clamp(.5rem,3vw,2rem) .6rem}
 .capa-in{max-width:52rem;margin:0 auto;background:var(--panel);border:1px solid var(--linea-2);border-radius:20px;padding:clamp(1.2rem,4vw,2.4rem)}
@@ -816,6 +832,109 @@ function totalAnticipo() {
   return P.iva === 'mas_iva' ? Math.round(P.anticipo * 116) / 100 : Number(P.anticipo);
 }
 
+// ---------- Producción y revisión del proyecto ----------
+// El cliente de un proyecto no entra al portal: aquí ve en qué va, revisa (en Frame.io o escribiendo), aprueba y paga
+let ajustesAbiertos = false;   // el formulario para pedir ajustes
+let porAprobar = false;        // la confirmación antes de aprobar
+const hoyMx = () => new Date().toLocaleDateString('en-CA', { timeZone: 'America/Mexico_City' });
+const diaMx = iso => new Date(iso).toLocaleDateString('en-CA', { timeZone: 'America/Mexico_City' });
+const pad2 = n => String(n).padStart(2, '0');
+const rondas = n => n === 1 ? '1 ronda' : `${n} rondas`;
+const diasGrab = g => { const [a, b] = g || []; return !a ? '' : !b || a === b ? `el ${fCorta(a)}` : a.slice(0, 7) === b.slice(0, 7) ? `el ${Number(a.slice(8, 10))} y el ${fCorta(b)}` : `el ${fCorta(a)} y el ${fCorta(b)}`; };
+const nombreVideo = v => v.titulo || `Video ${v.numero}`;
+
+function pasoProduccion(pr, paso) {
+  const vids = pr.videos || [], uno = vids.length === 1;
+  const quedan = Math.max(0, pr.rondas - pr.rondas_usadas), hoy = hoyMx();
+  const carpeta = pr.carpeta ? `<a class="btn" href="${esc(pr.carpeta)}" target="_blank" rel="noopener">Abrir la carpeta</a>` : '';
+  if (pr.estado === 'produccion') {
+    const grabado = (pr.grabacion[1] || pr.grabacion[0]) < hoy;
+    return paso('', 'En producción', grabado
+      ? `Ya grabamos y estamos editando. Te lo entrego el ${esc(fCorta(pr.entrega))} y te aviso por WhatsApp para que lo revises aquí mismo.`
+      : `Grabamos ${esc(diasGrab(pr.grabacion))} y te entrego el ${esc(fCorta(pr.entrega))}. Te aviso por WhatsApp para que lo revises aquí mismo.`,
+      `<div class="acciones"><a class="btn" href="${esc(wa(`Hola Manuel, tengo una duda sobre el proyecto de ${P.empresa}.`))}" target="_blank" rel="noopener">${WA_ICONO} Escribirme</a></div>`);
+  }
+  if (pr.estado === 'ajustes') {
+    const pedidos = vids.filter(v => v.ajuste && v.estado !== 'entregado');
+    return paso('', 'Estamos haciendo tus ajustes', `Los pediste${pr.ajustes_at ? ` el ${esc(fCorta(diaMx(pr.ajustes_at)))}` : ''}. Te aviso por WhatsApp en cuanto estén para que los revises aquí mismo.`,
+      pedidos.length || pr.ajustes_general ? `<ul class="rev-lista">${pedidos.map(v => `<li><b>${esc(nombreVideo(v))}:</b> ${esc(v.ajuste)}</li>`).join('')}${pr.ajustes_general ? `<li>${esc(pr.ajustes_general)}</li>` : ''}</ul>` : '');
+  }
+  if (pr.estado === 'aprobado') {
+    const bajar = vids.filter(v => v.final_url).map(v => `<a class="btn" href="${esc(v.final_url)}" target="_blank" rel="noopener">${uno ? 'Descargar tu video' : `Descargar ${esc(nombreVideo(v))}`}</a>`).join('');
+    return paso('hecho', uno ? 'Video aprobado' : 'Videos aprobados', `Quedó aprobado${pr.aprobado_at ? ` el ${esc(fCorta(diaMx(pr.aprobado_at)))}` : ''}. Descárgalo en alta calidad; el link está disponible 30 días.`,
+      bajar || carpeta ? `<div class="acciones">${bajar}${carpeta}</div>` : '');
+  }
+  // En revisión
+  const vencida = pr.revision_hasta && pr.revision_hasta < hoy;
+  const conFio = vids.some(v => v.revision_url);
+  const tarjetas = vids.map(v => `<div class="rev-video">
+      <p class="rev-cab"><b>${pad2(v.numero)}</b><span>${esc(nombreVideo(v))}</span></p>
+      <div class="acciones">${v.revision_url ? `<a class="btn btn-v" href="${esc(v.revision_url)}" target="_blank" rel="noopener">Ver y comentar</a>` : v.final_url ? `<a class="btn btn-v" href="${esc(v.final_url)}" target="_blank" rel="noopener">Ver el video</a>` : ''}</div>
+      ${ajustesAbiertos ? `<div class="campo"><label for="aj-${v.id}">¿Qué cambiarías?</label><textarea id="aj-${v.id}" name="aj-${v.id}" maxlength="1500" placeholder="Por ejemplo: en el segundo 0:42 cambiar la música por algo más tranquilo"></textarea></div>
+        ${v.revision_url ? `<label class="acepto"><input type="checkbox" name="fio-${v.id}"> Dejé mis comentarios en Frame.io</label>` : ''}` : ''}
+    </div>`).join('');
+  const explica = `${conFio ? 'En Frame.io puedes comentar en el segundo exacto y hasta dibujar sobre el video; solo te pide tu nombre y correo, sin crear cuenta. ' : ''}${vencida ? 'Ya pasó el plazo para pedir ajustes, así que se aprueba hoy.' : `Tienes hasta el ${esc(fCorta(pr.revision_hasta))} para revisarlo${quedan ? ` y te ${quedan === 1 ? 'queda' : 'quedan'} ${rondas(quedan)} de ajustes` : ''}. Si no me dices nada, se aprueba solo.`}`;
+  let abajo;
+  if (ajustesAbiertos) {
+    abajo = `<div class="campo" style="margin-top:1rem"><label for="aj-general">¿Algo general? <span style="font-weight:400;color:var(--crema-3)">(opcional)</span></label><textarea id="aj-general" name="general" maxlength="1500"></textarea></div>
+      <p class="rev-nota">Junta todo en un solo envío: cada envío cuenta como una ronda${quedan ? ` y te ${quedan === 1 ? 'queda' : 'quedan'} ${rondas(quedan)}` : ''}.</p>
+      <div class="acciones" style="margin-top:.9rem"><button class="btn btn-v" type="submit"${previa ? ' disabled' : ''}>Enviar mis ajustes</button><button class="enlace" type="button" data-accion="cerrar-ajustes">Cancelar</button></div>`;
+  } else if (porAprobar) {
+    abajo = `<div class="rev-confirma"><p>¿Lo apruebas tal como está? Ya no podrás pedir cambios${P.liquidada_at ? '' : ' y se activa el pago final'}.</p>
+      <div class="acciones"><button class="btn btn-v" type="button" data-accion="aprobar-entrega"${previa ? ' disabled' : ''}>Sí, lo apruebo</button><button class="enlace" type="button" data-accion="cancelar-aprobar">Cancelar</button></div></div>`;
+  } else {
+    abajo = `<div class="acciones" style="margin-top:1rem"><button class="btn btn-v" type="button" data-accion="pre-aprobar">${uno ? 'Aprobar mi video' : 'Aprobar mis videos'}</button>
+      ${quedan && !vencida ? '<button class="btn" type="button" data-accion="abrir-ajustes">Pedir ajustes</button>' : `<a class="btn" href="${esc(wa(`Hola Manuel, revisé el video de ${P.empresa} y tengo un comentario.`))}" target="_blank" rel="noopener">${WA_ICONO} Escribirme</a>`}</div>`;
+  }
+  return paso('', uno ? 'Revisa tu video' : `Revisa tus ${vids.length} videos`, explica,
+    `<form data-form="ajustes" id="revisar" novalidate><div class="rev-videos">${tarjetas}</div>${carpeta && !conFio ? `<div class="acciones">${carpeta}</div>` : ''}${abajo}<p class="error" data-error hidden></p></form>`);
+}
+
+async function aprobarEntrega(boton) {
+  const err = document.querySelector('#revisar [data-error]');
+  boton.disabled = true; boton.textContent = 'Aprobando…';
+  try {
+    P = await rpc('propuesta_aprobar_entrega', { p_token: token });
+    porAprobar = false;
+    repintarDecision(false);
+    document.getElementById('decision').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } catch (e) {
+    boton.disabled = false; boton.textContent = 'Sí, lo apruebo';
+    if (err) { err.textContent = errorRevision(e); err.hidden = false; }
+  }
+}
+
+async function pedirAjustes(f, boton, decir) {
+  const vids = (P.produccion && P.produccion.videos) || [];
+  const ajustes = vids.map(v => {
+    const t = (f.elements['aj-' + v.id] || {}).value || '', fio = !!(f.elements['fio-' + v.id] || {}).checked;
+    const texto = t.trim() ? t.trim() + (fio ? ' (También dejé comentarios en Frame.io.)' : '') : fio ? 'Dejé mis comentarios en Frame.io.' : '';
+    return { video_id: v.id, texto };
+  }).filter(a => a.texto);
+  const general = (f.elements.general || {}).value || '';
+  if (!ajustes.length && !general.trim()) return decir('Escribe qué cambiarías o marca que dejaste tus comentarios en Frame.io.');
+  boton.disabled = true; boton.textContent = 'Enviando…';
+  try {
+    P = await rpc('propuesta_pedir_ajustes', { p_token: token, p_ajustes: ajustes, p_general: general.trim() });
+    ajustesAbiertos = false;
+    repintarDecision(false);
+    document.getElementById('decision').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } catch (e) {
+    boton.disabled = false; boton.textContent = 'Enviar mis ajustes';
+    decir(errorRevision(e));
+  }
+}
+
+function errorRevision(e) {
+  const m = String(e && e.message || '');
+  return /no_en_revision/.test(m) ? 'Esta revisión ya se cerró. Recarga la página para ver en qué va.'
+    : /fuera_de_plazo/.test(m) ? 'Ya pasó el plazo para pedir ajustes. Escríbeme por WhatsApp y lo vemos.'
+    : /sin_rondas/.test(m) ? 'Ya usaste tus rondas de ajustes. Escríbeme por WhatsApp y lo vemos.'
+    : /sin_ajustes/.test(m) ? 'Escribe qué cambiarías o marca que dejaste tus comentarios en Frame.io.'
+    : /Failed to fetch|NetworkError|Load failed/i.test(m) ? 'No hay conexión. Revisa tu internet e inténtalo de nuevo.'
+    : 'No se pudo enviar. Inténtalo de nuevo o escríbeme por WhatsApp.';
+}
+
 function bloqueDecision() {
   const pila = String(P.nombre || '').split(/\s+/)[0];
   const dudas = `<a class="btn" href="${esc(wa(`Hola Manuel, tengo una duda sobre la propuesta para ${P.empresa}.`))}" target="_blank" rel="noopener">${WA_ICONO} Tengo dudas</a>`;
@@ -871,7 +990,10 @@ function bloqueDecision() {
         ? `Hola Manuel, ya firmé y pagué el anticipo de ${P.empresa}. ¿Qué día hacemos nuestra cita presencial?`
         : `Hola Manuel, ya ${firmado ? 'firmé el contrato de' : 'acepté la propuesta para'} ${P.empresa}. ¿Qué día hacemos nuestra cita presencial?`
       : `Hola Manuel, ya ${pagado ? (completo ? 'pagué el total de' : 'pagué el anticipo de') : 'acepté la propuesta para'} ${P.empresa}. ¿Cuándo arrancamos?`;
-    const p3 = !mensual && !completo && (pedido || liquidado)
+    const pr = !mensual && P.produccion;
+    const credito = !mensual && P.pago_modalidad === 'credito' && P.credito_dias;
+    const p3 = pr ? pasoProduccion(pr, paso)
+      : !mensual && !completo && (pedido || liquidado)
       ? paso('hecho', 'Producción', 'Tu video quedó listo.')
       : paso(pagado ? '' : 'espera', mensual ? 'Agenda tu cita presencial' : 'Arrancamos',
         mensual ? 'Es en persona: estrategia, tu portal y cómo escribir tus guiones. Escríbeme para elegir el día. <a href="/bienvenida/">Mira cómo arrancamos</a>.'
@@ -882,11 +1004,18 @@ function bloqueDecision() {
       : liquidado
         ? paso('hecho', 'Pago final', `Lo recibí ${P.liquidacion_metodo === 'tarjeta' ? 'con tarjeta' : 'por transferencia'}. Todo quedó pagado. ¡Gracias!`)
         : pedido
-          ? paso('', `Pago final: ${esc(dinero(resto))}`, 'Tu video ya está listo. Con este pago queda todo liquidado.',
+          ? paso('', `Pago final: ${esc(dinero(resto))}`, credito && P.final_vence ? `Vence el ${esc(fecha(P.final_vence))}. Puedes pagarlo aquí cuando quieras.` : 'Tu video ya está listo. Con este pago queda todo liquidado.',
               opciones('liquidacion', 'pago final', 'Pagar con tarjeta', conMsi() ? { nota: notaMsi('Con tarjeta de crédito, a meses sin intereses:', resto) } : null))
-          : paso('espera', `Pago final: ${esc(dinero(resto))}`, 'Cuando te entregue el video, aquí mismo pagas el 50% restante, con tarjeta o por transferencia.');
+          : paso('espera', `Pago final: ${esc(dinero(resto))}`, credito
+              ? `Cuando apruebes tu video, tienes ${esc(P.credito_dias)} días para pagar el resto, con tarjeta o por transferencia.`
+              : 'Cuando apruebes tu video, aquí mismo pagas el resto, con tarjeta o por transferencia.');
     const txt = mensual
       ? (pagado ? 'Ya quedó todo. Solo falta agendar tu cita presencial.' : 'Esto es lo que sigue, en orden:')
+      : pr && pr.estado === 'revision' ? (pr.videos.length === 1 ? 'Tu video está listo: revísalo y dime si lo apruebas o qué ajustarías.' : 'Tus videos están listos: revísalos y dime si los apruebas o qué ajustarías.')
+      : pr && pr.estado === 'ajustes' ? 'Estoy haciendo tus ajustes. Te aviso en cuanto estén.'
+      : pr && pr.estado === 'aprobado' && pedido && !liquidado ? (credito && P.final_vence ? `Tu video está aprobado. El pago final vence el ${esc(fecha(P.final_vence))}.` : 'Tu video está aprobado: solo falta el pago final.')
+      : pr && pr.estado === 'aprobado' ? 'Todo listo y pagado. ¡Gracias por confiar en mí!'
+      : pr ? 'Ya estamos en producción. Aquí ves en qué va.'
       : completo ? 'Ya quedó todo pagado. Te escribo para arrancar.'
       : liquidado ? 'Todo quedó pagado. ¡Gracias por confiar en mí!'
       : pedido ? 'Tu video está listo: solo falta el pago final.'
@@ -949,6 +1078,8 @@ function bloqueDecision() {
   </div>`;
 }
 
+const enRevision = () => !!(P.tipo === 'proyecto' && P.produccion && P.produccion.estado === 'revision');
+
 function pintar() {
   document.title = `Propuesta para ${P.empresa} · Connect Studios`;
   const incluye = renglones(P.incluye), condiciones = renglones(P.condiciones), diag = parrafos(P.diagnostico);
@@ -980,7 +1111,7 @@ function pintar() {
         <span class="top-der">Propuesta · ${esc(fecha(P.creada))}</span>
       </div>
       <div class="portada-txt">
-        <p class="ceja entra" style="animation-delay:.1s">${P.aceptada_at ? 'Propuesta aceptada' : 'Propuesta para'}</p>
+        <p class="ceja entra" style="animation-delay:.1s">${enRevision() ? 'Listo para revisar' : P.aceptada_at ? 'Propuesta aceptada' : 'Propuesta para'}</p>
         <h1 class="entra" style="animation-delay:.18s">${esc(P.empresa)}</h1>
         <p class="bajada entra" style="animation-delay:.28s">${esc(P.titulo)}</p>
         <dl class="meta entra" style="animation-delay:.38s">
@@ -989,7 +1120,7 @@ function pintar() {
           <div class="m-precio"><dt>Inversión</dt><dd>${esc(dinero(P.precio))}<small>${esc(nota)}</small></dd></div>
         </dl>
         <div class="acciones entra" style="animation-delay:.48s">
-          <button class="btn btn-v" type="button" data-accion="ir" data-id="decision">${P.aceptada_at ? 'Ver lo que sigue' : 'Ir a aceptar'}</button>
+          <button class="btn btn-v" type="button" data-accion="ir" data-id="${enRevision() ? 'revisar' : 'decision'}">${enRevision() ? 'Revisar mi video' : P.aceptada_at ? 'Ver lo que sigue' : 'Ir a aceptar'}</button>
           <button class="btn" type="button" data-accion="ir" data-id="propuesta">Leer la propuesta</button>
         </div>
         ${garantia && !P.aceptada_at ? `<p class="sin-riesgo entra" style="animation-delay:.56s">${ESCUDO} Primer mes sin riesgo</p>` : ''}
@@ -1296,6 +1427,11 @@ document.addEventListener('click', async ev => {
   else if (a === 'borrar-firma') { if (lienzo) lienzo.borrar(); }
   else if (a === 'imprimir') { document.body.classList.add('imprimiendo'); window.print(); setTimeout(() => document.body.classList.remove('imprimiendo'), 500); }
   else if (a === 'pagar-tarjeta') { if (!previa) pagarConTarjeta(el); }
+  else if (a === 'abrir-ajustes') { ajustesAbiertos = true; porAprobar = false; repintarDecision(false); const t = document.querySelector('#revisar textarea'); if (t) t.focus(); }
+  else if (a === 'cerrar-ajustes') { ajustesAbiertos = false; repintarDecision(false); document.getElementById('revisar').scrollIntoView({ block: 'center' }); }
+  else if (a === 'pre-aprobar') { porAprobar = true; repintarDecision(false); }
+  else if (a === 'cancelar-aprobar') { porAprobar = false; repintarDecision(false); }
+  else if (a === 'aprobar-entrega') { if (!previa) aprobarEntrega(el); }
   else if (a === 'ver-transferencia') { verTransferencia = !verTransferencia; repintarDecision(false); }
   else if (a === 'ver-video') {
     const caja = el.closest('[data-yt]');
@@ -1330,6 +1466,7 @@ document.addEventListener('submit', async ev => {
   const decir = t => { err.textContent = t; err.hidden = !t; };
   decir('');
   if (f.dataset.form === 'firmar') return firmar(f, boton, decir);
+  if (f.dataset.form === 'ajustes') { if (!ajustesAbiertos || !boton) return; return pedirAjustes(f, boton, decir); }
   try {
     if (f.dataset.form === 'aceptar') {
       const nombre = f.elements.nombre.value.trim();
@@ -1410,6 +1547,7 @@ async function arrancar() {
   }
   pintar();
   if (new URLSearchParams(location.search).has('contrato') && P.contrato) verContrato();
+  else if (enRevision() && !pagoVuelta) setTimeout(() => { const r = document.getElementById('revisar'); if (r) r.closest('li').scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 600);
   confirmarPago(10);
 }
 window.addEventListener('hashchange', () => {
