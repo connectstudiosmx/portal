@@ -1852,7 +1852,6 @@ const PROP_DEF = {
       'Preproducción: locaciones, fechas y plan de rodaje',
       'Grabación con dirección creativa',
       'Edición con música con licencia',
-      'Una ronda de ajustes',
       'Entrega en los formatos que necesites'].join('\n'),
     forma_pago: '50% de anticipo para apartar las fechas de grabación y 50% al entregar. Cada pago lleva su factura.',
     condiciones: ['Incluye una ronda de ajustes sobre la edición',
@@ -2030,39 +2029,39 @@ const COT_PLANT = [
     mercado: [45000, 120000], fuente: 'Productoras en México, 2026: básico de 1 día $40–70 mil; estándar de 2 días con varias locaciones $80–150 mil.',
     incluye: d => ['Diagnóstico y guion a partir de las columnas, los objetivos y el propósito de tu empresa', 'Preproducción: locaciones, entrevistados y plan de rodaje',
       `${d.grab} ${d.grab === 1 ? 'día' : 'días'} de grabación en tus instalaciones, con dos cámaras`, 'Entrevistas a directivos, colaboradores y clientes',
-      ...(d.dron ? ['Tomas aéreas con dron'] : []), 'Edición, color y audio, con música con licencia', 'Video final de 2 a 3 minutos', 'Una ronda de ajustes'] },
+      ...(d.dron ? ['Tomas aéreas con dron'] : []), 'Edición, color y audio, con música con licencia', 'Video final de 2 a 3 minutos'] },
   { id: 'capsula', nombre: 'Cápsula de comunicación interna', detalle: '45 segundos a 3 minutos', tipo: 'proyecto', horas: 4, grab: 1, edicion: 2,
     equipo: { cam_a: true, luz: true, audio: true }, extras: { gasolina: true },
     mercado: [15000, 40000], fuente: 'Piezas cortas de 1 día (testimonial, entrevista, aviso interno): $15–40 mil.',
-    incluye: () => ['Guion del mensaje', 'Grabación en tus instalaciones', 'Edición con música con licencia', 'Cápsula de 45 segundos a 3 minutos', 'Una ronda de ajustes'] },
+    incluye: () => ['Guion del mensaje', 'Grabación en tus instalaciones', 'Edición con música con licencia', 'Cápsula de 45 segundos a 3 minutos'] },
   { id: 'capacitacion', nombre: 'Video de capacitación', detalle: '8 a 10 minutos', tipo: 'proyecto', horas: 12, grab: 1, edicion: 5,
     equipo: { cam_a: true, cam_b: true, luz: true, audio: true }, crew: { asistente: true }, extras: { gasolina: true },
     mercado: [30000, 100000], fuente: 'Capacitación: desde $30 mil sencillo hasta ~$98 mil (5 min con locución, productora grande).',
-    incluye: () => ['Guion a partir de tus procesos', 'Grabación de los procesos y las explicaciones', 'Edición con apoyos visuales y música con licencia', 'Video de 8 a 10 minutos', 'Una ronda de ajustes'] },
+    incluye: () => ['Guion a partir de tus procesos', 'Grabación de los procesos y las explicaciones', 'Edición con apoyos visuales y música con licencia', 'Video de 8 a 10 minutos'] },
   { id: 'induccion', nombre: 'Video de inducción', detalle: 'hasta 30 minutos', tipo: 'proyecto', horas: 12, grab: 1, edicion: 8,
     equipo: { cam_a: true, cam_b: true, luz: true, audio: true, estab: true }, crew: { asistente: true }, extras: { gasolina: true },
     mercado: [35000, 120000], fuente: 'Estimado: pieza larga, entre una capacitación ($30 mil en adelante) y un institucional.',
-    incluye: () => ['Guion con la filosofía, los procesos y el flujo de información de tu empresa', 'Grabación en tus instalaciones', 'Edición en una pieza larga o en varias cortas', 'Una ronda de ajustes'] },
+    incluye: () => ['Guion con la filosofía, los procesos y el flujo de información de tu empresa', 'Grabación en tus instalaciones', 'Edición en una pieza larga o en varias cortas'] },
   { id: 'evento', nombre: 'Cobertura de evento', detalle: 'jornada y video resumen', tipo: 'proyecto', horas: 2, grab: 1, edicion: 2,
     equipo: { cam_a: true, cam_b: true, audio: true, estab: true }, crew: { asistente: true }, extras: { gasolina: true },
     mercado: [12000, 45000], fuente: 'Cobertura de evento: básica $8,500–15,000; profesional desde $41 mil.',
-    incluye: () => ['Cobertura del evento con dos cámaras', 'Video resumen del evento', 'Una ronda de ajustes'] },
+    incluye: () => ['Cobertura del evento con dos cámaras', 'Video resumen del evento'] },
   { id: 'podcast', nombre: 'Podcast en video', detalle: 'sesión de 4 episodios', tipo: 'proyecto', horas: 4, grab: 1, edicion: 2.5,
     equipo: { cam_a: true, cam_b: true, audio: true }, crew: { asistente: true }, extras: { mics: 1, gasolina: true },
     mercado: [20000, 30000], fuente: 'Paquetes de 4 episodios en video multicámara: $20–28 mil.',
-    incluye: () => ['Grabación multicámara de 4 episodios', 'Micrófono para cada participante', 'Edición de cada episodio', 'Una ronda de ajustes'] },
+    incluye: () => ['Grabación multicámara de 4 episodios', 'Micrófono para cada participante', 'Edición de cada episodio'] },
   { id: 'comercial', nombre: 'Video comercial o promocional', detalle: '30 segundos a 1 minuto', tipo: 'proyecto', horas: 10, grab: 1, edicion: 5,
     equipo: { cam_a: true, cam_b: true, luz: true, audio: true, estab: true }, crew: { asistente: true }, extras: { gasolina: true },
     mercado: [30000, 120000], fuente: 'Comercial sin actores ni campaña: $30–120 mil; spots de TV desde $120 mil.',
-    incluye: () => ['Idea y guion', 'Grabación con dirección creativa', 'Edición, color y audio, con música con licencia', 'Una ronda de ajustes'] },
+    incluye: () => ['Idea y guion', 'Grabación con dirección creativa', 'Edición, color y audio, con música con licencia'] },
   { id: 'testimonial', nombre: 'Testimonial o entrevista', detalle: '1 a 3 minutos', tipo: 'proyecto', horas: 4, grab: 1, edicion: 2,
     equipo: { cam_a: true, cam_b: true, luz: true, audio: true }, extras: { gasolina: true },
     mercado: [15000, 40000], fuente: 'Testimonial o entrevista: $15–40 mil.',
-    incluye: () => ['Preguntas clave para la entrevista', 'Grabación con dos cámaras', 'Edición con música con licencia', 'Una ronda de ajustes'] },
+    incluye: () => ['Preguntas clave para la entrevista', 'Grabación con dos cámaras', 'Edición con música con licencia'] },
   { id: 'reel', nombre: 'Reel suelto', detalle: '30 a 60 segundos', tipo: 'proyecto', horas: 2, grab: 0.5, edicion: 0.5,
     equipo: { cam_a: true, luz: true, audio: true }, extras: { gasolina: 1 },
     mercado: [5000, 20000], fuente: 'Reel suelto: $5–20 mil.',
-    incluye: () => ['Idea y guion', 'Grabación', 'Edición vertical', 'Una ronda de ajustes'] },
+    incluye: () => ['Idea y guion', 'Grabación', 'Edición vertical'] },
   { id: 'mensual', nombre: 'Contenido mensual', detalle: '12 videos al mes', tipo: 'mensual', horasTxt: 'Estrategia, revisión de guiones, copys y programación',
     horas: 10, grab: 2, edicion: 1, edicionTxt: 'Revisión de la edición', equipo: { cam_a: true, luz: true, audio: true }, extras: { editor: 12, gasolina: true },
     mercado: [21500, 28000], fuente: 'Agencias con 12 reels al mes: $21,500–28,000 + IVA, con 1 día de grabación.',
@@ -3855,7 +3854,7 @@ function modalPropuesta(id, desde) {
       <select id="pr-plazo" name="plazo_minimo" style="max-width:14rem">${[3, 9, 12].map(n => `<option value="${n}"${(base ? base.plazo_minimo || 3 : 3) === n ? ' selected' : ''}>${n} meses</option>`).join('')}</select>
       <p class="ayuda">Videos, días y plazo van al Anexo 1 del contrato.</p></div>
     <div class="campo"><label for="pr-pago">Forma de pago</label><textarea id="pr-pago" name="forma_pago" maxlength="1500" style="min-height:5rem">${v('forma_pago')}</textarea></div>
-    <div class="campo"><label for="pr-cond">Condiciones</label><textarea id="pr-cond" name="condiciones" maxlength="2500" style="min-height:7rem">${v('condiciones')}</textarea><p class="ayuda">Un punto por renglón.</p></div>
+    <div class="campo"><label for="pr-cond">Condiciones</label><textarea id="pr-cond" name="condiciones" maxlength="2500" style="min-height:7rem">${v('condiciones')}</textarea><p class="ayuda">Un punto por renglón. Las rondas de ajustes van aquí.</p><p class="aviso-linea" id="pr-aviso-rondas" hidden></p></div>
     <div class="fila-campos">
       <div class="campo"><label for="pr-ej">Video de ejemplo <span class="opc">(opcional)</span></label><input id="pr-ej" name="ejemplo_url" type="url" inputmode="url" value="${base ? esc(base.ejemplo_url || '') : ''}" placeholder="https://youtube.com/..."><p class="ayuda">Si lo dejas vacío, se muestran tus casos.</p></div>
       <div class="campo"><label for="pr-vig">Vigente hasta</label><input id="pr-vig" name="vigencia" type="date" required value="${esc(vigencia)}"></div>
@@ -3877,6 +3876,19 @@ function modalPropuesta(id, desde) {
       dlg.querySelectorAll('[data-solo-mensual]').forEach(el => { el.hidden = anterior !== 'mensual'; });
       dlg.querySelectorAll('[data-solo-proyecto]').forEach(el => { el.hidden = anterior !== 'proyecto'; });
     });
+    // Si "Qué incluye" y "Condiciones" dicen distinto número de rondas de ajustes, se avisa
+    const NUM = { un: 1, una: 1, dos: 2, tres: 3, cuatro: 4, cinco: 5 };
+    const rondas = t => [...String(t || '').toLowerCase().matchAll(/(\d+|un|una|dos|tres|cuatro|cinco)\s+rondas?\s+de\s+ajustes?/g)].map(m => NUM[m[1]] || Number(m[1]));
+    const avisoRondas = dlg.querySelector('#pr-aviso-rondas');
+    const revisarRondas = () => {
+      const a = rondas(f.elements.incluye.value), b = rondas(f.elements.condiciones.value);
+      const choca = a.length && b.length && a.some(x => !b.includes(x));
+      avisoRondas.hidden = !choca;
+      if (choca) avisoRondas.textContent = `Ojo: en “Qué incluye” dice ${a[0]} ${a[0] === 1 ? 'ronda' : 'rondas'} de ajustes y en “Condiciones” dice ${b[0]}. Déjalo igual en los dos o quítalo de uno.`;
+    };
+    ['incluye', 'condiciones'].forEach(k => f.elements[k].addEventListener('input', revisarRondas));
+    f.elements.tipo.addEventListener('change', revisarRondas);
+    revisarRondas();
     // Al cambiar el servicio, lo que no tocaste cambia a lo de ese servicio
     let servPrev = f.elements.servicio.value;
     const nombreServ = s => { const p = COT_PLANT.find(x => x.id === s); return p ? p.nombre : PROP_DEF.proyecto.titulo; };
