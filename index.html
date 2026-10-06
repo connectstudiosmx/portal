@@ -3546,7 +3546,7 @@ function modalVideo(id) {
       <p class="ayuda">El cliente lo ve solo cuando el video se entrega. Revisa que el archivo de Drive esté compartido.</p></div>
     <div class="campo"><label for="f-rev">Link de revisión (Frame.io)</label>
       <input id="f-rev" name="revision_url" type="url" inputmode="url" placeholder="https://f.io/..." value="${esc(v.revision_url || '')}"${bloqueado || ajeno ? ' disabled' : ''}>
-      <p class="ayuda">El link de Frame.io donde tú y el cliente comentan en el segundo exacto. En proyectos, el cliente lo abre desde su propuesta al revisar.</p></div>
+      <p class="ayuda">En Frame.io: sube el video, dale Share → Create new Share, deja Comments prendido y copia el link. Con un link de Drive o YouTube el cliente solo lo ve, no puede comentar sobre el video.</p></div>
     ${bloquePortadaVideo(v, c)}
     <div class="campo"><label for="f-notas">Notas del equipo</label>
       <textarea id="f-notas" name="team_notes" maxlength="5000" placeholder="Música, cortes, cambios pedidos">${esc(v.team_notes || '')}</textarea>

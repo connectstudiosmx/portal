@@ -841,6 +841,8 @@ const diaMx = iso => new Date(iso).toLocaleDateString('en-CA', { timeZone: 'Amer
 const pad2 = n => String(n).padStart(2, '0');
 const rondas = n => n === 1 ? '1 ronda' : `${n} rondas`;
 const diasGrab = g => { const [a, b] = g || []; return !a ? '' : !b || a === b ? `el ${fCorta(a)}` : a.slice(0, 7) === b.slice(0, 7) ? `el ${Number(a.slice(8, 10))} y el ${fCorta(b)}` : `el ${fCorta(a)} y el ${fCorta(b)}`; };
+// Solo un link de Frame.io deja comentar sobre el video; cualquier otro (Drive, YouTube) es solo para verlo
+const esFrameio = u => { try { return /(^|\.)(frame\.io|f\.io)$/i.test(new URL(u).hostname); } catch (e) { return false; } };
 const nombreVideo = v => v.titulo || `Video ${v.numero}`;
 
 function pasoProduccion(pr, paso) {
@@ -866,12 +868,12 @@ function pasoProduccion(pr, paso) {
   }
   // En revisión
   const vencida = pr.revision_hasta && pr.revision_hasta < hoy;
-  const conFio = vids.some(v => v.revision_url);
+  const conFio = vids.some(v => esFrameio(v.revision_url));
   const tarjetas = vids.map(v => `<div class="rev-video">
       <p class="rev-cab"><b>${pad2(v.numero)}</b><span>${esc(nombreVideo(v))}</span></p>
-      <div class="acciones">${v.revision_url ? `<a class="btn btn-v" href="${esc(v.revision_url)}" target="_blank" rel="noopener">Ver y comentar</a>` : v.final_url ? `<a class="btn btn-v" href="${esc(v.final_url)}" target="_blank" rel="noopener">Ver el video</a>` : ''}</div>
+      <div class="acciones">${esFrameio(v.revision_url) ? `<a class="btn btn-v" href="${esc(v.revision_url)}" target="_blank" rel="noopener">Ver y comentar en Frame.io</a>` : v.revision_url || v.final_url ? `<a class="btn btn-v" href="${esc(v.revision_url || v.final_url)}" target="_blank" rel="noopener">Ver el video</a>` : ''}</div>
       ${ajustesAbiertos ? `<div class="campo"><label for="aj-${v.id}">¿Qué cambiarías?</label><textarea id="aj-${v.id}" name="aj-${v.id}" maxlength="1500" placeholder="Por ejemplo: en el segundo 0:42 cambiar la música por algo más tranquilo"></textarea></div>
-        ${v.revision_url ? `<label class="acepto"><input type="checkbox" name="fio-${v.id}"> Dejé mis comentarios en Frame.io</label>` : ''}` : ''}
+        ${esFrameio(v.revision_url) ? `<label class="acepto"><input type="checkbox" name="fio-${v.id}"> Dejé mis comentarios en Frame.io</label>` : ''}` : ''}
     </div>`).join('');
   const explica = `${conFio ? 'En Frame.io puedes comentar en el segundo exacto y hasta dibujar sobre el video; solo te pide tu nombre y correo, sin crear cuenta. ' : ''}${vencida ? 'Ya pasó el plazo para pedir ajustes, así que se aprueba hoy.' : `Tienes hasta el ${esc(fCorta(pr.revision_hasta))} para revisarlo${quedan ? ` y te ${quedan === 1 ? 'queda' : 'quedan'} ${rondas(quedan)} de ajustes` : ''}. Si no me dices nada, se aprueba solo.`}`;
   let abajo;
