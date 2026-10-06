@@ -669,6 +669,49 @@ main.app{max-width:var(--ancho);margin:0 auto;padding:1.75rem 1.25rem 5rem}
 .aviso-linea.ok{border-left-color:var(--verde)}
 .aviso-linea.malo{border-left-color:var(--rojo)}
 .campo textarea.aj{min-height:4.2rem}
+/* Inicio */
+.rep-dato.dinero.malo b{color:var(--rojo)}
+.ini-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:0 1.2rem;align-items:start}
+@media (max-width:860px){.ini-grid{grid-template-columns:minmax(0,1fr)}}
+.pend{display:grid;gap:6px}
+.pend-fila{display:flex;align-items:center;gap:.8rem;width:100%;text-align:left;background:#0A0A0B;border:1px solid var(--linea);border-radius:10px;padding:.65rem .9rem;color:var(--crema);font:inherit;font-size:.94rem;cursor:pointer}
+.pend-fila:hover{border-color:var(--linea-2)}
+.pend-fila b{font-family:var(--display);font-weight:400;font-size:1.55rem;line-height:1;min-width:2ch;color:var(--dorado);font-variant-numeric:tabular-nums}
+.pend-fila.malo b{color:var(--rojo)}
+.pend-fila span{flex:1;min-width:0}
+.pend-fila i{font-style:normal;color:var(--crema-3);font-size:1.2rem}
+/* Agenda: Inicio, historial y "Fechas de tu mes" */
+.agenda{display:grid;gap:.85rem}
+.ag-dia h3{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--crema-3);margin:0 0 .3rem;font-weight:700}
+.ag-dia.hoy h3{color:var(--dorado)}
+.ag-dia.pasado .ag-ev{color:var(--crema-3)}
+.ag-ev{display:flex;gap:.6rem;align-items:baseline;padding:.15rem 0;font-size:.92rem;line-height:1.35;overflow-wrap:anywhere}
+.ag-ev small{color:var(--crema-3);font-variant-numeric:tabular-nums}
+.ag-ev i{flex:0 0 9px;height:9px;border-radius:2px;transform:translateY(1px)}
+.t-guion{background:var(--amarillo)}
+.t-grab{background:var(--crema)}
+.t-edit{background:var(--dorado)}
+.t-entrega{background:var(--verde)}
+.t-rev{background:repeating-linear-gradient(135deg,rgba(227,178,60,.9) 0 2px,rgba(227,178,60,.25) 2px 4px)}
+.t-publica{background:var(--verde-2);border-radius:50%}
+.t-llamada{border:2px solid var(--crema);border-radius:50%}
+.t-cobro{background:var(--dorado-2);border-radius:50%}
+.t-venta{background:var(--crema-3)}
+.hist-tit{font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;color:var(--verde);margin:1.2rem 0 .6rem}
+.fechas-mes{margin:0 0 1.4rem}
+.c-pub{font-size:.72rem;font-weight:700;color:var(--verde-2);text-shadow:0 1px 8px rgba(0,0,0,.85)}
+/* Calendario: publicaciones y llamadas */
+.pub{position:absolute;top:14px;width:calc(var(--dw) - 4px);margin-left:2px;height:20px;display:grid;place-items:center;font-size:.68rem;font-weight:800;border-radius:50%;background:var(--verde-2);color:#000;z-index:3}
+.llam{position:absolute;top:14px;width:calc(var(--dw) - 4px);margin-left:2px;height:20px;display:grid;place-items:center;font-size:.68rem;font-weight:800;border-radius:50%;border:2px solid var(--crema);color:var(--crema);z-index:3}
+/* Métricas de ventas */
+.emb{display:grid;gap:8px}
+.emb-fila{display:grid;grid-template-columns:minmax(7rem,11rem) minmax(0,1fr) 7.5rem;gap:.8rem;align-items:center;font-size:.92rem}
+.emb-barra{height:20px;border-radius:0 4px 4px 0;background:#0A0A0B;overflow:hidden}
+.emb-barra i{display:block;height:100%;min-width:2px;background:var(--verde);border-radius:0 4px 4px 0}
+.emb-num{text-align:right;font-variant-numeric:tabular-nums}
+.emb-num b{font-weight:700}
+.emb-num small{color:var(--crema-3);margin-left:.35rem}
+@media (max-width:560px){.emb-fila{grid-template-columns:minmax(0,1fr) auto}.emb-barra{grid-column:1/-1;grid-row:2}}
 </style>
 </head>
 <body>
@@ -704,7 +747,7 @@ const sb = (configLista() && window.supabase)
 
 const S = {
   sesion: null, perfil: null,
-  vista: 'produccion', subVista: {},
+  vista: 'inicio', subVista: {},
   clientes: [], ciclos: [], videos: [], perfiles: [], asignaciones: [], solicitudes: [], reportes: [], mlLog: [], verAtendidas: false, solFiltro: { ruta: '', califica: '', estado: '' },
   postulaciones: [], postFiltro: { rol: '', estado: 'activas', pais: '' }, facturas: [], pagoDatos: null, facFiltro: 'pendiente', faltaBase: false,
   pagosCli: null, propuestas: [], propFiltro: 'activas', ajustes: null, contratos: [], pagosStripe: [], stripeModo: null,
@@ -739,6 +782,7 @@ const ROL = { pendiente: 'Pendiente', admin: 'Administrador', editor: 'Editor', 
 const MESES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
 const MESES_C = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
 const DIAS_C = ['dom','lun','mar','mié','jue','vie','sáb'];
+const DIAS_L = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
 const aFecha = s => { const [y, m, d] = String(s).slice(0, 10).split('-').map(Number); return new Date(y, m - 1, d); };
 const aISO = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 const hoy = () => { const n = new Date(); return new Date(n.getFullYear(), n.getMonth(), n.getDate()); };
@@ -958,26 +1002,33 @@ function pantallaSimple(titulo, texto, boton, accion) {
 }
 
 // ---------- Barra superior ------------------------------------------
+// Lo que espera al admin, por vista; las pestañas de arriba suman las de su grupo
+function cuentas() {
+  if (S.perfil.role !== 'admin') return {};
+  return {
+    solicitudes: S.solicitudes.filter(x => !x.atendida).length,
+    propuestas: S.propuestas.filter(x => x.aceptada_at && !x.client_id).length + S.contratos.filter(c => !c.firma_prestador_at && S.propuestas.some(pr => pr.id === c.propuesta_id)).length,
+    accesos: S.perfiles.filter(x => x.role === 'pendiente').length,
+    postulaciones: S.postulaciones.filter(x => x.estado === 'nueva').length,
+    pagos: S.facturas.filter(x => x.estado === 'pendiente').length
+  };
+}
+const TXT_CUENTA = { solicitudes: 'solicitudes sin atender', propuestas: 'contratos por firmar o aceptadas sin dar de alta', accesos: 'accesos pendientes', postulaciones: 'postulaciones por revisar', pagos: 'facturas por emitir' };
+
 function barra() {
   const p = S.perfil, esAdmin = p.role === 'admin';
-  const tabs = esAdmin ? [['produccion', 'Producción'], ['clientes', 'Clientes'], ['solicitudes', 'Solicitudes'],
-      ['propuestas', 'Propuestas'], ['cotizador', 'Cotizador'], ['postulaciones', 'Postulaciones'], ['pagos', 'Pagos']]
-    : p.role === 'editor' ? [['produccion', 'Producción']] : [];
-  const pendientes = esAdmin ? S.perfiles.filter(x => x.role === 'pendiente').length : 0;
-  const nuevas = esAdmin ? S.solicitudes.filter(x => !x.atendida).length : 0;
-  const errML = esAdmin ? mlConError().length : 0;
-  const porRevisar = esAdmin ? S.postulaciones.filter(x => x.estado === 'nueva').length : 0;
-  const porEmitir = esAdmin ? S.facturas.filter(x => x.estado === 'pendiente').length : 0;
-  const porConvertir = esAdmin ? S.propuestas.filter(x => x.aceptada_at && !x.client_id).length + S.contratos.filter(c => !c.firma_prestador_at && S.propuestas.some(pr => pr.id === c.propuesta_id)).length : 0;
-  const punto = id => id === 'clientes' && errML ? `<span class="punto punto-error" aria-label="${errML} con error de MailerLite">!</span>`
-    : id === 'propuestas' && porConvertir ? `<span class="punto" aria-label="${porConvertir} ${porConvertir === 1 ? 'pendiente' : 'pendientes'}: contratos por firmar o aceptadas sin dar de alta">${porConvertir}</span>`
-    : id === 'postulaciones' && porRevisar ? `<span class="punto" aria-label="${porRevisar} por revisar">${porRevisar}</span>`
-    : id === 'pagos' && porEmitir ? `<span class="punto" aria-label="${porEmitir} ${porEmitir === 1 ? 'factura' : 'facturas'} por emitir">${porEmitir}</span>`
-    : id === 'solicitudes' && nuevas + pendientes ? `<span class="punto" aria-label="${nuevas} sin atender y ${pendientes} accesos pendientes">${nuevas + pendientes}</span>` : '';
+  const tabs = esAdmin ? PESTANAS : p.role === 'editor' ? [['produccion', 'Producción']] : [];
+  const n = cuentas(), errML = esAdmin ? mlConError().length : 0;
+  const punto = id => {
+    if (id === 'clientes' && errML) return `<span class="punto punto-error" aria-label="${errML} con error de MailerLite">!</span>`;
+    const partes = (GRUPOS[id] ? GRUPOS[id].map(([v]) => v) : [id]).filter(v => n[v]);
+    const total = partes.reduce((t, v) => t + n[v], 0);
+    return total ? `<span class="punto" aria-label="${esc(partes.map(v => `${n[v]} ${TXT_CUENTA[v]}`).join(', '))}">${total}</span>` : '';
+  };
   const actual = S.vista === 'previa' ? 'clientes' : grupoDe(S.vista) || S.vista;
   return `<header class="barra"><div class="barra-in">
     <div class="marca"><b>Connect Studios</b><span>Portal</span></div>
-    ${tabs.length ? `<nav class="nav" aria-label="Secciones">${tabs.map(([id, txt]) => `<button data-accion="ir" data-id="${S.subVista[id] || id}"${actual === id ? ' aria-current="page"' : ''}>${txt}${punto(id)}</button>`).join('')}</nav>` : ''}
+    ${tabs.length ? `<nav class="nav" aria-label="Secciones">${tabs.map(([id, txt]) => `<button data-accion="ir" data-id="${S.subVista[id] || (GRUPOS[id] ? GRUPOS[id][0][0] : id)}"${actual === id ? ' aria-current="page"' : ''}>${txt}${punto(id)}</button>`).join('')}</nav>` : ''}
     <div class="quien">
       <span class="quien-txt"><strong>${esc(nombreDe(p))}</strong><small>${esc(p.role === 'cliente' && S.portal && S.portal.client ? S.portal.client.name : ROL[p.role])}</small></span>
       ${p.role !== 'cliente' ? '<button class="btn btn-s btn-t" data-accion="actualizar">Actualizar</button>' : ''}
@@ -986,36 +1037,281 @@ function barra() {
   </div></header>`;
 }
 
-// Pestañas que agrupan dos vistas: arriba una sola, adentro sus sub-pestañas
-const GRUPOS = { produccion: [['produccion', 'Videos'], ['calendario', 'Calendario']], solicitudes: [['solicitudes', 'Solicitudes'], ['accesos', 'Accesos al portal']] };
+// Pestañas de arriba. Las que agrupan varias vistas muestran adentro sus sub-pestañas
+const PESTANAS = [['inicio', 'Inicio'], ['produccion', 'Producción'], ['clientes', 'Clientes'], ['ventas', 'Ventas'], ['pagos', 'Pagos'], ['equipo', 'Equipo']];
+const GRUPOS = {
+  produccion: [['produccion', 'Videos'], ['calendario', 'Calendario']],
+  ventas: [['solicitudes', 'Solicitudes'], ['propuestas', 'Propuestas'], ['cotizador', 'Cotizador'], ['metricas', 'Métricas']],
+  equipo: [['accesos', 'Accesos al portal'], ['postulaciones', 'Postulaciones']]
+};
+const VISTAS = {
+  inicio: () => vistaInicio(), produccion: () => vistaProduccion(), calendario: () => vistaCalendario(), clientes: () => vistaClientes(),
+  solicitudes: () => vistaSolicitudes(), propuestas: () => vistaPropuestas(), cotizador: () => vistaCotizador(), metricas: () => vistaMetricas(),
+  pagos: () => vistaPagos(), accesos: () => vistaAccesos(), postulaciones: () => vistaPostulaciones(), previa: () => vistaPrevia()
+};
+const PARA_EDITOR = ['produccion', 'calendario'];
 const grupoDe = v => Object.keys(GRUPOS).find(g => GRUPOS[g].some(([id]) => id === v));
 function subPestanas(v) {
-  const g = grupoDe(v); if (!g || (g === 'solicitudes' && S.perfil.role !== 'admin')) return '';
+  const g = grupoDe(v); if (!g) return '';
   S.subVista[g] = v;
-  const cuenta = id => id === 'solicitudes' ? S.solicitudes.filter(x => !x.atendida).length : id === 'accesos' ? S.perfiles.filter(x => x.role === 'pendiente').length : 0;
-  return `<div class="cli-tabs sub-tabs" role="tablist" aria-label="Vistas">${GRUPOS[g].map(([id, txt]) => `<button role="tab" aria-selected="${v === id}" data-accion="ir" data-id="${id}">${txt}${cuenta(id) ? ` <span class="cli-nuevo">${cuenta(id)}</span>` : ''}</button>`).join('')}</div>`;
+  const n = cuentas();
+  return `<div class="cli-tabs sub-tabs" role="tablist" aria-label="Vistas">${GRUPOS[g].map(([id, txt]) => `<button role="tab" aria-selected="${v === id}" data-accion="ir" data-id="${id}">${txt}${n[id] ? ` <span class="cli-nuevo">${n[id]}</span>` : ''}</button>`).join('')}</div>`;
 }
 
 function render() {
   if (!S.perfil) return;
   let cuerpo;
   if (S.perfil.role === 'cliente') cuerpo = vistaCliente(S.portal, false);
-  else if (S.vista === 'previa' && S.perfil.role === 'admin') cuerpo = vistaPrevia();
-  else if (S.vista === 'calendario') cuerpo = vistaCalendario();
-  else if (S.vista === 'clientes' && S.perfil.role === 'admin') cuerpo = vistaClientes();
-  else if (S.vista === 'accesos' && S.perfil.role === 'admin') cuerpo = vistaAccesos();
-  else if (S.vista === 'solicitudes' && S.perfil.role === 'admin') cuerpo = vistaSolicitudes();
-  else if (S.vista === 'propuestas' && S.perfil.role === 'admin') cuerpo = vistaPropuestas();
-  else if (S.vista === 'cotizador' && S.perfil.role === 'admin') cuerpo = vistaCotizador();
-  else if (S.vista === 'postulaciones' && S.perfil.role === 'admin') cuerpo = vistaPostulaciones();
-  else if (S.vista === 'pagos' && S.perfil.role === 'admin') cuerpo = vistaPagos();
-  else cuerpo = vistaProduccion();
-  if (S.perfil.role !== 'cliente' && S.vista !== 'previa') {
-    const v = ['calendario', 'accesos', 'solicitudes'].includes(S.vista) && (S.vista === 'calendario' || S.perfil.role === 'admin') ? S.vista : (['clientes', 'propuestas', 'cotizador', 'postulaciones', 'pagos'].includes(S.vista) && S.perfil.role === 'admin' ? S.vista : 'produccion');
-    cuerpo = subPestanas(v) + cuerpo;
+  else {
+    // Una vista que no existe o que no le toca a este rol cae en Producción
+    if (!VISTAS[S.vista] || (S.perfil.role !== 'admin' && !PARA_EDITOR.includes(S.vista))) S.vista = 'produccion';
+    cuerpo = S.vista === 'previa' ? vistaPrevia() : subPestanas(S.vista) + VISTAS[S.vista]();
   }
   pintar(barra() + `<main class="app">${cuerpo}</main>`);
   pintarMuestras();
+}
+
+// ---------- Fechas: agenda de Inicio, historial y portal del cliente ----------
+const pl = (n, uno, varios) => `${n} ${n === 1 ? uno : varios}`;
+const horaDe = ts => { const d = new Date(ts); return `${pad(d.getHours())}:${pad(d.getMinutes())}`; };
+// Fechas de un mes, sin texto: cada quien las nombra a su manera
+function fechasCiclo(c, vs) {
+  const ev = [];
+  if (c.script_due) ev.push({ f: c.script_due, tipo: 'guion', k: 'guiones' });
+  [...new Set([c.record_start, c.record_end].filter(Boolean))].forEach(f => ev.push({ f, tipo: 'grab', k: 'grabacion' }));
+  if (c.editor_due) ev.push({ f: c.editor_due, tipo: 'edit', k: 'edicion' });
+  if (c.delivery_date) ev.push({ f: c.delivery_date, tipo: 'entrega', k: 'entrega' });
+  if (c.revision_hasta && c.revision_estado === 'revision') ev.push({ f: c.revision_hasta, tipo: 'rev', k: 'revision' });
+  const pub = agrupar((vs || []).filter(v => v.programado_at).map(v => Object.assign({}, v, { dia: aISO(new Date(v.programado_at)) })), 'dia');
+  Object.keys(pub).forEach(f => ev.push({ f, tipo: 'publica', k: 'publica', vs: pub[f].sort((a, b) => a.programado_at.localeCompare(b.programado_at)) }));
+  return ev;
+}
+const TXT_FECHA_CLIENTE = { guiones: 'Último día para mandar tus guiones', grabacion: 'Grabamos', entrega: 'Recibes tus videos', revision: 'Último día para pedir ajustes' };
+const TXT_FECHA = { guiones: 'Fecha límite de guiones', grabacion: 'Grabación', edicion: 'Vence la edición', entrega: 'Entrega', revision: 'Último día para pedir ajustes' };
+const txtPublica = e => { const ya = e.f < hoyISO();
+  return e.vs.length === 1 ? `${ya ? 'Se publicó' : 'Se publica'} “${e.vs[0].title || 'Video ' + e.vs[0].number}”` : `${ya ? 'Se publicaron' : 'Se publican'} ${e.vs.length} videos`; };
+function diaTxt(f) {
+  const n = diasEntre(hoy(), aFecha(f));
+  if (n === 0) return 'Hoy';
+  if (n === 1) return 'Mañana';
+  if (n === -1) return 'Ayer';
+  return fDia(f) + (aFecha(f).getFullYear() !== hoy().getFullYear() ? ` ${aFecha(f).getFullYear()}` : '');
+}
+// Lista de fechas agrupada por día; las pasadas se ven apagadas
+function htmlAgenda(ev, desc) {
+  const h = hoyISO(), dias = agrupar(ev, 'f');
+  const orden = Object.keys(dias).sort(); if (desc) orden.reverse();
+  return `<div class="agenda">${orden.map(f => `<div class="ag-dia${f === h ? ' hoy' : f < h ? ' pasado' : ''}"><h3>${esc(diaTxt(f))}</h3>
+    ${dias[f].sort((a, b) => (desc ? -1 : 1) * String(a.hora || '').localeCompare(String(b.hora || ''))).map(e => `<div class="ag-ev"><i class="t-${e.tipo}" aria-hidden="true"></i><span>${e.hora ? `<small>${esc(e.hora)}</small> ` : ''}${esc(e.txt)}</span></div>`).join('')}
+  </div>`).join('')}</div>`;
+}
+
+// ---------- Inicio (admin): lo que espera, el dinero del mes y lo que viene ----------
+const anticipoDe = x => x.anticipo != null ? Number(x.anticipo) : Math.round(x.precio * 50) / 100;
+const conIva = (x, m) => x.iva === 'mas_iva' ? Math.round(m * 116) / 100 : Number(m);
+const enMes = (ts, mes) => !!ts && aISO(new Date(ts)).slice(0, 7) === mes;
+// Lo cobrado de propuestas (anticipos, pagos completos y pagos finales) en un mes 'AAAA-MM'
+function cobradoVentas(mes) {
+  return S.propuestas.reduce((t, x) => t
+    + (enMes(x.pagada_at, mes) ? conIva(x, pagoTotalDe(x) ? x.precio : anticipoDe(x)) : 0)
+    + (enMes(x.liquidada_at, mes) && !pagoTotalDe(x) ? restanteDe(x) : 0), 0);
+}
+function porHacer() {
+  const h = hoyISO(), n = cuentas(), cob = cuentasCobranza(), xs = [];
+  const add = (num, txt, ir, malo) => { if (num) xs.push({ num, txt, ir, malo }); };
+  add(cob.vencidos.length, `${cob.vencidos.length === 1 ? 'mensualidad vencida' : 'mensualidades vencidas'} · ${dinero(sumaMontos(cob.vencidos))}`, 'pagos', true);
+  add(mlConError().length, mlConError().length === 1 ? 'cliente no llegó a MailerLite' : 'clientes no llegaron a MailerLite', 'clientes', true);
+  add(cob.tocan.length, cob.tocan.length === 1 ? 'mensualidad toca cobrar' : 'mensualidades tocan cobrar', 'pagos');
+  const enRev = S.videos.filter(v => v.status === 'revision').length;
+  add(enRev, enRev === 1 ? 'video espera tu revisión' : 'videos esperan tu revisión', 'produccion');
+  const atrasados = S.ciclos.filter(c => c.script_due && c.script_due < h && c.record_start >= h)
+    .reduce((t, c) => t + S.videos.filter(v => v.cycle_id === c.id && v.status === 'sin_guion').length, 0);
+  add(atrasados, atrasados === 1 ? 'guion atrasado (ya pasó su fecha límite)' : 'guiones atrasados (ya pasó su fecha límite)', 'produccion');
+  const firmar = S.contratos.filter(c => !c.firma_prestador_at && S.propuestas.some(pr => pr.id === c.propuesta_id)).length;
+  add(firmar, firmar === 1 ? 'contrato espera tu firma' : 'contratos esperan tu firma', 'propuestas');
+  const sinAlta = S.propuestas.filter(x => x.aceptada_at && !x.client_id).length;
+  add(sinAlta, sinAlta === 1 ? 'propuesta aceptada sin dar de alta' : 'propuestas aceptadas sin dar de alta', 'propuestas');
+  const sinAnticipo = S.propuestas.filter(x => x.aceptada_at && !x.pagada_at).length;
+  add(sinAnticipo, sinAnticipo === 1 ? 'anticipo pendiente' : 'anticipos pendientes', 'propuestas');
+  // Seguimiento: enviadas hace más de 3 días, vigentes y sin respuesta
+  const sinResp = S.propuestas.filter(x => { const e = estadoPropuesta(x).clave; return ['enviada', 'vista'].includes(e) && x.enviada_at && diasEntre(aFecha(aISO(new Date(x.enviada_at))), hoy()) > 3; }).length;
+  add(sinResp, sinResp === 1 ? 'propuesta sin respuesta hace más de 3 días: dale seguimiento' : 'propuestas sin respuesta hace más de 3 días: dales seguimiento', 'propuestas');
+  add(n.solicitudes, n.solicitudes === 1 ? 'solicitud sin atender' : 'solicitudes sin atender', 'solicitudes');
+  add(n.pagos, n.pagos === 1 ? 'factura por emitir' : 'facturas por emitir', 'pagos');
+  add(n.accesos, n.accesos === 1 ? 'acceso al portal por aprobar' : 'accesos al portal por aprobar', 'accesos');
+  add(n.postulaciones, n.postulaciones === 1 ? 'postulación por revisar' : 'postulaciones por revisar', 'postulaciones');
+  return xs;
+}
+// Lo que pasa en los próximos 14 días, de todos los clientes
+function agendaEquipo(dias) {
+  const h = hoyISO(), fin = aISO(sumarDias(hoy(), dias - 1)), dentro = f => f >= h && f <= fin, ev = [];
+  S.ciclos.forEach(c => {
+    const cl = clientePorId(c.client_id), quien = cl ? cl.name : 'Cliente';
+    fechasCiclo(c, S.videos.filter(v => v.cycle_id === c.id)).filter(e => dentro(e.f))
+      .forEach(e => ev.push({ f: e.f, tipo: e.tipo, txt: `${quien}: ${e.k === 'publica' ? txtPublica(e).replace(/^Se p/, 'se p') : TXT_FECHA[e.k].toLowerCase()}${e.k === 'grabacion' || e.k === 'entrega' ? ` (${c.name})` : ''}` }));
+  });
+  S.solicitudes.filter(x => x.cita && dentro(aISO(new Date(x.cita))))
+    .forEach(x => ev.push({ f: aISO(new Date(x.cita)), hora: horaDe(x.cita), tipo: 'llamada', txt: `Llamada con ${x.nombre}${x.empresa ? ` (${x.empresa})` : ''}` }));
+  (S.cobros || []).filter(x => x.estado === 'pendiente' && dentro(x.vence)).forEach(x => {
+    const cl = clientePorId(x.client_id);
+    ev.push({ f: x.vence, tipo: 'cobro', txt: `Toca cobrar a ${cl ? cl.name : 'cliente'}${x.monto ? ` ${dinero(x.monto)}` : ''}` });
+  });
+  S.propuestas.filter(x => !x.aceptada_at && !x.rechazada_at && x.enviada_at && dentro(x.vigencia))
+    .forEach(x => ev.push({ f: x.vigencia, tipo: 'venta', txt: `Vence la propuesta de ${x.empresa}` }));
+  return ev;
+}
+function vistaInicio() {
+  const mes = hoyISO().slice(0, 7), cob = cuentasCobranza(), xs = porHacer(), ev = agendaEquipo(14);
+  const ventas = cobradoVentas(mes);
+  const pila = nombreDe(S.perfil).split(' ')[0];
+  return `<div class="encabezado">
+    <div><h1>Hola, ${esc(pila)}</h1><p class="sub">Hoy es ${esc(DIAS_L[hoy().getDay()])} ${esc(fLarga(hoyISO()))}. Esto es lo que necesita tu atención.</p></div>
+  </div>
+  <section class="rep">
+    <div class="rep-cab"><h2>Dinero de <span>${esc(MESES[hoy().getMonth()])}</span></h2><button class="btn btn-s btn-t" data-accion="ir" data-id="pagos">Ver cobranza</button></div>
+    <div class="rep-datos">
+      <div class="rep-dato dinero"><b>${esc(dinero(cob.cobrado))}</b><span>Mensualidades cobradas</span></div>
+      <div class="rep-dato dinero"><b>${esc(dinero(ventas))}</b><span>Anticipos y proyectos cobrados</span></div>
+      <div class="rep-dato dinero"><b>${esc(dinero(cob.porCobrar))}</b><span>Por cobrar</span></div>
+      <div class="rep-dato dinero${cob.vencidos.length ? ' malo' : ''}"><b>${esc(dinero(sumaMontos(cob.vencidos)))}</b><span>Vencido</span></div>
+    </div>
+  </section>
+  ${avisosRevision()}
+  <div class="ini-grid">
+    <section class="rep">
+      <div class="rep-cab"><h2>Por <span>hacer</span></h2></div>
+      ${xs.length ? `<div class="pend">${xs.map(x => `<button class="pend-fila${x.malo ? ' malo' : ''}" data-accion="ir" data-id="${x.ir}"><b>${x.num}</b><span>${esc(x.txt)}</span><i aria-hidden="true">›</i></button>`).join('')}</div>`
+        : '<p class="rep-txt">Todo al día. No hay nada esperándote.</p>'}
+    </section>
+    <section class="rep">
+      <div class="rep-cab"><h2>Próximos <span>14 días</span></h2><button class="btn btn-s btn-t" data-accion="ir" data-id="calendario">Calendario</button></div>
+      ${ev.length ? htmlAgenda(ev) : '<p class="rep-txt">Nada agendado en los próximos 14 días.</p>'}
+    </section>
+  </div>`;
+}
+
+// ---------- Métricas de ventas ----------------------------------------------
+const PERIODOS = { 30: 'Últimos 30 días', 90: 'Últimos 90 días', anio: 'Este año', todo: 'Todo' };
+const esPrueba = x => !!x && (x.origen || {}).utm_source === 'prueba';
+// Barras de un embudo o un conteo: el % es contra el paso anterior (embudo) o contra el total
+function barras(filas, embudo) {
+  const max = Math.max(1, ...filas.map(f => f[1]));
+  return `<div class="emb">${filas.map(([txt, n], i) => {
+    const base = embudo ? (i ? filas[i - 1][1] : 0) : filas.reduce((t, f) => t + f[1], 0);
+    const pct = base ? Math.round(n / base * 100) : null;
+    return `<div class="emb-fila" title="${esc(`${txt}: ${n}${pct !== null ? ` (${pct}%${embudo ? ' del paso anterior' : ' del total'})` : ''}`)}"><span>${esc(txt)}</span>
+      <div class="emb-barra"><i style="width:${n / max * 100}%"></i></div>
+      <span class="emb-num"><b>${n}</b>${pct !== null ? `<small>${pct}%</small>` : ''}</span></div>`;
+  }).join('')}</div>`;
+}
+function vistaMetricas() {
+  const per = S.metPeriodo || '90';
+  const desde = per === 'todo' ? '' : per === 'anio' ? `${hoy().getFullYear()}-01-01` : aISO(sumarDias(hoy(), -Number(per) + 1));
+  const enPer = ts => !!ts && aISO(new Date(ts)) >= desde;
+  const solDe = x => S.solicitudes.find(s => s.id === x.solicitud_id);
+  const sols = S.solicitudes.filter(x => x.tipo !== 'guia' && !esPrueba(x) && enPer(x.created_at));
+  const props = S.propuestas.filter(x => !esPrueba(solDe(x)) && enPer(x.created_at));
+  const propDe = s => S.propuestas.find(x => x.solicitud_id === s.id);
+  const enviadas = props.filter(x => x.enviada_at), aceptadas = props.filter(x => x.aceptada_at);
+  const suma = xs => xs.reduce((t, x) => t + Number(x.precio || 0), 0);
+  const dias = aceptadas.map(x => { const s = solDe(x); return (new Date(x.aceptada_at) - new Date((s || x).created_at)) / 86400000; });
+  const promDias = dias.length ? Math.round(dias.reduce((t, d) => t + d, 0) / dias.length) : null;
+  const fuentes = Object.entries(sols.reduce((m, x) => { const f = fuenteDe(x) || 'Sin dato'; m[f] = m[f] || [0, 0]; m[f][0]++; if ((propDe(x) || {}).aceptada_at) m[f][1]++; return m; }, {}))
+    .sort((a, b) => b[1][0] - a[1][0]);
+  const motivos = Object.entries(props.filter(x => x.rechazada_at && !x.aceptada_at).reduce((m, x) => { const k = MOTIVOS_PROP[x.motivo] || 'Otro motivo'; m[k] = (m[k] || 0) + 1; return m; }, {})).sort((a, b) => b[1] - a[1]);
+  const vacio = '<p class="rep-txt">Aún no hay suficientes datos en este periodo.</p>';
+  const opt = (v, t) => `<option value="${v}"${per === v ? ' selected' : ''}>${t}</option>`;
+  return `<div class="encabezado">
+    <div><h1>Métricas</h1><p class="sub">Cuántos prospectos llegan, cuántos cierran y de dónde vienen los que sí compran. No cuenta las descargas de la guía ni las pruebas.</p></div>
+    <div class="controles"><select class="campo-in" data-cambio="met-periodo" aria-label="Periodo">${Object.entries(PERIODOS).map(([v, t]) => opt(v, t)).join('')}</select></div>
+  </div>
+  <section class="rep">
+    <div class="rep-datos">
+      <div class="rep-dato"><b>${enviadas.length ? Math.round(aceptadas.length / enviadas.length * 100) + '%' : '—'}</b><span>Cierre: aceptadas de las enviadas</span></div>
+      <div class="rep-dato"><b>${promDias !== null ? promDias : '—'}</b><span>Días promedio de la solicitud al sí</span></div>
+      <div class="rep-dato dinero"><b>${esc(dinero(suma(aceptadas)) || '$0.00')}</b><span>Cerrado, de ${esc(dinero(suma(enviadas)) || '$0.00')} propuesto</span></div>
+      <div class="rep-dato dinero"><b>${aceptadas.length ? esc(dinero(Math.round(suma(aceptadas) / aceptadas.length))) : '—'}</b><span>Ticket promedio (mensualidad o proyecto)</span></div>
+    </div>
+  </section>
+  <div class="ini-grid">
+    <section class="rep">
+      <div class="rep-cab"><h2>Tus <span>prospectos</span></h2></div>
+      ${sols.length ? barras([['Solicitudes', sols.length], ['Agendaron llamada', sols.filter(x => x.cita).length],
+        ['Con propuesta', sols.filter(propDe).length], ['Aceptaron', sols.filter(x => (propDe(x) || {}).aceptada_at).length]], true) : vacio}
+    </section>
+    <section class="rep">
+      <div class="rep-cab"><h2>Tus <span>propuestas</span></h2></div>
+      ${props.length ? barras([['Hechas', props.length], ['Enviadas', enviadas.length], ['Las abrieron', props.filter(x => x.primera_vista || x.vistas).length],
+        ['Aceptadas', aceptadas.length], ['Pagaron anticipo', props.filter(x => x.pagada_at).length], ['Ya son clientes', props.filter(x => x.client_id).length]], true) : vacio}
+    </section>
+    <section class="rep">
+      <div class="rep-cab"><h2>De dónde <span>llegan</span></h2></div>
+      ${fuentes.length ? barras(fuentes.map(([f, n]) => [`${f}${n[1] ? ` · ${pl(n[1], 'cerró', 'cerraron')}` : ''}`, n[0]])) : vacio}
+    </section>
+    <section class="rep">
+      <div class="rep-cab"><h2>Por qué <span>dicen que no</span></h2></div>
+      ${motivos.length ? barras(motivos) : '<p class="rep-txt">Nadie ha dicho que no en este periodo.</p>'}
+    </section>
+  </div>`;
+}
+
+// ---------- Historial de un cliente: todo lo que ha pasado y lo que viene ----------
+function historialCliente(id) {
+  const cl = clientePorId(id); if (!cl) return { viene: [], paso: [] };
+  const ev = [], ts = (t, tipo, txt) => { if (t) ev.push({ t: new Date(t), f: aISO(new Date(t)), hora: horaDe(t), tipo, txt }); };
+  const dia = (f, tipo, txt) => { if (f) ev.push({ f, tipo, txt }); };
+  const correo = String(cl.contact_email || '').toLowerCase();
+  const props = S.propuestas.filter(x => x.client_id === id);
+  const sols = S.solicitudes.filter(x => props.some(p => p.solicitud_id === x.id) || (correo && String(x.correo || '').toLowerCase() === correo));
+  sols.forEach(x => {
+    const f = fuenteDe(x);
+    ts(x.created_at, 'venta', `${x.tipo === 'guia' ? 'Descargó la guía' : 'Llegó su solicitud'}${f ? ` (${f})` : ''}`);
+    if (x.cita) ts(x.cita, 'llamada', 'Llamada de venta');
+  });
+  props.forEach(x => {
+    ts(x.created_at, 'venta', `Hiciste la propuesta “${x.titulo}” por ${dinero(x.precio)}`);
+    ts(x.enviada_at, 'venta', 'Le mandaste la propuesta');
+    ts(x.primera_vista, 'venta', 'Abrió la propuesta por primera vez');
+    ts(x.rechazada_at, 'venta', `Dijo que ahora no${x.motivo ? `: ${(MOTIVOS_PROP[x.motivo] || 'otro motivo').toLowerCase()}` : ''}`);
+    ts(x.aceptada_at, 'entrega', `Aceptó la propuesta${x.aceptada_por ? ` (${x.aceptada_por})` : ''}`);
+    ts(x.pagada_at, 'cobro', pagoTotalDe(x) ? 'Pagó todo de una vez' : `Pagó el anticipo${x.pago_metodo ? ` ${x.pago_metodo === 'tarjeta' ? 'con tarjeta' : 'por transferencia'}` : ''}`);
+    if (!pagoTotalDe(x)) ts(x.liquidada_at, 'cobro', 'Pagó el resto del proyecto');
+  });
+  S.contratos.filter(c => c.client_id === id || props.some(p => p.id === c.propuesta_id)).forEach(c => {
+    ts(c.firmado_at, 'venta', `Firmó el contrato${c.firmado_por ? ` (${c.firmado_por})` : ''}`);
+    ts(c.firma_prestador_at, 'venta', 'Firmaste el contrato');
+  });
+  ts(cl.created_at, 'entrega', 'Lo diste de alta como cliente');
+  S.ciclos.filter(c => c.client_id === id).forEach(c => {
+    fechasCiclo(c, S.videos.filter(v => v.cycle_id === c.id)).forEach(e => dia(e.f, e.tipo, `${c.name}: ${e.k === 'publica' ? txtPublica(e).replace(/^Se p/, 'se p') : TXT_FECHA[e.k].toLowerCase()}`));
+    ts(c.entregado_at, 'entrega', `${c.name}: le entregaste los videos`);
+    ts(c.ajustes_at, 'rev', `${c.name}: pidió ajustes`);
+    ts(c.aprobado_at, 'entrega', `${c.name}: ${c.aprobado_por === 'tiempo' ? 'se aprobó solo (no pidió ajustes)' : 'aprobó los videos'}`);
+    const r = S.reportes.find(x => x.cycle_id === c.id && x.publicado);
+    if (r) ts(r.updated_at, 'venta', `${c.name}: publicaste su reporte`);
+  });
+  (S.cobros || []).filter(x => x.client_id === id).forEach(x => {
+    const cy = S.ciclos.find(c => c.id === x.cycle_id), de = `mensualidad${cy ? ` de ${cy.name}` : ''}`;
+    if (x.estado === 'pagado') ts(x.pagado_at, 'cobro', `Pagó la ${de}${x.monto ? ` (${dinero(x.monto)})` : ''}`);
+    else if (x.estado === 'pendiente') dia(x.vence, 'cobro', `${estadoCobro(x).clave === 'vencido' ? 'Venció' : 'Toca pagar'} la ${de}${x.monto ? ` (${dinero(x.monto)})` : ''}`);
+  });
+  S.facturas.filter(x => x.client_id === id).forEach(x => {
+    ts(x.created_at, 'cobro', `Pidió factura: ${x.concepto}`);
+    if (x.estado === 'emitida') ts(x.emitida_at, 'cobro', `Emitiste la factura: ${x.concepto}`);
+  });
+  // Lo que tiene hora ya pasó si su hora pasó; lo que solo tiene día, desde hoy cuenta como "lo que viene"
+  const ahora = new Date(), h = hoyISO();
+  return { viene: ev.filter(e => e.t ? e.t > ahora : e.f >= h), paso: ev.filter(e => e.t ? e.t <= ahora : e.f < h) };
+}
+function modalHistorial(id) {
+  const cl = clientePorId(id); if (!cl) return;
+  const { viene, paso } = historialCliente(id);
+  abrirModal(`<div class="d-cab"><div><h2 class="d-titulo">Historial de ${esc(cl.name)}</h2>
+      <p class="d-sub">${cl.active ? 'Cliente activo' : 'En pausa'}${cl.mensualidad ? ` · ${esc(dinero(cl.mensualidad))} al mes` : ''} · ${pl(cl.videos_per_cycle, 'video', 'videos')} por mes</p></div></div>
+    ${viene.length ? `<h3 class="hist-tit">Lo que viene</h3>${htmlAgenda(viene)}` : ''}
+    <h3 class="hist-tit">Lo que pasó</h3>
+    ${paso.length ? htmlAgenda(paso, true) : '<p class="nota">Todavía no hay nada.</p>'}
+    <div class="d-pie"><button type="button" class="btn" data-accion="cerrar">Cerrar</button></div>`);
 }
 
 // ---------- Producción (admin y editores) ---------------------------
@@ -1257,6 +1553,12 @@ function vistaCalendario() {
     [...new Set([c.record_start, c.record_end])].forEach(d => { const i = idx(d); if (i >= 0 && i < DIAS) carga[i]++; });
   });
   const celdasCarga = carga.map((n, i) => n ? `<span class="carga ${n > 1 ? 'c2' : 'c1'}" style="left:${i * DW}px" title="${n} ${n > 1 ? 'grabaciones' : 'grabación'} el ${fLarga(aISO(sumarDias(inicio, i)))}">${n}</span>` : '').join('');
+  // Publicaciones programadas y llamadas de venta: un círculo por día con cuántas hay
+  const porDia = (fechas, cls, txt) => Object.entries(fechas.reduce((m, x) => { const i = idx(x.f); if (i >= 0 && i < DIAS) (m[i] = m[i] || []).push(x.t); return m; }, {}))
+    .map(([i, ts]) => `<span class="${cls}" style="left:${i * DW}px" title="${esc(`${fLarga(aISO(sumarDias(inicio, +i)))}: ${txt(ts.length)}\n${ts.join('\n')}`)}">${ts.length}</span>`).join('');
+  const pubs = porDia(S.videos.filter(v => v.programado_at).map(v => { const cy = S.ciclos.find(c => c.id === v.cycle_id), cl = cy && clientePorId(cy.client_id);
+    return { f: aISO(new Date(v.programado_at)), t: `${cl ? cl.name + ': ' : ''}${v.title || 'Video ' + v.number}` }; }), 'pub', n => n === 1 ? '1 video se publica' : `${n} videos se publican`);
+  const llamadas = esAdmin ? porDia(S.solicitudes.filter(x => x.cita).map(x => ({ f: aISO(new Date(x.cita)), t: `${horaDe(x.cita)} ${x.nombre}${x.empresa ? ` (${x.empresa})` : ''}` })), 'llam', n => n === 1 ? '1 llamada de venta' : `${n} llamadas de venta`) : '';
 
   const tramo = (a, b, cls, txt, c, titulo) => {
     let i0 = idx(a), i1 = idx(b);
@@ -1300,6 +1602,8 @@ function vistaCalendario() {
     ${lineaHoy}
     <div class="lt-fila lt-regla"><div class="lt-lbl"><small>${rango(iISO, fISO)}</small></div><div class="lt-pista" style="width:${ancho}px">${regla}</div></div>
     <div class="lt-fila"><div class="lt-lbl">Grabaciones<small>por día</small></div><div class="lt-pista" style="width:${ancho}px">${celdasCarga}</div></div>
+    <div class="lt-fila"><div class="lt-lbl">Publicaciones<small>programadas</small></div><div class="lt-pista" style="width:${ancho}px">${pubs}</div></div>
+    ${esAdmin ? `<div class="lt-fila"><div class="lt-lbl">Llamadas<small>de venta</small></div><div class="lt-pista" style="width:${ancho}px">${llamadas}</div></div>` : ''}
     ${filas}
   </div></div>
   <div class="leyenda">
@@ -1307,6 +1611,8 @@ function vistaCalendario() {
     <span><i style="background:var(--dorado)"></i>${esAdmin ? 'Edición' : 'Tu edición'}</span>
     <span><i style="background:repeating-linear-gradient(135deg,rgba(227,178,60,.6) 0 4px,rgba(227,178,60,.18) 4px 8px)"></i>${esAdmin ? 'Tu revisión' : 'Revisión de Connect'}</span>
     <span><i style="background:var(--verde);width:4px"></i>Entrega al cliente</span>
+    <span><i style="background:var(--verde-2);width:10px;border-radius:50%"></i>Publicaciones</span>
+    ${esAdmin ? '<span><i style="border:2px solid var(--crema);width:10px;border-radius:50%"></i>Llamadas de venta</span>' : ''}
     <span><i style="background:var(--dorado);width:2px"></i>Hoy</span>
   </div>
   ${enRango.length ? (esAdmin ? '<p class="nota">Toca cualquier tramo para cambiar las fechas de ese mes.</p>' : '')
@@ -1338,11 +1644,12 @@ function bloqueCliente(cl) {
         <h2 class="cli-nombre${cl.active ? '' : ' pausado'}"><button class="g-plegar" data-accion="plegar" data-id="cc:${cl.id}" aria-expanded="${abierto}"><span class="g-flecha" aria-hidden="true"></span>${esc(cl.name)}</button></h2>
         <p class="cli-meta"><b>${cs.length ? `${cs.length} ${cs.length === 1 ? 'mes' : 'meses'}` : 'Sin meses'}</b>${cs.length && !abierto ? ` (${esc(cs.slice(0, 3).map(c => c.name).join(', '))}${cs.length > 3 ? '…' : ''})` : ''}.
           ${cl.videos_per_cycle} videos por mes${cl.active ? '' : ', en pausa'}. ${usuarios.length ? `Con acceso: ${usuarios.map(u => esc(nombreDe(u))).join(', ')}.` : 'Nadie de este cliente tiene acceso todavía.'}
-          ${editores.length ? `Editores: ${editores.map(u => esc(nombreDe(u))).join(', ')}.` : 'Sin editor asignado (se asigna en Solicitudes → Accesos al portal).'}</p>
+          ${editores.length ? `Editores: ${editores.map(u => esc(nombreDe(u))).join(', ')}.` : 'Sin editor asignado (se asigna en Equipo → Accesos al portal).'}</p>
         ${lineaMailerlite(cl)}
         <p class="cli-meta">${(e => e && e.confirmado_at ? `Estilo visual confirmado el ${esc(fCorta(e.confirmado_at))}.` : e ? 'Estilo visual en proceso: todavía no lo confirma.' : 'Estilo visual: todavía no lo elige.')(estiloFila(cl.id))}</p>
       </div>
       <div class="controles">
+        <button class="btn btn-s btn-t" data-accion="cli-historial" data-id="${cl.id}">Historial</button>
         <button class="btn btn-s btn-t" data-accion="estilo-cliente" data-id="${cl.id}">Estilo</button>
         ${cs.length ? `<button class="btn btn-s btn-t" data-accion="previa" data-id="${cl.id}">Ver como cliente</button>` : ''}
         <button class="btn btn-s" data-accion="editar-cliente" data-id="${cl.id}">Editar</button>
@@ -1427,6 +1734,13 @@ const sitioDe = t => {
 const RUTAS = { A: 'Mensual', B: 'Proyecto' };
 const ESTADOS_SOL = { incompleto: 'Incompleta', completo: 'Completa, sin agendar', agendado: 'Agendada' };
 const qaDe = x => Array.isArray((x.respuestas || {})._qa) ? x.respuestas._qa : [];
+// De dónde llegó: lo que contestó en "¿cómo nos conociste?" o, si no, la campaña del link
+function fuenteDe(x) {
+  const o = x.origen || {}, conocio = (qaDe(x).find(r => r[0] === 'conocio') || [])[2];
+  return x.tipo === 'solicitud'
+    ? [conocio && !/^Llegó por un link/.test(conocio) ? conocio : o.utm_source, o.utm_campaign].filter(Boolean).join(' · ')
+    : [o.utm_source, o.utm_campaign, o.utm_content].filter(Boolean).join(' · ');
+}
 function mensajeWA(x, pila) {
   if (x.tipo === 'guia') return `Hola ${pila}, soy Manuel de Connect Studios. Vi que descargaste la guía de videos, ¿te sirvió?`;
   if (x.tipo === 'web') return `Hola ${pila}, soy Manuel de Connect Studios. Vi tu mensaje en la página.`;
@@ -1457,11 +1771,8 @@ function vistaSolicitudes() {
   </div>
   ${nuevas ? `<p class="aviso-linea">${nuevas === 1 ? 'Hay 1 solicitud sin atender.' : `Hay ${nuevas} solicitudes sin atender.`}</p>` : ''}
   ${lista.length ? `<div class="sol-lista">${lista.map(x => {
-    const o = x.origen || {}, wa = waDe(x.whatsapp), pila = String(x.nombre || '').split(/\s+/)[0], qa = qaDe(x);
-    const conocio = (qa.find(r => r[0] === 'conocio') || [])[2];
-    const fuente = x.tipo === 'solicitud'
-      ? [conocio && !/^Llegó por un link/.test(conocio) ? conocio : o.utm_source, o.utm_campaign].filter(Boolean).join(' · ')
-      : [o.utm_source, o.utm_campaign, o.utm_content].filter(Boolean).join(' · ');
+    const wa = waDe(x.whatsapp), pila = String(x.nombre || '').split(/\s+/)[0], qa = qaDe(x);
+    const fuente = fuenteDe(x);
     const sol = x.tipo === 'solicitud';
     const ultima = sol && x.estado === 'incompleto' && qa.length ? qa[qa.length - 1][1] : '';
     const detalle = qa.filter(r => !['nombre', 'correo', 'whatsapp'].includes(r[0]));
@@ -2393,13 +2704,22 @@ function waRecordatorio(x, cl, cy) {
   const cuando = e.clave === 'vencido' ? 'ya pasó su fecha de pago' : e.clave === 'toca' ? 'hoy es su día de pago' : `vence el ${fLarga(x.vence)}`;
   return `https://wa.me/${tel}?text=${encodeURIComponent(`Hola${pila ? ' ' + pila : ''}, te recuerdo la mensualidad de ${cl.name}${cy ? ` (${cy.name})` : ''}: ${x.monto ? dinero(x.monto) : ''}; ${cuando}. La puedes pagar con tarjeta o por transferencia desde tu portal, en la pestaña Pagos: ${PORTAL_URL}\n\n¡Gracias!`)}`;
 }
+// Las cuentas de cobranza: las usan Pagos e Inicio, para que siempre den lo mismo
+const sumaMontos = xs => xs.reduce((t, x) => t + Number(x.monto || 0), 0);
+function cuentasCobranza() {
+  const todos = (S.cobros || []).map(x => Object.assign({}, x, { e: estadoCobro(x), cl: clientePorId(x.client_id), cy: S.ciclos.find(c => c.id === x.cycle_id) }));
+  const mes = hoyISO().slice(0, 7);
+  return {
+    todos,
+    vencidos: todos.filter(x => x.e.clave === 'vencido'),
+    tocan: todos.filter(x => x.e.clave === 'toca'),
+    porCobrar: sumaMontos(todos.filter(x => x.estado === 'pendiente')),
+    cobrado: sumaMontos(todos.filter(x => x.estado === 'pagado' && x.pagado_at && aISO(new Date(x.pagado_at)).slice(0, 7) === mes))
+  };
+}
 function bloqueCobranza() {
   const f = S.cobFiltro || 'pendientes';
-  const todos = (S.cobros || []).map(x => Object.assign({}, x, { e: estadoCobro(x), cl: clientePorId(x.client_id), cy: S.ciclos.find(c => c.id === x.cycle_id) }));
-  const suma = xs => xs.reduce((t, x) => t + Number(x.monto || 0), 0);
-  const vencidos = todos.filter(x => x.e.clave === 'vencido'), tocan = todos.filter(x => x.e.clave === 'toca');
-  const mes = hoyISO().slice(0, 7);
-  const cobrado = suma(todos.filter(x => x.estado === 'pagado' && x.pagado_at && aISO(new Date(x.pagado_at)).slice(0, 7) === mes));
+  const { todos, vencidos, tocan, cobrado } = cuentasCobranza(), suma = sumaMontos;
   const orden = { vencido: 0, toca: 1, pendiente: 2, pagado: 3, no_aplica: 4 };
   const lista = todos.filter(x => f === 'todos' || (f === 'pendientes' ? x.estado === 'pendiente' : x.estado === 'pagado'))
     .sort((a, b) => (orden[a.e.clave] - orden[b.e.clave]) || (f === 'pagados' ? b.vence.localeCompare(a.vence) : a.vence.localeCompare(b.vence)));
@@ -2563,6 +2883,10 @@ function vistaCliente(P, previa) {
       <div class="avance-txt"><span>${esc(mensaje)}</span>${tira(vs)}</div>
     </div>
     <div class="hoja">${vs.map(v => cuadro(v, previa)).join('')}</div>
+    <section class="rep fechas-mes" style="margin-top:1.6rem">
+      <div class="rep-cab"><h2>Fechas de <span>${esc(c.name)}</span></h2></div>
+      ${htmlAgenda(fechasCiclo(c, vs).map(e => ({ f: e.f, tipo: e.tipo, txt: e.k === 'publica' ? txtPublica(e) : TXT_FECHA_CLIENTE[e.k] })))}
+    </section>
     <p class="nota" style="margin-top:1.25rem">${previa ? 'En esta vista previa, tocar un video abre su ficha interna.' : 'Toca un video para subir o cambiar su guion. Cuando esté entregado, desde ahí lo abres.'}</p>
   </div>`;
 }
@@ -2610,6 +2934,7 @@ function cuadro(v, previa) {
     ${pill(v.status, true)}
     <span class="c-pie">
       ${v.title ? `<span class="c-tit">${esc(v.title)}</span>` : ''}
+      ${v.programado_at ? `<span class="c-pub">${new Date(v.programado_at) > new Date() ? 'Se publica' : 'Publicado'} el ${esc(fDia(aISO(new Date(v.programado_at))))}</span>` : ''}
       ${accion ? `<span class="c-accion" aria-hidden="true">${accion}</span>` : ''}
     </span>
   </button>`;
@@ -2632,7 +2957,7 @@ function portalLocal(idCliente) {
         final_url: v.status === 'entregado' ? v.final_url : null,
         copy: v.status === 'entregado' ? v.copy : null,
         portada_url: v.status === 'entregado' ? v.portada_url : null,
-        ajuste_cliente: v.ajuste_cliente
+        ajuste_cliente: v.ajuste_cliente, programado_at: v.programado_at
       })),
       // A diferencia de client_portal, aquí se ve también el borrador para revisarlo antes de publicarlo
       report: (r => r ? Object.assign({}, r, { borrador: !r.publicado }) : null)(S.reportes.find(r => r.cycle_id === c.id))
@@ -3366,7 +3691,7 @@ function modalAsignarMes(idCiclo) {
     ${vs.length ? `
     <div class="campo"><label for="a-editor">Editor</label>
       <select id="a-editor" name="editor_id">${equipo.map(p => `<option value="${p.id}">${esc(nombreDe(p))}${p.role === 'admin' ? ' (administrador)' : ''}</option>`).join('')}<option value="">Sin editor (quitar)</option></select>
-      ${suyos.length ? '' : '<p class="ayuda">Este cliente no tiene editores asignados. Asígnalos en Solicitudes → Accesos al portal para que aparezcan aquí.</p>'}</div>
+      ${suyos.length ? '' : '<p class="ayuda">Este cliente no tiene editores asignados. Asígnalos en Equipo → Accesos al portal para que aparezcan aquí.</p>'}</div>
     <div class="campo" role="radiogroup" aria-label="Qué videos">
       <label class="interruptor" style="min-height:2rem"><input type="radio" name="alcance" value="todos" checked> Todos los videos del mes (${vs.length})</label>
       <label class="interruptor" style="min-height:2rem"><input type="radio" name="alcance" value="libres"${libres ? '' : ' disabled'}> Solo los que no tienen editor (${libres})</label>
@@ -4016,6 +4341,7 @@ const ACC = {
   'recargar-pagina'() { location.reload(); },
   async actualizar() { await recargar(); aviso('Actualizado'); },
   ir(el, id) { S.vista = id; S.previa = null; render(); window.scrollTo(0, 0); },
+  'cli-historial'(el, id) { modalHistorial(id); },
   previa(el, id) { S.previa = id; S.vista = 'previa'; S.cicloCliente = null; S.pestanaCli = 'videos'; elegirMesCliente(portalLocal(id)); render(); window.scrollTo(0, 0); },
   'ver-mes'(el, id) { S.cicloCliente = id; render(); },
   'cli-pestana'(el, id) {
@@ -4365,8 +4691,19 @@ const ACC = {
   },
   async 'prop-borrar'(el, id) {
     const x = S.propuestas.find(pr => pr.id === id); if (!x) return;
-    if (!await confirmar(`¿Borrar la propuesta para ${x.empresa}?`, 'El link deja de funcionar. No se puede deshacer.', 'Borrar', true)) return;
-    try { await q(sb.from('propuestas').delete().eq('id', id)); aviso('Propuesta borrada'); await recargar(); }
+    // Con pago o ya dado de alta, la propuesta es el registro de la venta: no se borra
+    if (x.pagada_at || x.client_id || S.pagosStripe.some(ps => ps.propuesta_id === id)) {
+      return aviso(`No se puede borrar: ${x.client_id ? `${x.empresa} ya es cliente` : 'ya tiene un pago registrado'} y esta propuesta es el registro de la venta. Para no verla, usa el filtro de Propuestas.`, true);
+    }
+    // Si firmó contrato pero no pagó, el contrato se va con la propuesta para no dejarlo suelto
+    const ct = contratoDe(x);
+    const texto = ct ? `También se borra el contrato que firmó ${ct.firmado_por || x.nombre} el ${fCorta(ct.firmado_at)}. El link deja de funcionar. No se puede deshacer.` : 'El link deja de funcionar. No se puede deshacer.';
+    if (!await confirmar(`¿Borrar la propuesta para ${x.empresa}?`, texto, 'Borrar', true)) return;
+    try {
+      if (ct) await q(sb.from('contratos').delete().eq('id', ct.id));
+      await q(sb.from('propuestas').delete().eq('id', id));
+      aviso(ct ? 'Propuesta y contrato borrados' : 'Propuesta borrada'); await recargar();
+    }
     catch (e) { aviso(humano(e), true); }
   },
   async 'prop-cliente'(el, id) {
@@ -4449,6 +4786,7 @@ const CAMBIOS = {
   },
   'fac-filtro'(el) { S.facFiltro = el.value; render(); },
   'prop-filtro'(el) { S.propFiltro = el.value; render(); },
+  'met-periodo'(el) { S.metPeriodo = el.value; render(); },
   'cot-agregar'(el) {
     const g = el.dataset.grupo, v = el.value, c = S.cot.actual; if (!v || !c) return;
     const cfg = cotCfg(), t = cfg.tarifas;
