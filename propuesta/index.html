@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
-<meta name="referrer" content="no-referrer">
+<meta name="referrer" content="strict-origin">
 <meta name="theme-color" content="#000000">
 <title>Propuesta · Connect Studios</title>
 <meta property="og:title" content="Tu propuesta de Connect Studios">
@@ -236,6 +236,34 @@ h1{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size
 .rev-lista{margin:.8rem 0 0;padding-left:1.1rem;color:var(--crema-2);font-size:.92rem}
 .rev-lista li{margin:.25rem 0}
 .rev-lista b{color:var(--crema)}
+.rev-lista li{white-space:pre-line}
+.rev-media{width:100%;margin:.9rem auto 0}
+.rev-player{position:relative;width:100%;aspect-ratio:16/9;background:#000;border-radius:12px;overflow:hidden}
+.rev-player video{display:block;width:100%;height:100%;object-fit:contain;background:#000}
+.rev-capa{position:absolute;inset:0;cursor:crosshair;background:rgba(0,0,0,.35);display:flex;align-items:flex-start;justify-content:center;padding-top:.8rem}
+.rev-capa span{background:rgba(0,0,0,.8);color:var(--crema);font-size:.82rem;font-weight:600;padding:.35rem .75rem;border-radius:999px;pointer-events:none}
+.rev-capa[hidden],.rev-punto[hidden]{display:none}
+.rev-punto{position:absolute;width:24px;height:24px;margin:-12px 0 0 -12px;border-radius:50%;border:3px solid var(--verde);box-shadow:0 0 0 3px rgba(0,0,0,.55),inset 0 0 0 2px rgba(0,0,0,.4);pointer-events:none}
+.rev-ticks{position:relative;height:12px;margin-top:.45rem;border-radius:6px;background:var(--linea)}
+.rev-ticks button{position:absolute;top:0;width:8px;height:12px;margin-left:-4px;padding:0;border:0;border-radius:3px;background:var(--verde);cursor:pointer}
+.rev-ticks button.enviado{background:var(--crema-3)}
+.rev-nuevo{margin-top:.9rem;display:grid;gap:.5rem}
+.rev-t{font-size:.84rem;font-weight:700;color:var(--crema-2)}
+.rev-t b{color:var(--verde);font-variant-numeric:tabular-nums}
+.rev-nuevo textarea{width:100%;min-height:4.4rem;background:#000;border:1px solid var(--linea-2);border-radius:10px;padding:.7rem .85rem;color:var(--crema);resize:vertical}
+.rev-nuevo textarea:focus{outline:none;border-color:var(--verde)}
+.rev-nuevo .acciones,.rev-nuevo .error{margin:0}
+.rev-coms{list-style:none;margin:.8rem 0 0;padding:0;display:grid;gap:.4rem}
+.rev-coms:empty{display:none}
+.rev-coms li{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:.7rem;align-items:baseline;padding:.55rem .75rem;border:1px solid var(--linea);border-radius:10px;font-size:.92rem;color:var(--crema)}
+.rev-coms li.enviado{opacity:.6}
+.rev-coms span{overflow-wrap:anywhere}
+.rev-coms small{color:var(--crema-3);font-size:.75rem;white-space:nowrap}
+.rev-coms .enlace{padding:0;font-size:.82rem}
+.rev-ir{background:none;border:0;padding:0;font:inherit;font-weight:700;color:var(--verde);cursor:pointer;font-variant-numeric:tabular-nums}
+.rev-pin{display:inline-block;width:.6rem;height:.6rem;border-radius:50%;border:2px solid var(--verde);vertical-align:middle;margin-left:.2rem}
+#rev-abajo{margin-top:1.1rem}
+#rev-abajo .campo{margin-bottom:.8rem}
 
 /* Panel para firmar y vista del contrato */
 .capa{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.82);overflow-y:auto;padding:clamp(.5rem,3vw,2rem) .6rem}
@@ -430,6 +458,10 @@ h1{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size
   .logo{width:108px}
   .meta{gap:.9rem 1.6rem}
   .pasos-sig > li{padding-left:1.2rem;padding-top:3.2rem}
+  .pasos-sig > li:has(#revisar){padding-left:.8rem;padding-right:.8rem}
+  .rev-video{padding:.85rem .75rem}
+  .rev-coms li{grid-template-columns:auto minmax(0,1fr);gap:.2rem .6rem}
+  .rev-coms li > :last-child{grid-column:2;justify-self:start}
   .reels{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:72%;overflow-x:auto;scroll-snap-type:x mandatory;margin-right:calc(-1 * clamp(1rem,4vw,2.5rem));padding-right:clamp(1rem,4vw,2.5rem);scrollbar-width:none}
   .reels::-webkit-scrollbar{display:none}
   .reel{scroll-snap-align:start}
@@ -833,17 +865,100 @@ function totalAnticipo() {
 }
 
 // ---------- Producción y revisión del proyecto ----------
-// El cliente de un proyecto no entra al portal: aquí ve en qué va, revisa (en Frame.io o escribiendo), aprueba y paga
-let ajustesAbiertos = false;   // el formulario para pedir ajustes
-let porAprobar = false;        // la confirmación antes de aprobar
+// El cliente de un proyecto no entra al portal: aquí ve en qué va, revisa el video (comentando en el segundo exacto), aprueba y paga
+// Clave de navegador de Google: solo sirve para la Drive API y solo desde el portal (restringida por sitio en Google Cloud)
+const DRIVE_LLAVE = 'AIzaSyDZ4QVL7krc_LbDLz7_439qP2qKfk7Ai6o';
+let ajustesAbiertos = false;          // la confirmación para enviar los ajustes
+let porAprobar = false;               // la confirmación antes de aprobar
+const sinReproductor = new Set();     // videos de Drive que no cargaron aquí: sus cambios se escriben a mano
+const marcas = {};                    // punto marcado en la imagen, por video, antes de agregar el comentario
 const hoyMx = () => new Date().toLocaleDateString('en-CA', { timeZone: 'America/Mexico_City' });
 const diaMx = iso => new Date(iso).toLocaleDateString('en-CA', { timeZone: 'America/Mexico_City' });
 const pad2 = n => String(n).padStart(2, '0');
+const mmss = s => `${Math.floor(s / 60)}:${pad2(Math.floor(s % 60))}`;
 const rondas = n => n === 1 ? '1 ronda' : `${n} rondas`;
 const diasGrab = g => { const [a, b] = g || []; return !a ? '' : !b || a === b ? `el ${fCorta(a)}` : a.slice(0, 7) === b.slice(0, 7) ? `el ${Number(a.slice(8, 10))} y el ${fCorta(b)}` : `el ${fCorta(a)} y el ${fCorta(b)}`; };
-// Solo un link de Frame.io deja comentar sobre el video; cualquier otro (Drive, YouTube) es solo para verlo
 const esFrameio = u => { try { return /(^|\.)(frame\.io|f\.io)$/i.test(new URL(u).hostname); } catch (e) { return false; } };
+// El id del archivo en un link de Drive (las carpetas no se pueden reproducir)
+const driveId = u => { const s = String(u || ''); const m = s.match(/drive\.google\.com\/(?:file\/d\/|open\?(?:[^#]*&)?id=|uc\?(?:[^#]*&)?id=)([\w-]{20,})/) || s.match(/drive\.usercontent\.google\.com\/[^#]*[?&]id=([\w-]{20,})/); return m ? m[1] : null; };
+// Con qué se revisa cada video: el link de revisión manda (Frame.io o Drive); si no hay, el link del video en Drive
+const fuenteRev = v => esFrameio(v.revision_url) ? { tipo: 'frameio', url: v.revision_url }
+  : driveId(v.revision_url) ? { tipo: 'drive', id: driveId(v.revision_url), url: v.revision_url }
+  : driveId(v.final_url) ? { tipo: 'drive', id: driveId(v.final_url), url: v.final_url }
+  : { tipo: 'link', url: v.revision_url || v.final_url || '' };
+const enReproductor = v => fuenteRev(v).tipo === 'drive' && !sinReproductor.has(v.id);
 const nombreVideo = v => v.titulo || `Video ${v.numero}`;
+const videoDe = id => ((P.produccion && P.produccion.videos) || []).find(x => x.id === id);
+const borradores = v => (v.comentarios || []).filter(k => !k.enviado);
+const enRevisionAbierta = pr => pr.rondas - pr.rondas_usadas > 0 && !(pr.revision_hasta && pr.revision_hasta < hoyMx());
+
+function listaComentarios(v) {
+  const ks = (v.comentarios || []).slice().sort((a, b) => (a.enviado - b.enviado) || ((b.ronda || 0) - (a.ronda || 0)) || (a.segundo - b.segundo));
+  return ks.map(k => `<li class="${k.enviado ? 'enviado' : ''}">
+      <button class="rev-ir" type="button" data-accion="ir-segundo" data-id="${v.id}" data-k="${k.id}" aria-label="Ir al segundo ${mmss(k.segundo)}">${mmss(k.segundo)}</button>
+      <span>${esc(k.texto)}${k.x != null ? ' <i class="rev-pin" title="Con un punto en la imagen"></i>' : ''}</span>
+      ${k.enviado ? `<small>Ronda ${esc(k.ronda)}</small>` : `<button class="enlace" type="button" data-accion="borrar-comentario" data-id="${v.id}" data-k="${k.id}"${previa ? ' disabled' : ''}>Borrar</button>`}
+    </li>`).join('');
+}
+
+function tarjetaRevision(v, puede) {
+  const f = fuenteRev(v);
+  let cuerpo;
+  if (enReproductor(v)) {
+    cuerpo = `<div class="rev-media">
+        <div class="rev-player">
+          <video src="https://www.googleapis.com/drive/v3/files/${encodeURIComponent(f.id)}?alt=media&key=${DRIVE_LLAVE}" controls playsinline preload="metadata" data-video="${v.id}"></video>
+          <div class="rev-punto" data-punto="${v.id}" hidden></div>
+          <div class="rev-capa" data-accion="poner-punto" data-id="${v.id}" hidden><span>Toca la imagen donde va el cambio</span></div>
+        </div>
+        <div class="rev-ticks" data-ticks="${v.id}"></div>
+      </div>
+      ${puede ? `<div class="rev-nuevo">
+        <label class="rev-t" for="c-${v.id}">Comentario en el segundo <b data-t="${v.id}">0:00</b></label>
+        <textarea id="c-${v.id}" data-comentario="${v.id}" maxlength="1000" placeholder="¿Qué cambiarías en este momento?"></textarea>
+        <div class="acciones"><button class="btn btn-v" type="button" data-accion="comentar" data-id="${v.id}"${previa ? ' disabled' : ''}>Agregar comentario</button>
+          <button class="enlace" type="button" data-accion="marcar" data-id="${v.id}">${marcas[v.id] ? 'Quitar el punto' : 'Marcar un punto en la imagen'}</button></div>
+        <p class="error" data-error-c="${v.id}" hidden></p>
+      </div>` : ''}
+      <ul class="rev-coms" data-coms="${v.id}">${listaComentarios(v)}</ul>`;
+  } else if (f.tipo === 'frameio') {
+    cuerpo = `<div class="acciones"><a class="btn btn-v" href="${esc(f.url)}" target="_blank" rel="noopener">Ver y comentar en Frame.io</a></div>`;
+  } else {
+    cuerpo = (f.url ? `<div class="acciones"><a class="btn btn-v" href="${esc(f.url)}" target="_blank" rel="noopener">Ver el video</a></div>` : '')
+      + (sinReproductor.has(v.id) ? `<p class="rev-nota">No pude cargarlo aquí. Ábrelo en Drive y, al pedir ajustes, escríbeme qué cambiarías. Si tampoco abre, escríbeme por WhatsApp.</p>
+        <ul class="rev-coms" data-coms="${v.id}">${listaComentarios(v)}</ul>` : '');
+  }
+  return `<div class="rev-video" data-tarjeta="${v.id}"><p class="rev-cab"><b>${pad2(v.numero)}</b><span>${esc(nombreVideo(v))}</span></p>${cuerpo}</div>`;
+}
+
+// Lo de abajo (aprobar o pedir ajustes) se repinta solo, para no reiniciar los videos
+function abajoRevision(pr) {
+  const vids = pr.videos || [], uno = vids.length === 1;
+  const quedan = Math.max(0, pr.rondas - pr.rondas_usadas), abierta = enRevisionAbierta(pr);
+  const n = vids.reduce((t, v) => t + borradores(v).length, 0);
+  const aMano = vids.filter(v => !enReproductor(v));
+  let html;
+  if (ajustesAbiertos) {
+    html = `${n ? `<p class="rev-nota" style="margin-top:0">Vas a enviar ${n === 1 ? 'tu comentario' : `tus ${n} comentarios`} en el video.</p>` : ''}
+      ${aMano.map(v => `<div class="campo"><label for="aj-${v.id}">¿Qué cambiarías${uno ? '' : ` de ${esc(nombreVideo(v))}`}?</label><textarea id="aj-${v.id}" name="aj-${v.id}" maxlength="1500" placeholder="Por ejemplo: en el segundo 0:42 cambiar la música por algo más tranquilo"></textarea>
+        ${fuenteRev(v).tipo === 'frameio' ? `<label class="acepto"><input type="checkbox" name="fio-${v.id}"> Dejé mis comentarios en Frame.io</label>` : ''}</div>`).join('')}
+      <div class="campo"><label for="aj-general">¿Algo general? <span style="font-weight:400;color:var(--crema-3)">(opcional)</span></label><textarea id="aj-general" name="general" maxlength="1500"></textarea></div>
+      <p class="rev-nota">${quedan === 1 ? 'Esta es tu última ronda de ajustes' : `Esto usa una de tus ${quedan} rondas de ajustes`}. Después de enviarlo ya no puedes agregar comentarios hasta que te entregue los cambios.</p>
+      <div class="acciones" style="margin-top:.9rem"><button class="btn btn-v" type="submit"${previa ? ' disabled' : ''}>Enviar mis ajustes</button><button class="enlace" type="button" data-accion="cerrar-ajustes">Cancelar</button></div>`;
+  } else if (porAprobar) {
+    html = `<div class="rev-confirma"><p>¿Lo apruebas tal como está? Ya no podrás pedir cambios${P.liquidada_at ? '' : ' y se activa el pago final'}.${n ? ` Tus ${n === 1 ? 'comentario sin enviar no se envía' : `${n} comentarios sin enviar no se envían`}.` : ''}</p>
+      <div class="acciones"><button class="btn btn-v" type="button" data-accion="aprobar-entrega"${previa ? ' disabled' : ''}>Sí, lo apruebo</button><button class="enlace" type="button" data-accion="cancelar-aprobar">Cancelar</button></div></div>`;
+  } else {
+    html = `<div class="acciones"><button class="btn${n ? '' : ' btn-v'}" type="button" data-accion="pre-aprobar">${uno ? 'Aprobar mi video' : 'Aprobar mis videos'}</button>
+      ${quedan && abierta ? `<button class="btn${n ? ' btn-v' : ''}" type="button" data-accion="abrir-ajustes">${n ? `Enviar mis ${n === 1 ? 'comentario' : `${n} comentarios`} como ajustes` : 'Pedir ajustes'}</button>`
+        : `<a class="btn" href="${esc(wa(`Hola Manuel, revisé el video de ${P.empresa} y tengo un comentario.`))}" target="_blank" rel="noopener">${WA_ICONO} Escribirme</a>`}</div>`;
+  }
+  return `<form data-form="ajustes" id="rev-abajo" novalidate>${html}<p class="error" data-error hidden></p></form>`;
+}
+function pintarAbajo() {
+  const d = document.getElementById('rev-abajo');
+  if (d && P.produccion) d.outerHTML = abajoRevision(P.produccion);
+}
 
 function pasoProduccion(pr, paso) {
   const vids = pr.videos || [], uno = vids.length === 1;
@@ -868,32 +983,115 @@ function pasoProduccion(pr, paso) {
   }
   // En revisión
   const vencida = pr.revision_hasta && pr.revision_hasta < hoy;
-  const conFio = vids.some(v => esFrameio(v.revision_url));
-  const tarjetas = vids.map(v => `<div class="rev-video">
-      <p class="rev-cab"><b>${pad2(v.numero)}</b><span>${esc(nombreVideo(v))}</span></p>
-      <div class="acciones">${esFrameio(v.revision_url) ? `<a class="btn btn-v" href="${esc(v.revision_url)}" target="_blank" rel="noopener">Ver y comentar en Frame.io</a>` : v.revision_url || v.final_url ? `<a class="btn btn-v" href="${esc(v.revision_url || v.final_url)}" target="_blank" rel="noopener">Ver el video</a>` : ''}</div>
-      ${ajustesAbiertos ? `<div class="campo"><label for="aj-${v.id}">¿Qué cambiarías?</label><textarea id="aj-${v.id}" name="aj-${v.id}" maxlength="1500" placeholder="Por ejemplo: en el segundo 0:42 cambiar la música por algo más tranquilo"></textarea></div>
-        ${esFrameio(v.revision_url) ? `<label class="acepto"><input type="checkbox" name="fio-${v.id}"> Dejé mis comentarios en Frame.io</label>` : ''}` : ''}
-    </div>`).join('');
-  const explica = `${conFio ? 'En Frame.io puedes comentar en el segundo exacto y hasta dibujar sobre el video; solo te pide tu nombre y correo, sin crear cuenta. ' : ''}${vencida ? 'Ya pasó el plazo para pedir ajustes, así que se aprueba hoy.' : `Tienes hasta el ${esc(fCorta(pr.revision_hasta))} para revisarlo${quedan ? ` y te ${quedan === 1 ? 'queda' : 'quedan'} ${rondas(quedan)} de ajustes` : ''}. Si no me dices nada, se aprueba solo.`}`;
-  let abajo;
-  if (ajustesAbiertos) {
-    abajo = `<div class="campo" style="margin-top:1rem"><label for="aj-general">¿Algo general? <span style="font-weight:400;color:var(--crema-3)">(opcional)</span></label><textarea id="aj-general" name="general" maxlength="1500"></textarea></div>
-      <p class="rev-nota">Junta todo en un solo envío: cada envío cuenta como una ronda${quedan ? ` y te ${quedan === 1 ? 'queda' : 'quedan'} ${rondas(quedan)}` : ''}.</p>
-      <div class="acciones" style="margin-top:.9rem"><button class="btn btn-v" type="submit"${previa ? ' disabled' : ''}>Enviar mis ajustes</button><button class="enlace" type="button" data-accion="cerrar-ajustes">Cancelar</button></div>`;
-  } else if (porAprobar) {
-    abajo = `<div class="rev-confirma"><p>¿Lo apruebas tal como está? Ya no podrás pedir cambios${P.liquidada_at ? '' : ' y se activa el pago final'}.</p>
-      <div class="acciones"><button class="btn btn-v" type="button" data-accion="aprobar-entrega"${previa ? ' disabled' : ''}>Sí, lo apruebo</button><button class="enlace" type="button" data-accion="cancelar-aprobar">Cancelar</button></div></div>`;
-  } else {
-    abajo = `<div class="acciones" style="margin-top:1rem"><button class="btn btn-v" type="button" data-accion="pre-aprobar">${uno ? 'Aprobar mi video' : 'Aprobar mis videos'}</button>
-      ${quedan && !vencida ? '<button class="btn" type="button" data-accion="abrir-ajustes">Pedir ajustes</button>' : `<a class="btn" href="${esc(wa(`Hola Manuel, revisé el video de ${P.empresa} y tengo un comentario.`))}" target="_blank" rel="noopener">${WA_ICONO} Escribirme</a>`}</div>`;
-  }
+  const puede = enRevisionAbierta(pr);
+  const conPlayer = vids.some(enReproductor), conFio = vids.some(v => fuenteRev(v).tipo === 'frameio');
+  const explica = `${conPlayer && puede ? `Dale play y, cuando veas algo que quieras cambiar, pausa y escribe tu comentario: se guarda en ese segundo exacto. Si quieres, marca también el punto en la imagen. Al terminar, mándame todos tus comentarios juntos. ` : ''}${conFio ? 'En Frame.io puedes comentar en el segundo exacto; solo te pide tu nombre y correo, sin crear cuenta. ' : ''}${vencida ? 'Ya pasó el plazo para pedir ajustes, así que se aprueba hoy.' : `Tienes hasta el ${esc(fCorta(pr.revision_hasta))} para revisarlo${quedan ? ` y te ${quedan === 1 ? 'queda' : 'quedan'} ${rondas(quedan)} de ajustes` : ''}. Si no me dices nada, se aprueba solo.`}`;
   return paso('', uno ? 'Revisa tu video' : `Revisa tus ${vids.length} videos`, explica,
-    `<form data-form="ajustes" id="revisar" novalidate><div class="rev-videos">${tarjetas}</div>${carpeta && !conFio ? `<div class="acciones">${carpeta}</div>` : ''}${abajo}<p class="error" data-error hidden></p></form>`);
+    `<div id="revisar"><div class="rev-videos">${vids.map(v => tarjetaRevision(v, puede)).join('')}</div>${carpeta && !conPlayer && !conFio ? `<div class="acciones" style="margin-top:.9rem">${carpeta}</div>` : ''}${abajoRevision(pr)}</div>`);
+}
+
+// ---------- El reproductor: tamaño, segundo actual, marcas y comentarios ----------
+function pintarTicks(id) {
+  const caja = document.querySelector(`[data-ticks="${id}"]`), vid = document.querySelector(`video[data-video="${id}"]`), v = videoDe(id);
+  if (!caja || !vid || !v || !(vid.duration > 0)) return;
+  caja.innerHTML = (v.comentarios || []).map(k => `<button type="button" class="${k.enviado ? 'enviado' : ''}" style="left:${Math.min(100, k.segundo / vid.duration * 100).toFixed(2)}%" data-accion="ir-segundo" data-id="${id}" data-k="${k.id}" title="${esc(mmss(k.segundo) + ' · ' + k.texto)}" aria-label="Ir al comentario del ${mmss(k.segundo)}"></button>`).join('');
+}
+function refrescarVideo(id) {
+  const v = videoDe(id), ul = document.querySelector(`[data-coms="${id}"]`);
+  if (v && ul) ul.innerHTML = listaComentarios(v);
+  pintarTicks(id);
+  pintarAbajo();
+}
+function verPunto(id, k) {
+  const p = document.querySelector(`[data-punto="${id}"]`);
+  if (!p) return;
+  if (k && k.x != null) { p.style.left = (k.x * 100) + '%'; p.style.top = (k.y * 100) + '%'; p.hidden = false; } else p.hidden = true;
+}
+function errorComentario(id, t) { const e = document.querySelector(`[data-error-c="${id}"]`); if (e) { e.textContent = t; e.hidden = !t; } }
+
+// Los eventos del video no suben: se escuchan en captura
+document.addEventListener('loadedmetadata', ev => {
+  const vid = ev.target; if (!vid.dataset || !vid.dataset.video) return;
+  const r = vid.videoWidth / vid.videoHeight;
+  if (r) {
+    vid.parentElement.style.aspectRatio = `${vid.videoWidth} / ${vid.videoHeight}`;
+    vid.closest('.rev-media').style.width = `min(100%, calc(68vh * ${r.toFixed(4)}))`;
+  }
+  pintarTicks(vid.dataset.video);
+}, true);
+document.addEventListener('timeupdate', ev => {
+  const vid = ev.target; if (!vid.dataset || !vid.dataset.video) return;
+  const b = document.querySelector(`[data-t="${vid.dataset.video}"]`); if (b) b.textContent = mmss(vid.currentTime);
+}, true);
+document.addEventListener('play', ev => {
+  const vid = ev.target; if (!vid.dataset || !vid.dataset.video) return;
+  if (!marcas[vid.dataset.video]) verPunto(vid.dataset.video, null);
+}, true);
+document.addEventListener('error', ev => {
+  const vid = ev.target; if (!vid.dataset || !vid.dataset.video || vid.tagName !== 'VIDEO') return;
+  const id = vid.dataset.video, v = videoDe(id), t = document.querySelector(`[data-tarjeta="${id}"]`);
+  sinReproductor.add(id);
+  if (v && t && P.produccion) { t.outerHTML = tarjetaRevision(v, enRevisionAbierta(P.produccion)); pintarAbajo(); }
+}, true);
+// Al empezar a escribir, el video se pausa para que el comentario quede en ese segundo
+document.addEventListener('input', ev => {
+  const id = ev.target.dataset && ev.target.dataset.comentario; if (!id) return;
+  const vid = document.querySelector(`video[data-video="${id}"]`); if (vid && !vid.paused) vid.pause();
+  errorComentario(id, '');
+});
+
+async function comentar(id, boton) {
+  const v = videoDe(id), vid = document.querySelector(`video[data-video="${id}"]`), ta = document.querySelector(`[data-comentario="${id}"]`);
+  if (!v || !ta) return;
+  const texto = ta.value.trim();
+  if (!texto) { errorComentario(id, 'Escribe qué cambiarías en ese momento del video.'); return ta.focus(); }
+  const m = marcas[id] || null;
+  boton.disabled = true; boton.textContent = 'Guardando…';
+  try {
+    const k = await rpc('propuesta_comentar', { p_token: token, p_video: id, p_segundo: vid ? Math.round(vid.currentTime * 100) / 100 : 0, p_x: m ? m.x : null, p_y: m ? m.y : null, p_texto: texto });
+    v.comentarios = (v.comentarios || []).concat(k);
+    ta.value = ''; delete marcas[id]; verPunto(id, null);
+    const bm = document.querySelector(`[data-accion="marcar"][data-id="${id}"]`); if (bm) bm.textContent = 'Marcar un punto en la imagen';
+    refrescarVideo(id);
+  } catch (e) {
+    errorComentario(id, /sin_texto/.test(e.message) ? 'Escribe qué cambiarías en ese momento del video.' : /demasiados/.test(e.message) ? 'Ya son muchos comentarios. Envíalos como ajustes o escríbeme por WhatsApp.' : errorRevision(e));
+  }
+  boton.disabled = false; boton.textContent = 'Agregar comentario';
+}
+async function borrarComentario(id, kid) {
+  const v = videoDe(id); if (!v) return;
+  try { await rpc('propuesta_borrar_comentario', { p_token: token, p_id: kid }); }
+  catch (e) { return errorComentario(id, errorRevision(e)); }
+  v.comentarios = (v.comentarios || []).filter(k => k.id !== kid);
+  refrescarVideo(id);
+}
+function irSegundo(id, kid) {
+  const v = videoDe(id), vid = document.querySelector(`video[data-video="${id}"]`), k = v && (v.comentarios || []).find(x => x.id === kid);
+  if (!vid || !k) return;
+  vid.pause();
+  vid.currentTime = Number(k.segundo);
+  verPunto(id, k);
+  vid.closest('.rev-media').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+function marcar(id, boton) {
+  const capa = document.querySelector(`[data-accion="poner-punto"][data-id="${id}"]`), vid = document.querySelector(`video[data-video="${id}"]`);
+  if (!capa) return;
+  if (marcas[id]) { delete marcas[id]; verPunto(id, null); boton.textContent = 'Marcar un punto en la imagen'; return; }
+  if (vid && !vid.paused) vid.pause();
+  capa.hidden = false;
+}
+function ponerPunto(capa, ev) {
+  const id = capa.dataset.id, r = capa.getBoundingClientRect();
+  const x = Math.min(1, Math.max(0, (ev.clientX - r.left) / r.width)), y = Math.min(1, Math.max(0, (ev.clientY - r.top) / r.height));
+  marcas[id] = { x: Math.round(x * 10000) / 10000, y: Math.round(y * 10000) / 10000 };
+  capa.hidden = true;
+  verPunto(id, marcas[id]);
+  const bm = document.querySelector(`[data-accion="marcar"][data-id="${id}"]`); if (bm) bm.textContent = 'Quitar el punto';
+  const ta = document.querySelector(`[data-comentario="${id}"]`); if (ta) ta.focus({ preventScroll: true });
 }
 
 async function aprobarEntrega(boton) {
-  const err = document.querySelector('#revisar [data-error]');
+  const err = document.querySelector('#rev-abajo [data-error]');
   boton.disabled = true; boton.textContent = 'Aprobando…';
   try {
     P = await rpc('propuesta_aprobar_entrega', { p_token: token });
@@ -908,13 +1106,14 @@ async function aprobarEntrega(boton) {
 
 async function pedirAjustes(f, boton, decir) {
   const vids = (P.produccion && P.produccion.videos) || [];
-  const ajustes = vids.map(v => {
+  const ajustes = vids.filter(v => !enReproductor(v)).map(v => {
     const t = (f.elements['aj-' + v.id] || {}).value || '', fio = !!(f.elements['fio-' + v.id] || {}).checked;
     const texto = t.trim() ? t.trim() + (fio ? ' (También dejé comentarios en Frame.io.)' : '') : fio ? 'Dejé mis comentarios en Frame.io.' : '';
     return { video_id: v.id, texto };
   }).filter(a => a.texto);
   const general = (f.elements.general || {}).value || '';
-  if (!ajustes.length && !general.trim()) return decir('Escribe qué cambiarías o marca que dejaste tus comentarios en Frame.io.');
+  const n = vids.reduce((t, v) => t + borradores(v).length, 0);
+  if (!n && !ajustes.length && !general.trim()) return decir('Agrega al menos un comentario en el video o escribe qué cambiarías.');
   boton.disabled = true; boton.textContent = 'Enviando…';
   try {
     P = await rpc('propuesta_pedir_ajustes', { p_token: token, p_ajustes: ajustes, p_general: general.trim() });
@@ -932,9 +1131,9 @@ function errorRevision(e) {
   return /no_en_revision/.test(m) ? 'Esta revisión ya se cerró. Recarga la página para ver en qué va.'
     : /fuera_de_plazo/.test(m) ? 'Ya pasó el plazo para pedir ajustes. Escríbeme por WhatsApp y lo vemos.'
     : /sin_rondas/.test(m) ? 'Ya usaste tus rondas de ajustes. Escríbeme por WhatsApp y lo vemos.'
-    : /sin_ajustes/.test(m) ? 'Escribe qué cambiarías o marca que dejaste tus comentarios en Frame.io.'
+    : /sin_ajustes/.test(m) ? 'Agrega al menos un comentario en el video o escribe qué cambiarías.'
     : /Failed to fetch|NetworkError|Load failed/i.test(m) ? 'No hay conexión. Revisa tu internet e inténtalo de nuevo.'
-    : 'No se pudo enviar. Inténtalo de nuevo o escríbeme por WhatsApp.';
+    : 'No se pudo guardar. Inténtalo de nuevo o escríbeme por WhatsApp.';
 }
 
 function bloqueDecision() {
@@ -1429,10 +1628,15 @@ document.addEventListener('click', async ev => {
   else if (a === 'borrar-firma') { if (lienzo) lienzo.borrar(); }
   else if (a === 'imprimir') { document.body.classList.add('imprimiendo'); window.print(); setTimeout(() => document.body.classList.remove('imprimiendo'), 500); }
   else if (a === 'pagar-tarjeta') { if (!previa) pagarConTarjeta(el); }
-  else if (a === 'abrir-ajustes') { ajustesAbiertos = true; porAprobar = false; repintarDecision(false); const t = document.querySelector('#revisar textarea'); if (t) t.focus(); }
-  else if (a === 'cerrar-ajustes') { ajustesAbiertos = false; repintarDecision(false); document.getElementById('revisar').scrollIntoView({ block: 'center' }); }
-  else if (a === 'pre-aprobar') { porAprobar = true; repintarDecision(false); }
-  else if (a === 'cancelar-aprobar') { porAprobar = false; repintarDecision(false); }
+  else if (a === 'abrir-ajustes') { ajustesAbiertos = true; porAprobar = false; pintarAbajo(); const t = document.querySelector('#rev-abajo textarea'); if (t) t.focus({ preventScroll: true }); document.getElementById('rev-abajo').scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+  else if (a === 'cerrar-ajustes') { ajustesAbiertos = false; pintarAbajo(); }
+  else if (a === 'pre-aprobar') { porAprobar = true; ajustesAbiertos = false; pintarAbajo(); }
+  else if (a === 'cancelar-aprobar') { porAprobar = false; pintarAbajo(); }
+  else if (a === 'comentar') { if (!previa) comentar(el.dataset.id, el); }
+  else if (a === 'borrar-comentario') { if (!previa) borrarComentario(el.dataset.id, el.dataset.k); }
+  else if (a === 'ir-segundo') { irSegundo(el.dataset.id, el.dataset.k); }
+  else if (a === 'marcar') { marcar(el.dataset.id, el); }
+  else if (a === 'poner-punto') { ponerPunto(el, ev); }
   else if (a === 'aprobar-entrega') { if (!previa) aprobarEntrega(el); }
   else if (a === 'ver-transferencia') { verTransferencia = !verTransferencia; repintarDecision(false); }
   else if (a === 'ver-video') {

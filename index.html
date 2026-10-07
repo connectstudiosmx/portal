@@ -394,6 +394,18 @@ main.app{max-width:var(--ancho);margin:0 auto;padding:1.75rem 1.25rem 5rem}
 .p-nota::placeholder{color:var(--crema-3)}
 .link-tarjeta{display:inline-flex;align-items:center;gap:.5rem;flex-wrap:wrap;font-size:.86rem;color:var(--crema-2)}
 
+/* Comentarios del cliente en el video */
+.coms-player{position:relative;max-width:22rem;aspect-ratio:16/9;margin:.2rem 0 .6rem;background:#000;border-radius:10px;overflow:hidden}
+.coms-player video{display:block;width:100%;height:100%;object-fit:contain;background:#000}
+.coms-punto{position:absolute;width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50%;border:3px solid var(--dorado);box-shadow:0 0 0 3px rgba(0,0,0,.55);pointer-events:none}
+.coms-punto[hidden]{display:none}
+.coms-cli{list-style:none;margin:0;padding:0;display:grid;gap:.35rem}
+.coms-cli li{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:.6rem;align-items:baseline;padding:.45rem .65rem;border:1px solid var(--linea);border-radius:8px;font-size:.9rem}
+.coms-cli span{overflow-wrap:anywhere}
+.coms-cli small{color:var(--crema-3);font-size:.75rem;white-space:nowrap}
+.coms-t{background:none;border:0;padding:0;font:inherit;font-weight:700;color:var(--dorado);cursor:pointer;font-variant-numeric:tabular-nums}
+.coms-pin{display:inline-block;width:.6rem;height:.6rem;border-radius:50%;border:2px solid var(--dorado);vertical-align:middle;margin-left:.2rem}
+
 /* Proyectos */
 .tag-proy{display:inline-block;vertical-align:middle;margin-left:.6rem;padding:.15rem .55rem;border:1px solid var(--dorado);border-radius:999px;font-family:var(--texto);font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--dorado)}
 
@@ -770,7 +782,7 @@ const sb = (configLista() && window.supabase)
 const S = {
   sesion: null, perfil: null,
   vista: 'inicio', subVista: {},
-  clientes: [], ciclos: [], videos: [], perfiles: [], asignaciones: [], solicitudes: [], reportes: [], mlLog: [], verAtendidas: false, solFiltro: { ruta: '', califica: '', estado: '' },
+  clientes: [], ciclos: [], videos: [], perfiles: [], comentarios: [], asignaciones: [], solicitudes: [], reportes: [], mlLog: [], verAtendidas: false, solFiltro: { ruta: '', califica: '', estado: '' },
   postulaciones: [], postFiltro: { rol: '', estado: 'activas', pais: '' }, facturas: [], pagoDatos: null, facFiltro: 'pendiente', faltaBase: false,
   pagosCli: null, propuestas: [], propFiltro: 'activas', ajustes: null, contratos: [], pagosStripe: [], stripeModo: null,
   cot: { config: null, lista: [], actual: null, falta: false },
@@ -920,6 +932,9 @@ async function cargarEquipo() {
   S.videos = (videos || []).map(v => { const x = Object.assign({}, v); delete x.cycles; return x; });
   const est = await sb.from('estilos').select('*');
   S.estilos = est.error ? [] : est.data || [];
+  // Comentarios del cliente en el video (el editor solo ve los ya enviados)
+  const com = await sb.from('revision_comentarios').select('*');
+  S.comentarios = com.error ? [] : com.data || [];
   if (S.perfil.role === 'admin') {
     try { S.solicitudes = await q(sb.from('solicitudes').select('*').order('created_at', { ascending: false }).limit(300)) || []; }
     catch (e) { S.solicitudes = []; }
@@ -2870,7 +2885,7 @@ function avisosRevision() {
       const pila = String((cl && cl.contact_name) || '').split(/\s+/)[0];
       const prop = cl && cl.tipo === 'proyecto' ? S.propuestas.find(x => x.cycle_id === c.id) : null, quedan = c.rondas - c.rondas_usadas;
       const texto = prop
-        ? `Hola${pila ? ' ' + pila : ''}, ¡ya ${n === 1 ? 'está listo tu video' : `están listos tus ${n} videos`}! ${n === 1 ? 'Revísalo' : 'Revísalos'} aquí: ${linkPropuesta(prop)}\n\nPuedes comentar en el segundo exacto en Frame.io o escribirme tus cambios ahí mismo. Tienes hasta el ${fLarga(c.revision_hasta)}${quedan > 0 ? ` (te ${quedan === 1 ? 'queda 1 ronda' : `quedan ${quedan} rondas`} de ajustes)` : ''}. Si todo está bien, ${n === 1 ? 'apruébalo' : 'apruébalos'}; si no me dices nada, se aprueba solo.`
+        ? `Hola${pila ? ' ' + pila : ''}, ¡ya ${n === 1 ? 'está listo tu video' : `están listos tus ${n} videos`}! ${n === 1 ? 'Revísalo' : 'Revísalos'} aquí: ${linkPropuesta(prop)}\n\nAhí mismo lo ves y me dejas tus comentarios en el segundo exacto. Tienes hasta el ${fLarga(c.revision_hasta)}${quedan > 0 ? ` (te ${quedan === 1 ? 'queda 1 ronda' : `quedan ${quedan} rondas`} de ajustes)` : ''}. Si todo está bien, ${n === 1 ? 'apruébalo' : 'apruébalos'}; si no me dices nada, se aprueba solo.`
         : `Hola${pila ? ' ' + pila : ''}, ¡ya ${n === 1 ? 'está tu video' : `están tus ${n} videos`} de ${c.name}! Míralos en tu portal: ${PORTAL_URL}\n\nTienes hasta el ${fLarga(c.revision_hasta)} para pedirme una ronda de ajustes, en un solo mensaje, desde ahí mismo. Si todo está bien, apruébalos; si no me pides nada, se aprueban solos.`;
       const wa = tel ? `https://wa.me/${tel}?text=${encodeURIComponent(texto)}` : '';
       return fila(c, `En revisión del cliente hasta el ${esc(fLarga(c.revision_hasta))}. Si no pide ajustes, se aprueba solo.`,
@@ -3603,10 +3618,11 @@ function modalVideo(id) {
     </div>
     <div class="campo"><label for="f-final">Link de este video (opcional si ya está en la carpeta del mes)</label>
       <input id="f-final" name="final_url" type="url" inputmode="url" placeholder="https://drive.google.com/..." value="${esc(v.final_url || '')}"${bloqueado || ajeno ? ' disabled' : ''}>
-      <p class="ayuda">El cliente lo ve solo cuando el video se entrega. Revisa que el archivo de Drive esté compartido.</p></div>
-    <div class="campo"><label for="f-rev">Link de revisión (Frame.io)</label>
+      <p class="ayuda">El cliente lo ve solo cuando el video se entrega. Revisa que el archivo de Drive esté compartido con "Cualquier persona con el enlace". En proyectos, si es el link del archivo (no de la carpeta), el cliente lo ve y lo comenta en su link, en el segundo exacto.</p></div>
+    <div class="campo"><label for="f-rev">Link de revisión <span class="opc">(opcional)</span></label>
       <input id="f-rev" name="revision_url" type="url" inputmode="url" placeholder="https://f.io/..." value="${esc(v.revision_url || '')}"${bloqueado || ajeno ? ' disabled' : ''}>
-      <p class="ayuda">En Frame.io: sube el video, dale Share → Create new Share, deja Comments prendido y copia el link. Con un link de Drive o YouTube el cliente solo lo ve, no puede comentar sobre el video.</p></div>
+      <p class="ayuda">Solo si quieres que lo revise en otro lado, por ejemplo Frame.io (Share → Create new Share, con Comments prendido). Si lo dejas vacío, revisa con el link de arriba.</p></div>
+    ${bloqueComentariosVideo(v)}
     ${bloquePortadaVideo(v, c)}
     <div class="campo"><label for="f-notas">Notas del equipo</label>
       <textarea id="f-notas" name="team_notes" maxlength="5000" placeholder="Música, cortes, cambios pedidos">${esc(v.team_notes || '')}</textarea>
@@ -4128,11 +4144,45 @@ function revisarLinks(f, nombres) {
   return true;
 }
 
-async function guardarVideo(id, cambios, ok) {
+// ---------- Videos de Drive para revisar ----------
+// Clave de navegador de Google: solo sirve para la Drive API y solo desde el portal (restringida por sitio en Google Cloud)
+const DRIVE_LLAVE = 'AIzaSyDZ4QVL7krc_LbDLz7_439qP2qKfk7Ai6o';
+const driveId = u => { const s = String(u || ''); const m = s.match(/drive\.google\.com\/(?:file\/d\/|open\?(?:[^#]*&)?id=|uc\?(?:[^#]*&)?id=)([\w-]{20,})/) || s.match(/drive\.usercontent\.google\.com\/[^#]*[?&]id=([\w-]{20,})/); return m ? m[1] : null; };
+const mmss = s => `${Math.floor(s / 60)}:${pad(Math.floor(s % 60))}`;
+// Si el link es un archivo de Drive, revisa que el cliente lo pueda ver: compartido con cualquiera que tenga el enlace y que sea video
+async function avisoDrive(url) {
+  const id = driveId(url); if (!id) return '';
+  try {
+    const r = await fetch(`https://www.googleapis.com/drive/v3/files/${encodeURIComponent(id)}?fields=mimeType&key=${DRIVE_LLAVE}`);
+    if (r.status === 404) return 'Se guardó, pero ese archivo de Drive no está compartido con "Cualquier persona con el enlace": el cliente no lo va a poder ver.';
+    if (!r.ok) return '';
+    const j = await r.json();
+    return /^video\//.test(j.mimeType || '') ? '' : 'Se guardó, pero ese link de Drive no es un video.';
+  } catch (e) { return ''; }
+}
+function bloqueComentariosVideo(v) {
+  const ks = S.comentarios.filter(k => k.video_id === v.id && k.enviado_at).sort((a, b) => (b.ronda - a.ronda) || (a.segundo - b.segundo));
+  if (!ks.length) return '';
+  const id = driveId(v.revision_url) || driveId(v.final_url);
+  return `<div class="campo"><label>Comentarios del cliente en el video</label>
+    ${id ? `<div class="coms-player"><video src="https://www.googleapis.com/drive/v3/files/${encodeURIComponent(id)}?alt=media&key=${DRIVE_LLAVE}" controls playsinline preload="metadata" data-vid-modal></video><div class="coms-punto" hidden></div></div>` : ''}
+    <ul class="coms-cli">${ks.map(k => `<li><button type="button" class="coms-t" data-accion="ir-seg" data-seg="${k.segundo}" data-x="${k.x ?? ''}" data-y="${k.y ?? ''}">${mmss(k.segundo)}</button><span>${esc(k.texto)}${k.x != null ? ' <i class="coms-pin" title="Marcó un punto en la imagen"></i>' : ''}</span><small>Ronda ${k.ronda}</small></li>`).join('')}</ul>
+    <p class="ayuda">Dale clic al minuto para ver ese momento${ks.some(k => k.x != null) ? ' y el punto que marcó' : ''}.</p></div>`;
+}
+// El reproductor del modal toma la forma del video, para que el punto caiga donde lo marcó el cliente
+document.addEventListener('loadedmetadata', ev => {
+  const vid = ev.target; if (!vid.hasAttribute || !vid.hasAttribute('data-vid-modal')) return;
+  if (vid.videoWidth) {
+    vid.parentElement.style.aspectRatio = `${vid.videoWidth} / ${vid.videoHeight}`;
+    vid.parentElement.style.width = `min(100%, 22rem, calc(55vh * ${(vid.videoWidth / vid.videoHeight).toFixed(4)}))`;
+  }
+}, true);
+
+async function guardarVideo(id, cambios, ok, alerta) {
   try {
     await q(sb.from('videos').update(cambios).eq('id', id));
     cerrarModal();
-    aviso(ok || 'Cambios guardados');
+    if (alerta) aviso(alerta, true); else aviso(ok || 'Cambios guardados');
     await recargar();
   } catch (e) { aviso(humano(e), true); }
 }
@@ -4165,7 +4215,8 @@ const FORMS = {
       if (!v.editor_id && cambios.status && !('editor_id' in cambios)) cambios.editor_id = yo;
     }
     if (!Object.keys(cambios).length) return cerrarModal();
-    await guardarVideo(id, cambios);
+    const alerta = (await Promise.all([cambios.final_url, cambios.revision_url].filter(Boolean).map(avisoDrive))).find(Boolean);
+    await guardarVideo(id, cambios, null, alerta);
   },
   async termine(f) {
     const id = f.dataset.id, v = S.videos.find(x => x.id === id); if (!v) return;
@@ -4176,7 +4227,7 @@ const FORMS = {
     const cambios = { status: 'revision' };
     if (url) cambios.final_url = url;
     if (!v.editor_id) cambios.editor_id = S.perfil.id;
-    await guardarVideo(id, cambios, 'Enviado a revisión');
+    await guardarVideo(id, cambios, 'Enviado a revisión', url ? await avisoDrive(url) : '');
   },
   async 'ajustes-mes'(f) {
     const ajustes = [...f.querySelectorAll('textarea[data-video]')].map(t => ({ video_id: t.dataset.video, texto: t.value.trim() })).filter(a => a.texto);
@@ -4809,6 +4860,13 @@ const ACC = {
     modalPropuesta(null, sol ? { solicitud: sol } : {});
   },
   'prop-editar'(el, id) { modalPropuesta(id); },
+  'ir-seg'(el) {
+    const box = el.closest('.campo').querySelector('.coms-player'), vid = box && box.querySelector('video');
+    if (!vid) return;
+    vid.pause(); vid.currentTime = Number(el.dataset.seg);
+    const p = box.querySelector('.coms-punto');
+    if (el.dataset.x !== '') { p.style.left = (Number(el.dataset.x) * 100) + '%'; p.style.top = (Number(el.dataset.y) * 100) + '%'; p.hidden = false; } else p.hidden = true;
+  },
   'prop-produccion'(el, id) { const x = S.propuestas.find(pr => pr.id === id); if (x) modalProduccion(x); },
   'prop-cobrar-final'(el, id) { const x = S.propuestas.find(pr => pr.id === id); if (x) modalCobroFinal(x); },
   async 'cobro-final'(el, id) {
