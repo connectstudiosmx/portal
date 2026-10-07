@@ -324,10 +324,29 @@ main.app{max-width:var(--ancho);margin:0 auto;padding:1.75rem 1.25rem 5rem}
 .cli-nombre.pausado{color:var(--crema-3)}
 .cli-meta{color:var(--crema-2);font-size:.88rem;margin:.35rem 0 0}
 .cli-meta b{color:var(--crema);font-weight:600}
-.ciclos{margin-top:.85rem;display:grid;gap:.45rem}
-.ciclo{display:grid;grid-template-columns:minmax(8rem,1fr) minmax(0,2.2fr) minmax(130px,1fr) auto;gap:.5rem 1rem;align-items:center;background:var(--panel);border:1px solid var(--linea);border-radius:var(--r2);padding:.6rem .8rem;font-size:.88rem}
-.ciclo-av{display:grid;gap:.3rem}
-@media (max-width:760px){.ciclo{grid-template-columns:1fr}}
+/* Clientes: una pestaña por cliente y, adentro, una por mes o proyecto */
+.tabs-cli{display:flex;flex-wrap:wrap;gap:0 .2rem;border-bottom:1px solid var(--linea);margin:0 0 1.4rem}
+.tabs-cli button{display:inline-flex;align-items:center;gap:.45rem;background:none;border:0;border-bottom:3px solid transparent;margin-bottom:-1px;padding:.7rem .85rem .6rem;color:var(--crema-2);font:inherit;font-weight:700;font-size:.95rem;cursor:pointer;white-space:nowrap}
+.tabs-cli button:hover{color:var(--crema)}
+.tabs-cli button[aria-selected="true"]{color:var(--crema);border-bottom-color:var(--verde)}
+.tabs-cli button.pausado{color:var(--crema-3)}
+.tabs-cli small{font-size:.62rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--dorado);border:1px solid currentColor;border-radius:999px;padding:.05rem .4rem}
+.tabs-cli button.pausado small{color:var(--crema-3)}
+.cli .mes-tabs{margin:1.3rem 0 .8rem}
+.ciclo-det{background:var(--panel);border:1px solid var(--linea);border-radius:12px;padding:clamp(1rem,3vw,1.4rem)}
+.ciclo-det-cab{display:flex;align-items:flex-start;justify-content:space-between;gap:.6rem 1rem;flex-wrap:wrap}
+.ciclo-det-cab h3{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:1.7rem;line-height:1;margin:0 0 .45rem}
+.ciclo-det-cab .nota{display:block;margin-top:.35rem}
+.ciclo-det .mes-info{margin:1rem 0 1.1rem}
+.etapa{display:inline-block;padding:.15rem .6rem;border-radius:999px;border:1px solid var(--linea-2);font-size:.78rem;font-weight:700;color:var(--crema-2)}
+.etapa-ok{border-color:var(--verde);color:var(--verde)}
+.etapa-aviso{border-color:var(--amarillo);color:var(--amarillo)}
+.ciclo-av{display:grid;gap:.3rem;margin-bottom:.8rem}
+.ciclo-vids{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:6px}
+.ciclo-vid{display:flex;align-items:center;gap:.7rem;width:100%;text-align:left;background:#0A0A0B;border:1px solid var(--linea);border-radius:var(--r2);padding:.5rem .7rem;color:var(--crema);font:inherit;font-size:.88rem;cursor:pointer}
+.ciclo-vid:hover{border-color:var(--linea-2)}
+.ciclo-vid .f-num{font-size:1.1rem}
+.cv-tit{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
 /* Accesos */
 .tabla-env{overflow-x:auto}
@@ -757,7 +776,7 @@ const S = {
   cot: { config: null, lista: [], actual: null, falta: false },
   portal: null, cicloCliente: null, previa: null, pestanaCli: 'videos',
   filtro: { cliente: 'todos', estado: 'todos', mios: false, entregados: false },
-  calInicio: null, verTodos: {}, cargadoEn: 0
+  calInicio: null, cliSel: null, cicloSel: {}, cargadoEn: 0
 };
 
 // Meses desplegados en Producción: se recuerdan en este navegador
@@ -1381,7 +1400,7 @@ function cabGrupo(g, abierto) {
       <button class="btn btn-s${c.delivery_url ? '' : ' btn-p'}" data-accion="carpetas-mes" data-id="${c.id}">${c.delivery_url ? 'Carpetas de Drive' : 'Asignar carpeta de Drive'}</button>
       ${enRevision ? `<button class="btn btn-s" data-accion="aprobar-ciclo" data-id="${c.id}">Aprobar ${enRevision} en revisión</button>` : ''}
       ${aprobados ? `<button class="btn btn-s btn-p" data-accion="entregar-ciclo" data-id="${c.id}">Entregar ${aprobados} al cliente</button>` : ''}
-      <button class="btn btn-s btn-t" data-accion="editar-ciclo" data-id="${c.id}">Editar mes</button>
+      <button class="btn btn-s btn-t" data-accion="editar-ciclo" data-id="${c.id}">Editar ${unidad(c.client_id)}</button>
     </div>` : ((porEmpezar || sinGrabar || c.raw_url || c.delivery_url) ? `<div class="g-acc">
       ${porEmpezar ? `<button class="btn btn-s btn-p" data-accion="empezar-ciclo" data-id="${c.id}">Marcar todos en edición (${porEmpezar})</button>`
         : sinGrabar ? `<button class="btn btn-s" disabled>Marcar todos en edición</button><span class="nota">Se activa cuando Connect marque los videos como grabados.</span>` : ''}
@@ -1520,12 +1539,12 @@ function cabCliente(b, abierto) {
   return `<div class="cp-cab">
     <div>
       <h2 class="cp-nombre"><button class="g-plegar" data-accion="plegar" data-id="pc:${b.id}" aria-expanded="${abierto}"><span class="g-flecha" aria-hidden="true"></span>${esc(b.cli ? b.cli.name : 'Cliente')}</button>${b.cli && b.cli.tipo === 'proyecto' ? '<span class="tag-proy">Proyecto</span>' : ''}</h2>
-      <p class="cp-meta">${n} ${n === 1 ? 'mes' : 'meses'}: ${esc(b.grupos.map(g => g.c.name).join(', '))}${abierto ? '' : ` · <span class="g-resumen">${esc(resumenEstados(todos))}</span>`}</p>
+      <p class="cp-meta">${n} ${unidad(b.id, n)}: ${esc(b.grupos.map(g => g.c.name).join(', '))}${abierto ? '' : ` · <span class="g-resumen">${esc(resumenEstados(todos))}</span>`}</p>
       ${prox ? `<p class="cp-meta limite plazo-${p.nivel}">Próximo límite de edición <b>${fDia(prox.c.editor_due)}</b> <em class="faltan">${p.txt}</em>${n > 1 ? ` <span class="nota">(${esc(prox.c.name)})</span>` : ''}</p>` : ''}
     </div>
     <div class="cp-der">
       <span class="nota">${terminados} de ${todos.length} terminados</span>
-      ${esAdmin && b.cli ? `<button class="btn btn-s btn-t" data-accion="nuevo-ciclo" data-id="${b.id}">Nuevo mes</button>` : ''}
+      ${esAdmin && b.cli ? `<button class="btn btn-s btn-t" data-accion="nuevo-ciclo" data-id="${b.id}">Nuevo ${unidad(b.id)}</button>` : ''}
     </div>
   </div>`;
 }
@@ -1626,43 +1645,100 @@ function vistaCalendario() {
 }
 
 // ---------- Clientes --------------------------------------------------
+// Un cliente por proyecto no tiene meses: cada ciclo suyo es un proyecto
+const esProyecto = idCliente => (clientePorId(idCliente) || {}).tipo === 'proyecto';
+const unidad = (idCliente, n) => esProyecto(idCliente) ? (n === undefined || n === 1 ? 'proyecto' : 'proyectos') : (n === undefined || n === 1 ? 'mes' : 'meses');
+const mayus = t => t.charAt(0).toUpperCase() + t.slice(1);
+const ciclosDe = id => S.ciclos.filter(c => c.client_id === id).sort((a, b) => b.delivery_date.localeCompare(a.delivery_date));
+const clientesOrden = () => S.clientes.filter(cl => cl.active).concat(S.clientes.filter(cl => !cl.active));
+// El cliente abierto: el que tocaste o el primero activo
+function clienteSel() {
+  const lista = clientesOrden();
+  return lista.find(cl => cl.id === S.cliSel) || lista[0] || null;
+}
+// El mes (o proyecto) abierto de un cliente: el que tocaste o el que está en curso
+function cicloSel(id) {
+  const cs = ciclosDe(id), h = hoyISO();
+  return cs.find(c => c.id === S.cicloSel[id]) || cs.slice().reverse().find(c => c.delivery_date >= h) || cs[0] || null;
+}
+
 function vistaClientes() {
+  const cl = clienteSel();
   return `<div class="encabezado">
-    <div><h1>Clientes</h1><p class="sub">Cada mes de contenido nace aquí, con sus videos y sus fechas.</p></div>
+    <div><h1>Clientes</h1><p class="sub">Cada mes de contenido o proyecto nace aquí, con sus videos y sus fechas.</p></div>
     <div class="controles"><button class="btn btn-p" data-accion="nuevo-cliente">Nuevo cliente</button></div>
   </div>
-  ${mlConError().map(cl => `<p class="aviso-linea aviso-error"><b>MailerLite no recibió los datos de ${esc(cl.name)}.</b> ${esc(mlUltimo(cl.id).mensaje || '')}
-    <button class="btn btn-s" data-accion="ml-reenviar" data-id="${cl.id}">Reenviar a MailerLite</button></p>`).join('')}
-  ${S.clientes.length ? S.clientes.map(bloqueCliente).join('') : `<div class="caja-vacia"><p>Todavía no hay clientes. Tip: crea uno llamado “Demo” con un mes de ejemplo para enseñarle el portal a tus prospectos.</p><button class="btn btn-p" data-accion="nuevo-cliente">Nuevo cliente</button></div>`}`;
+  ${mlConError().map(x => `<p class="aviso-linea aviso-error"><b>MailerLite no recibió los datos de ${esc(x.name)}.</b> ${esc(mlUltimo(x.id).mensaje || '')}
+    <button class="btn btn-s" data-accion="ml-reenviar" data-id="${x.id}">Reenviar a MailerLite</button></p>`).join('')}
+  ${cl ? `<div class="tabs-cli" role="tablist" aria-label="Clientes">${clientesOrden().map(x => `<button role="tab" aria-selected="${x.id === cl.id}" data-accion="cli-sel" data-id="${x.id}"${x.active ? '' : ' class="pausado"'}>${esc(x.name)}${x.tipo === 'proyecto' ? '<small>Proyecto</small>' : ''}${x.active ? '' : '<small>En pausa</small>'}${(mlUltimo(x.id) || {}).estado === 'error' ? '<span class="punto punto-error" aria-label="Error de MailerLite">!</span>' : ''}</button>`).join('')}</div>
+    <div class="cli-panel" role="tabpanel">${bloqueCliente(cl)}</div>`
+    : `<div class="caja-vacia"><p>Todavía no hay clientes. Tip: crea uno llamado “Demo” con un mes de ejemplo para enseñarle el portal a tus prospectos.</p><button class="btn btn-p" data-accion="nuevo-cliente">Nuevo cliente</button></div>`}`;
 }
 
 function bloqueCliente(cl) {
-  const cs = S.ciclos.filter(c => c.client_id === cl.id).sort((a, b) => b.delivery_date.localeCompare(a.delivery_date));
+  const cs = ciclosDe(cl.id), proy = cl.tipo === 'proyecto', c = cicloSel(cl.id);
   const usuarios = S.perfiles.filter(p => p.role === 'cliente' && p.client_id === cl.id);
   const editores = editoresDeCliente(cl.id);
-  const mostrar = S.verTodos[cl.id] ? cs : cs.slice(0, 4);
-  const abierto = S.abiertos.has('cc:' + cl.id);
   return `<section class="cli">
     <div class="cli-cab">
       <div>
-        <h2 class="cli-nombre${cl.active ? '' : ' pausado'}"><button class="g-plegar" data-accion="plegar" data-id="cc:${cl.id}" aria-expanded="${abierto}"><span class="g-flecha" aria-hidden="true"></span>${esc(cl.name)}</button>${cl.tipo === 'proyecto' ? '<span class="tag-proy">Proyecto</span>' : ''}</h2>
-        <p class="cli-meta"><b>${cs.length ? `${cs.length} ${cs.length === 1 ? 'mes' : 'meses'}` : 'Sin meses'}</b>${cs.length && !abierto ? ` (${esc(cs.slice(0, 3).map(c => c.name).join(', '))}${cs.length > 3 ? '…' : ''})` : ''}.
-          ${cl.tipo === 'proyecto' ? 'Proyecto: lo revisa y lo paga en el link de su propuesta, sin portal.' : `${cl.videos_per_cycle} videos por mes${cl.active ? '' : ', en pausa'}. ${usuarios.length ? `Con acceso: ${usuarios.map(u => esc(nombreDe(u))).join(', ')}.` : 'Nadie de este cliente tiene acceso todavía.'}`}
+        <h2 class="cli-nombre${cl.active ? '' : ' pausado'}">${esc(cl.name)}${proy ? '<span class="tag-proy">Proyecto</span>' : ''}</h2>
+        <p class="cli-meta"><b>${cs.length ? pl(cs.length, unidad(cl.id), unidad(cl.id, 2)) : `Sin ${unidad(cl.id, 2)}`}</b>.
+          ${proy ? 'Proyecto: lo revisa y lo paga en el link de su propuesta, sin portal.' : `${cl.videos_per_cycle} videos por mes${cl.active ? '' : ', en pausa'}. ${usuarios.length ? `Con acceso: ${usuarios.map(u => esc(nombreDe(u))).join(', ')}.` : 'Nadie de este cliente tiene acceso todavía.'}`}
           ${editores.length ? `Editores: ${editores.map(u => esc(nombreDe(u))).join(', ')}.` : 'Sin editor asignado (se asigna en Equipo → Accesos al portal).'}</p>
-        ${cl.tipo === 'proyecto' ? '' : lineaMailerlite(cl)}
-        <p class="cli-meta"${cl.tipo === 'proyecto' ? ' hidden' : ''}>${(e => e && e.confirmado_at ? `Estilo visual confirmado el ${esc(fCorta(e.confirmado_at))}.` : e ? 'Estilo visual en proceso: todavía no lo confirma.' : 'Estilo visual: todavía no lo elige.')(estiloFila(cl.id))}</p>
+        ${proy ? '' : lineaMailerlite(cl)}
+        ${proy ? '' : `<p class="cli-meta">${(e => e && e.confirmado_at ? `Estilo visual confirmado el ${esc(fCorta(e.confirmado_at))}.` : e ? 'Estilo visual en proceso: todavía no lo confirma.' : 'Estilo visual: todavía no lo elige.')(estiloFila(cl.id))}</p>`}
       </div>
       <div class="controles">
         <button class="btn btn-s btn-t" data-accion="cli-historial" data-id="${cl.id}">Historial</button>
-        ${cl.tipo === 'proyecto' ? '' : `<button class="btn btn-s btn-t" data-accion="estilo-cliente" data-id="${cl.id}">Estilo</button>`}
-        ${cs.length && cl.tipo !== 'proyecto' ? `<button class="btn btn-s btn-t" data-accion="previa" data-id="${cl.id}">Ver como cliente</button>` : ''}
-        <button class="btn btn-s" data-accion="editar-cliente" data-id="${cl.id}">Editar</button>
-        <button class="btn btn-s btn-p" data-accion="nuevo-ciclo" data-id="${cl.id}">Nuevo mes</button>
+        ${proy ? '' : `<button class="btn btn-s btn-t" data-accion="estilo-cliente" data-id="${cl.id}">Estilo</button>`}
+        ${cs.length && !proy ? `<button class="btn btn-s btn-t" data-accion="previa" data-id="${cl.id}">Ver como cliente</button>` : ''}
+        <button class="btn btn-s" data-accion="editar-cliente" data-id="${cl.id}">Editar cliente</button>
+        <button class="btn btn-s btn-p" data-accion="nuevo-ciclo" data-id="${cl.id}">Nuevo ${unidad(cl.id)}</button>
       </div>
     </div>
-    ${abierto ? `${cs.length ? `<div class="ciclos">${mostrar.map(filaCiclo).join('')}</div>` : '<p class="nota">Sin meses todavía.</p>'}
-    ${cs.length > 4 && !S.verTodos[cl.id] ? `<button class="btn btn-s btn-t" data-accion="ver-todos" data-id="${cl.id}">Ver los ${cs.length} meses</button>` : ''}` : ''}
+    ${c ? `<div class="mes-tabs" role="tablist" aria-label="${mayus(unidad(cl.id, 2))}">${cs.map(x => `<button role="tab" aria-selected="${x.id === c.id}" aria-pressed="${x.id === c.id}" data-accion="ciclo-sel" data-id="${x.id}">${esc(x.name)}</button>`).join('')}</div>
+      ${panelCiclo(c)}`
+      : `<div class="caja-vacia"><p>${proy ? 'Este cliente todavía no tiene proyectos en producción. Se crean con “Pasar a producción” en su propuesta, o aquí con “Nuevo proyecto”.' : 'Este cliente todavía no tiene meses. Crea el primero con “Nuevo mes”.'}</p></div>`}
   </section>`;
+}
+
+// Cómo va un mes o proyecto, en pocas palabras
+function etapaCiclo(c, vs) {
+  const h = hoyISO();
+  if (c.revision_estado === 'aprobado' || c.aprobado_at) return ['ok', 'Aprobado'];
+  if (c.revision_estado === 'ajustes') return ['aviso', 'Pidió ajustes'];
+  if (c.revision_estado === 'revision') return c.revision_hasta < h ? ['ok', 'Aprobado (no pidió ajustes)'] : ['aviso', `En revisión del cliente hasta el ${fCorta(c.revision_hasta)}`];
+  if (vs.length && vs.every(v => v.status === 'entregado')) return ['ok', 'Entregado'];
+  if (h < c.record_start) return ['', 'Por grabar'];
+  if (h <= c.record_end) return ['', 'Grabando'];
+  return ['', 'En edición'];
+}
+
+function panelCiclo(c) {
+  const vs = S.videos.filter(v => v.cycle_id === c.id).sort((a, b) => a.number - b.number);
+  const ent = vs.filter(v => v.status === 'entregado').length;
+  const r = S.reportes.find(x => x.cycle_id === c.id), proy = esProyecto(c.client_id);
+  const [nivel, etapa] = etapaCiclo(c, vs);
+  return `<div class="ciclo-det" role="tabpanel">
+    <div class="ciclo-det-cab">
+      <div><h3>${esc(c.name)}</h3><span class="etapa${nivel ? ' etapa-' + nivel : ''}">${esc(etapa)}</span>${proy && c.rondas ? `<span class="nota">Ronda de ajustes ${Math.min((c.rondas_usadas || 0) + 1, c.rondas)} de ${c.rondas}</span>` : ''}</div>
+      <div class="controles">
+        ${ent || (r && r.publicado) ? `<button class="btn btn-s btn-t" data-accion="wa-aviso" data-id="${c.id}" title="Avisar al cliente por WhatsApp">WhatsApp</button>` : ''}
+        ${proy ? '' : `<button class="btn btn-s${r ? '' : ' btn-t'}" data-accion="reporte" data-id="${c.id}">${r ? (r.publicado ? 'Reporte publicado' : 'Reporte en borrador') : 'Hacer reporte'}</button>`}
+        <button class="btn btn-s" data-accion="editar-ciclo" data-id="${c.id}">Editar ${unidad(c.client_id)}</button>
+      </div>
+    </div>
+    <div class="mes-info">
+      ${c.script_due ? `<div>Guiones hasta<b>${esc(fDia(c.script_due))}</b></div>` : ''}
+      <div>Grabación<b>${esc(diasGrab(c.record_start, c.record_end))}</b></div>
+      <div>Edición hasta<b>${esc(fDia(c.editor_due))}</b></div>
+      <div class="clave">Entrega<b>${esc(fDia(c.delivery_date))}</b></div>
+    </div>
+    ${vs.length ? `<div class="ciclo-av"><span class="nota">${ent} de ${vs.length} entregados</span>${tira(vs)}</div>
+      <div class="ciclo-vids">${vs.map(v => `<button class="ciclo-vid" data-accion="abrir-video" data-id="${v.id}"><span class="f-num">${pad(v.number)}</span><span class="cv-tit">${v.title ? esc(v.title) : '<span class="vacio">Sin título</span>'}</span>${pill(v.status)}</button>`).join('')}</div>`
+      : `<p class="nota">Los videos de ${proy ? 'este proyecto' : 'este mes'} no están cargados porque es de hace tiempo. <button class="f-ver" data-accion="historial" data-id="${c.id}">Ver videos</button></p>`}
+  </div>`;
 }
 
 function lineaMailerlite(cl) {
@@ -1679,22 +1755,6 @@ function lineaMailerlite(cl) {
   }
   return `<p class="cli-meta ml-linea">${txt}${correo ? ` <span class="nota">(${esc(correo)})</span>` : ''}
     <button class="btn btn-s btn-t" data-accion="ml-reenviar" data-id="${cl.id}">Reenviar a MailerLite</button></p>`;
-}
-
-function filaCiclo(c) {
-  const vs = S.videos.filter(v => v.cycle_id === c.id).sort((a, b) => a.number - b.number);
-  const ent = vs.filter(v => v.status === 'entregado').length;
-  const r = S.reportes.find(x => x.cycle_id === c.id);
-  return `<div class="ciclo">
-    <b>${esc(c.name)}</b>
-    <span class="nota">${c.script_due ? `Guiones hasta ${fCorta(c.script_due)}. ` : ''}Graba ${diasGrab(c.record_start, c.record_end)}. Edición hasta ${fCorta(c.editor_due)}. Entrega ${fCorta(c.delivery_date)}.</span>
-    ${vs.length ? `<div class="ciclo-av">${tira(vs)}<span class="nota">${ent} de ${vs.length} entregados</span></div>` : `<button class="btn btn-s btn-t" data-accion="historial" data-id="${c.id}">Ver videos</button>`}
-    <span class="controles">
-      ${ent || (r && r.publicado) ? `<button class="btn btn-s btn-t" data-accion="wa-aviso" data-id="${c.id}" title="Avisar al cliente por WhatsApp">WhatsApp</button>` : ''}
-      <button class="btn btn-s${r ? '' : ' btn-t'}" data-accion="reporte" data-id="${c.id}">${r ? (r.publicado ? 'Reporte publicado' : 'Reporte en borrador') : 'Hacer reporte'}</button>
-      <button class="btn btn-s btn-t" data-accion="editar-ciclo" data-id="${c.id}">Editar</button>
-    </span>
-  </div>`;
 }
 
 // ---------- Accesos ----------------------------------------------------
@@ -3625,6 +3685,7 @@ function modalGuion(id) {
 function modalCiclo(idCiclo, idCliente) {
   const c = idCiclo ? S.ciclos.find(x => x.id === idCiclo) : null;
   const cl = clientePorId(c ? c.client_id : idCliente); if (!cl) return;
+  const proy = cl.tipo === 'proyecto', u = unidad(cl.id);
   let d;
   if (c) d = Object.assign({}, c);
   else {
@@ -3632,14 +3693,14 @@ function modalCiclo(idCiclo, idCliente) {
     let ini = hoy();
     if (previo) { const p = aFecha(previo.record_start); ini = new Date(p.getFullYear(), p.getMonth() + 1, Math.min(p.getDate(), 28)); }
     const entrega = sugerirEntrega(aISO(ini));
-    d = { name: nombreMes(entrega), record_start: aISO(ini), record_end: aISO(sumarDias(ini, 1)),
+    d = { name: proy ? '' : nombreMes(entrega), record_start: aISO(ini), record_end: aISO(sumarDias(ini, 1)),
           editor_due: aISO(sumarDias(entrega, -CONFIG.DIAS_COLCHON)), delivery_date: aISO(entrega), raw_url: '',
           script_due: aISO(sumarDias(ini, -CONFIG.DIAS_GUIONES)) };
   }
   abrirModal(`<form data-form="ciclo" data-id="${c ? c.id : ''}" data-cliente="${cl.id}" novalidate>
-    <div class="d-cab"><div><h2 class="d-titulo">${c ? 'Editar mes' : 'Nuevo mes'}</h2><p class="d-sub">${esc(cl.name)}</p></div></div>
-    <div class="campo"><label for="c-nombre">Nombre del mes</label><input id="c-nombre" name="name" required maxlength="80" value="${esc(d.name)}">
-      <p class="ayuda">Es lo que ve el cliente en grande. Normalmente, el mes en que se publica el contenido.</p></div>
+    <div class="d-cab"><div><h2 class="d-titulo">${c ? 'Editar' : 'Nuevo'} ${u}</h2><p class="d-sub">${esc(cl.name)}</p></div></div>
+    <div class="campo"><label for="c-nombre">Nombre del ${u}</label><input id="c-nombre" name="name" required maxlength="80" value="${esc(d.name)}">
+      <p class="ayuda">${proy ? 'Así aparece en Producción y en el calendario. Por ejemplo, “Video institucional”.' : 'Es lo que ve el cliente en grande. Normalmente, el mes en que se publica el contenido.'}</p></div>
     <div class="campo"><label for="c-gui">Límite para subir guiones</label><input id="c-gui" name="script_due" type="date" required value="${d.script_due || ''}" style="max-width:12rem">
       <p class="ayuda">Se calcula solo: ${CONFIG.DIAS_GUIONES} días antes de la grabación. Cámbialo si hace falta; el cliente lo ve y MailerLite le recuerda apartar su día una semana antes.</p></div>
     <div class="fila-campos">
@@ -3652,14 +3713,14 @@ function modalCiclo(idCiclo, idCliente) {
     <div class="campo"><label for="c-raw">Carpeta de crudos en Drive</label><input id="c-raw" name="raw_url" type="url" inputmode="url" placeholder="https://drive.google.com/..." value="${esc(d.raw_url || '')}">
       <p class="ayuda">La ven los editores, nunca el cliente. Puedes agregarla después de grabar.</p></div>
     <div class="campo"><label for="c-final">Carpeta de videos terminados en Drive</label><input id="c-final" name="delivery_url" type="url" inputmode="url" placeholder="https://drive.google.com/..." value="${esc(d.delivery_url || '')}">
-      <p class="ayuda">Una para todo el mes. El editor sube ahí sus videos; el cliente la ve cuando le entregas.</p></div>
+      <p class="ayuda">Una para todo el ${u}. El editor sube ahí sus videos; el cliente la ve cuando le entregas.</p></div>
     ${c ? '' : `<div class="campo"><label for="c-n">Número de videos</label><input id="c-n" name="count" type="number" min="1" max="40" value="${cl.videos_per_cycle}" style="max-width:8rem">
       ${(eds => eds.length === 1 ? `<p class="ayuda">Se asignan solos a ${esc(nombreDe(eds[0]))}, el editor de este cliente.</p>`
         : `<p class="ayuda">${eds.length ? 'Este cliente tiene varios editores' : 'Este cliente no tiene editor'}: después usa “Asignar editor” en Producción.</p>`)(editoresDeCliente(cl.id))}</div>`}
     <div class="d-pie">
-      ${c ? `<button type="button" class="btn btn-t btn-peligro izq" data-accion="borrar-ciclo" data-id="${c.id}">Borrar mes</button>` : ''}
+      ${c ? `<button type="button" class="btn btn-t btn-peligro izq" data-accion="borrar-ciclo" data-id="${c.id}">Borrar ${u}</button>` : ''}
       <button type="button" class="btn" data-accion="cerrar">Cancelar</button>
-      <button type="submit" class="btn btn-p">${c ? 'Guardar cambios' : 'Crear mes'}</button>
+      <button type="submit" class="btn btn-p">${c ? 'Guardar cambios' : 'Crear ' + u}</button>
     </div>
   </form>`, dlg => montarCiclo(dlg.querySelector('form'), !c));
 }
@@ -4140,7 +4201,8 @@ const FORMS = {
     const d = {};
     ['name', 'record_start', 'record_end', 'editor_due', 'delivery_date', 'raw_url', 'delivery_url', 'count', 'script_due'].forEach(n => { d[n] = valor(f, n); });
     if (!d.script_due) { aviso('Pon la fecha límite de guiones.', true); return f.elements.script_due.focus(); }
-    if (!d.name) { aviso('Escribe el nombre del mes.', true); return f.elements.name.focus(); }
+    const u = unidad(f.dataset.cliente);
+    if (!d.name) { aviso(`Escribe el nombre del ${u}.`, true); return f.elements.name.focus(); }
     if (!d.record_start || !d.record_end || !d.editor_due || !d.delivery_date) return aviso('Completa las cuatro fechas.', true);
     if (d.record_end < d.record_start) return aviso('La grabación no puede terminar antes de empezar.', true);
     if (d.delivery_date < d.record_end) return aviso('La entrega no puede ser antes de que termine la grabación.', true);
@@ -4154,7 +4216,8 @@ const FORMS = {
         if (!(n >= 1 && n <= 40)) return aviso('El número de videos tiene que estar entre 1 y 40.', true);
         const nuevo = await q(sb.rpc('create_cycle', { p_client: f.dataset.cliente, p_name: d.name, p_record_start: d.record_start, p_record_end: d.record_end, p_editor_due: d.editor_due, p_delivery: d.delivery_date, p_raw_url: d.raw_url || null, p_count: n }));
         if (nuevo) {
-          S.abiertos.add(nuevo); S.abiertos.add('pc:' + f.dataset.cliente); S.abiertos.add('cc:' + f.dataset.cliente); guardarAbiertos();
+          S.abiertos.add(nuevo); S.abiertos.add('pc:' + f.dataset.cliente); guardarAbiertos();
+          S.cicloSel[f.dataset.cliente] = nuevo;
           // La base pone el límite automático; solo se toca si lo cambiaste o si agregaste carpeta
           const extra = {};
           if (d.delivery_url) extra.delivery_url = d.delivery_url;
@@ -4163,7 +4226,7 @@ const FORMS = {
         }
       }
       cerrarModal();
-      aviso(f.dataset.id ? 'Mes actualizado' : 'Mes creado');
+      aviso(mayus(u) + (f.dataset.id ? ' actualizado' : ' creado'));
       await recargar();
     } catch (e) { aviso(humano(e), true); }
   },
@@ -4439,7 +4502,8 @@ const ACC = {
     }
     render();
   },
-  'ver-todos'(el, id) { S.verTodos[id] = true; render(); },
+  'cli-sel'(el, id) { S.cliSel = id; render(); },
+  'ciclo-sel'(el, id) { const c = S.ciclos.find(x => x.id === id); if (c) { S.cicloSel[c.client_id] = id; render(); } },
   'cal-mover'(el, id) {
     const n = Number(id), base = S.calInicio || primerDia(hoy());
     S.calInicio = n === 0 ? primerDia(hoy()) : new Date(base.getFullYear(), base.getMonth() + n, 1);
@@ -4836,8 +4900,9 @@ const ACC = {
   'editar-ciclo'(el, id) { modalCiclo(id); },
   async 'borrar-ciclo'(el, id) {
     const c = S.ciclos.find(x => x.id === id); if (!c) return;
-    if (!await confirmar(`¿Borrar ${c.name}?`, 'Se borran todos los videos de este mes, con sus guiones y links. No se puede deshacer.', 'Borrar mes', true)) return;
-    try { await q(sb.from('cycles').delete().eq('id', id)); aviso('Mes borrado'); await recargar(); }
+    const u = unidad(c.client_id);
+    if (!await confirmar(`¿Borrar ${c.name}?`, `Se borran todos los videos de este ${u}, con sus guiones y links. No se puede deshacer.`, 'Borrar ' + u, true)) return;
+    try { await q(sb.from('cycles').delete().eq('id', id)); aviso(mayus(u) + ' borrado'); await recargar(); }
     catch (e) { aviso(humano(e), true); }
   },
   async historial(el, id) {
