@@ -1799,7 +1799,7 @@ function vistaAccesos() {
 }
 
 // ---------- Solicitudes (páginas /solicitud y /guia) ------------------
-const INTERES = { mensual: 'Contenido mensual', proyecto: 'Video o proyecto', no_se: 'Aún no sabe' };
+const INTERES = { mensual: 'Sistema Completo de Distribución de Marca Personal', proyecto: 'Video o proyecto', no_se: 'Aún no sabe' };
 const fHora = s => { const d = new Date(s); return `${d.getDate()} ${MESES_C[d.getMonth()]} · ${pad(d.getHours())}:${pad(d.getMinutes())}`; };
 const waDe = t => { let d = String(t || '').replace(/\D/g, ''); if (d.length === 10) d = '52' + d; return d; };
 const sitioDe = t => {
@@ -1911,7 +1911,7 @@ const contratoDe = x => S.contratos.find(c => c.propuesta_id === x.id);
 const contratoListo = () => { const a = S.ajustes; return !!(a && a.prestador_rfc && a.prestador_domicilio && a.horas_jornada && a.precio_dia_adicional && S.pagoDatos); };
 const PROP_DEF = {
   mensual: {
-    titulo: 'Contenido mensual para redes', precio: 14499, precio_nota: 'al mes',
+    titulo: 'Sistema Completo de Distribución de Marca Personal', precio: 14499, precio_nota: 'al mes',
     incluye: ['12 videos verticales al mes, editados para tus redes',
       'Guiones acompañados: tú decides los temas y antes de grabar los revisamos juntos',
       '2 días de grabación al mes en tu negocio, en la Zona Metropolitana de Guadalajara',
@@ -2187,7 +2187,7 @@ const COT_PLANT = [
     equipo: { cam_a: true, luz: true, audio: true }, extras: { gasolina: 1 },
     mercado: [5000, 20000], fuente: 'Reel suelto: $5–20 mil.',
     incluye: () => ['Idea y guion', 'Grabación', 'Edición vertical'] },
-  { id: 'mensual', nombre: 'Contenido mensual', detalle: '12 videos al mes', tipo: 'mensual', horasTxt: 'Estrategia, revisión de guiones, copys y programación',
+  { id: 'mensual', nombre: 'Sistema Completo de Distribución de Marca Personal', detalle: '12 videos al mes', tipo: 'mensual', horasTxt: 'Estrategia, revisión de guiones, copys y programación',
     horas: 10, grab: 2, edicion: 1, edicionTxt: 'Revisión de la edición', equipo: { cam_a: true, luz: true, audio: true }, extras: { editor: 12, gasolina: true },
     mercado: [21500, 28000], fuente: 'Agencias con 12 reels al mes: $21,500–28,000 + IVA, con 1 día de grabación.',
     precioFijo: 14499, nota: 'Tu precio fijo es $14,499: aquí ves cuánto te cuesta de verdad.' },
@@ -3963,7 +3963,7 @@ function modalPropuesta(id, desde) {
     </div>
     <div class="d-sep"><h3>La propuesta</h3><p>Al cambiar el tipo se ponen los textos de arranque, si no los habías cambiado.</p></div>
     <div class="fila-campos">
-      <div class="campo"><label for="pr-tipo">Tipo</label><select id="pr-tipo" name="tipo"><option value="mensual"${tipo === 'mensual' ? ' selected' : ''}>Contenido mensual</option><option value="proyecto"${tipo === 'proyecto' ? ' selected' : ''}>Proyecto (corporativo, evento)</option></select></div>
+      <div class="campo"><label for="pr-tipo">Tipo</label><select id="pr-tipo" name="tipo"><option value="mensual"${tipo === 'mensual' ? ' selected' : ''}>Sistema Completo de Distribución de Marca Personal</option><option value="proyecto"${tipo === 'proyecto' ? ' selected' : ''}>Proyecto (corporativo, evento)</option></select></div>
       <div class="campo"><label for="pr-titulo">Título</label><input id="pr-titulo" name="titulo" maxlength="140" required value="${v('titulo')}"></div>
     </div>
     <div class="campo" data-solo-proyecto${tipo === 'proyecto' ? '' : ' hidden'}><label for="pr-serv">Servicio</label>
