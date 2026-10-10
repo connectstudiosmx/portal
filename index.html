@@ -1826,6 +1826,8 @@ function mensajeWA(x, pila) {
   if (x.tipo !== 'solicitud') return `Hola ${pila}, soy Manuel de Connect Studios. Vi tu solicitud.`;
   if (x.estado === 'incompleto') return `Hola ${pila}, soy Manuel de Connect Studios. Vi que empezaste tu solicitud en la página, ¿te ayudo con algo?`;
   if (x.estado === 'agendado') return `Hola ${pila}, soy Manuel de Connect Studios. Ya vi que agendaste nuestra llamada, ¡nos vemos!`;
+  // El mismo mensaje del aviso de seguimiento de Telegram: su link abre directo la agenda
+  if (x.califica && x.token) return `Hola ${pila}, soy Manuel de Connect Studios. Vi tu solicitud y me encantaría platicarla. ¿Te quedó alguna duda antes de agendar la llamada? Aquí eliges el horario que te acomode: ${PORTAL_URL.replace(/\/$/, '')}/solicitud/?s=${x.token}`;
   if (x.califica) return `Hola ${pila}, soy Manuel de Connect Studios. Vi tu solicitud y me encantaría platicarla, ¿te ayudo a agendar la llamada?`;
   return `Hola ${pila}, soy Manuel de Connect Studios. Revisé tu solicitud.`;
 }

@@ -811,8 +811,24 @@ body.final .escena,body.final .nav{display:none}
   });
 
   // ---------- Arranque -----------------------------------------------------
-  if (E.fin) mostrarFinal();
-  else { document.body.classList.add('preguntando'); bienvenida(); }
+  function arrancar() {
+    if (E.fin) mostrarFinal();
+    else { document.body.classList.add('preguntando'); bienvenida(); }
+  }
+  // Link de seguimiento (/solicitud/?s=código): retoma la solicitud para agendar, aunque se abra en otro navegador.
+  // El Lead ya se contó cuando la llenó; aquí solo falta que agende.
+  const retomar = params.get('s');
+  if (/^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(retomar || '')) {
+    const limpiar = () => { try { history.replaceState(null, '', location.pathname); } catch (x) { /* se queda el link */ } };
+    if (E.fin && E.token === retomar) { limpiar(); arrancar(); }
+    else rpc('solicitud_retomar', { p_token: retomar }).then(r => {
+      if (r) {
+        E = { token: retomar, R: { nombre: r.nombre, correo: r.correo, whatsapp: r.whatsapp, decide: r.decide }, paso: null, t0: Date.now(),
+              origen: ORIGEN, fin: { califica: true }, agendado: !!r.agendado, pixel: r.agendado ? { lead: 1, agenda: 1 } : { lead: 1 } };
+        recordar();
+      }
+    }).catch(() => { /* sin conexión o código viejo: empieza normal */ }).then(() => { limpiar(); arrancar(); });
+  } else arrancar();
 })();
 </script>
 </body>
